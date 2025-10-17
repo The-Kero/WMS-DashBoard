@@ -1,0 +1,62 @@
+# 데이터 소스 동적 설정
+# 새 모듈 추가 시 여기에만 추가하면 됨
+
+sources:
+  # 기존 5개 모듈
+  - name: inbound
+    enabled: true
+    description: "입고 정보"
+    path: "C:/OSIS_AUTO/입고정보/inbound_merged_*.csv"
+    refresh_interval: 30
+    required_columns:
+      - 입고예정번호
+      - 공급사
+      - 상품
+      - 입고수량
+    
+  - name: outbound
+    enabled: true
+    description: "출고 정보"
+    path: "C:/OSIS_AUTO/출고정보/outbound_*.csv"
+    refresh_interval: 30
+    required_columns:
+      - 출고번호
+      - 출하금액
+    
+  - name: inventory
+    enabled: true
+    description: "재고 정보"
+    path: "C:/OSIS_AUTO/재고정보/inventory_status_*.csv"
+    refresh_interval: 60
+    required_columns:
+      - 로케이션
+      - 상품
+      - 가용수량
+    
+  - name: delete
+    enabled: true
+    description: "삭제 정보"
+    path: "C:/OSIS_AUTO/삭제정보/delete_status_*.csv"
+    refresh_interval: 60
+    required_columns:
+      - 삭제처리일
+      - 상품
+    
+  - name: irregular_order
+    enabled: true
+    description: "비정형 오더"
+    path: "C:/OSIS_AUTO/비정형오더/irregular_order_*.csv"
+    refresh_interval: 60
+    required_columns:
+      - 상세내용
+      - 출고센터명
+
+  # 새 모듈 추가 예시 (현재 비활성화)
+  # - name: new_module
+  #   enabled: false
+  #   description: "새로운 모듈"
+  #   path: "C:/OSIS_AUTO/신규모듈/new_module_*.csv"
+  #   refresh_interval: 30
+  #   required_columns:
+  #     - 필수컬럼1
+  #     - 필수컬럼2
