@@ -159,3 +159,26 @@ WMS-DashBoard/
 - 데이터 업데이트 주기 최적화 필요
 - 에러 처리 강화 필요
 - 성능 테스트 필요 (대용량 데이터)
+
+---
+
+## 📊 Phase 1: MVP 개발 (진행 중)
+
+### 현재 진행: Day 6 완료 ✅ (2025-10-17)
+
+**Day 6: OutboundCollector 기본 구조**
+- [x] outbound.py 파일 생성 (122 lines)
+- [x] 필수 컬럼 정의 (7개)
+- [x] load_data() 구현
+- [x] validate() 구현
+- [x] get_summary() 구현
+- [x] get_top_destinations() 구현
+- [x] get_top_products() 구현
+- [x] 기본 단위 테스트 작성 및 통과
+
+**Day 7 계획:**
+- OutboundCollector UI 컴포넌트 추가
+- 출고 시간대별 분석 기능
+- 통합 테스트
+
+**전체 진행률: 10% (Day 6/15)**
