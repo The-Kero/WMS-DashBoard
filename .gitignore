@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# 민감 정보
+login.txt
+test.txt
+*.csv
+config/config.yaml
+
+# 로그 및 캐시
+logs/
+*.log
+data/cache/
+*.sqlite
+*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
+
+# 테스트
+.pytest_cache/
+.coverage
+htmlcov/
