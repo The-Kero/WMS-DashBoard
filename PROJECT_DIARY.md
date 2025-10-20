@@ -1433,3 +1433,119 @@ Phase 1 진행률:
 - InventoryCollector 개발 시작
 
 ---
+
+
+## 2025-10-20 13:29 (일요일)
+**작업:** GitHub 커밋 및 푸시 완료
+
+**커밋 정보:**
+- 커밋 해시: b0c2cd7
+- 브랜치: main
+- 커밋 메시지: "fix: OutboundCollector 백엔드 실제 데이터 구조 반영 완료"
+
+**변경된 파일 (8개):**
+1. PROJECT_DIARY.md (작업 일지 업데이트)
+2. dashboard/src/data/collectors/outbound.py (완전 재작성, 185줄)
+3. dashboard/tests/fixtures/sample_outbound.csv (실제 데이터 20개)
+4. BACKEND_COLUMN_ANALYSIS.md (신규, 백엔드 컬럼 분석)
+5. COLLECTOR_修正_PLAN.md (신규, 전체 수정 계획)
+6. analyze_backend.py (신규, 분석 스크립트)
+7. create_sample_outbound.py (신규, 샘플 생성 스크립트)
+8. test_outbound_collector.py (신규, 테스트 스크립트)
+
+**통계:**
+- 총 변경: 1,020줄 추가, 26줄 삭제
+- 신규 파일: 5개
+- 수정 파일: 3개
+
+**GitHub 푸시:**
+- 원격 저장소: https://github.com/The-Kero/WMS-DashBoard.git
+- 상태: 성공 ✅
+- 커밋 히스토리:
+  - b0c2cd7: OutboundCollector 수정 완료 (최신) ⭐
+  - c392583: 3개 모듈 날짜 자동화 완료
+  - bc69ad6: 백엔드 모듈 백업 시스템 추가
+
+**다음 작업:**
+- InventoryCollector 개발 시작 (Phase 1 Day 8-9)
+- 예상 소요 시간: 3-4시간
+
+---
+
+
+## 2025-10-20 15:05 (일요일)
+**작업:** Config 날짜 자동화 시스템 추가 완료 ✅
+
+**내용:**
+- 백엔드 CSV 파일명 날짜 방식을 Collector(프론트엔드)에 반영
+- {date} 플레이스홀더를 오늘 날짜로 자동 치환하는 시스템 구축
+- 모든 설정 파일 경로를 실제 백엔드 구조에 맞춰 수정
+
+**주요 작업:**
+
+**1. data_sources.yaml 수정**
+- 폴더 경로 수정: 한글명 → 영문명 (Inbound Status 등)
+- 파일명 패턴: 와일드카드(*) → {date} 플레이스홀더
+- 필수 컬럼 업데이트: 백엔드 실제 컬럼으로 수정
+- 5개 모듈 모두 통일
+
+**수정 전:**
+```yaml
+inbound: "C:/OSIS_AUTO/입고정보/inbound_merged_*.csv"
+outbound: "C:/OSIS_AUTO/출고정보/outbound_*.csv"
+```
+
+**수정 후:**
+```yaml
+inbound: "C:/OSIS_AUTO/Inbound Status/inbound_merged_{date}.csv"
+outbound: "C:/OSIS_AUTO/Outbound Status/outbound_all_{date}.csv"
+```
+
+**2. config.example.yaml 수정**
+- data_sources 경로 전체 수정
+- 주석 추가 (플레이스홀더 설명)
+
+**3. config_utils.py 생성 (신규)**
+- `replace_date_placeholder()`: 재귀적 날짜 치환
+- `load_config_with_date()`: config.yaml 로드 + 날짜 치환
+- `load_data_sources_with_date()`: data_sources.yaml 로드 + 날짜 치환
+
+**핵심 기능:**
+```python
+# {date} → 20251020 자동 치환
+config = load_config_with_date('config.yaml')
+# 'inbound_merged_{date}.csv' → 'inbound_merged_20251020.csv'
+```
+
+**4. 테스트 스크립트 작성**
+- Test 1: 날짜 치환 함수 테스트 ✅
+- Test 2: config.yaml 로드 테스트 ✅
+- Test 3: data_sources.yaml 로드 테스트 ✅
+- Test 4: OutboundCollector 통합 테스트 ✅
+
+**테스트 결과:**
+- 5개 모듈 모두 날짜 치환 성공 ✅
+- Config 파일 정상 로드 ✅
+- Collector와 통합 정상 작동 ✅
+- 실제 데이터 4,312건 정상 로드 ✅
+
+**생성/수정된 파일:**
+1. `dashboard/config/data_sources.yaml` (96줄, 완전 재작성)
+2. `dashboard/config/config.example.yaml` (45줄, 수정)
+3. `dashboard/src/utils/config_utils.py` (110줄, 신규)
+4. `dashboard/src/utils/__init__.py` (16줄, 신규)
+5. `test_config_date_replacement.py` (153줄, 테스트 스크립트)
+6. `BACKEND_FILENAME_STATUS.md` (137줄, 현황 문서)
+7. `check_backend_filenames.py` (92줄, 확인 스크립트)
+
+**효과:**
+- 백엔드 날짜 방식 변경사항 완전 반영 ✅
+- 매일 자동으로 오늘 날짜 파일 찾기 ✅
+- Config 파일 유지보수 간편화 ✅
+- 5개 모듈 통일된 방식 사용 ✅
+
+**다음 작업:**
+- GitHub 커밋 (OutboundCollector + Config 날짜화)
+- InventoryCollector 개발 시작
+
+---

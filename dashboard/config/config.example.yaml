@@ -1,13 +1,16 @@
 # WMS 대시보드 설정 파일
 # 복사하여 config.yaml로 사용: copy config.example.yaml config.yaml
+# 
+# {date} 플레이스홀더는 자동으로 오늘 날짜(YYYYMMDD)로 치환됩니다
+# 예: inbound_merged_{date}.csv → inbound_merged_20251020.csv
 
-# 데이터 소스 경로 (운영 환경에 맞게 수정)
+# 데이터 소스 경로 (백엔드 실제 경로 반영)
 data_sources:
-  inbound: "C:/OSIS_AUTO/입고정보/inbound_merged_*.csv"
-  outbound: "C:/OSIS_AUTO/출고정보/outbound_*.csv"
-  inventory: "C:/OSIS_AUTO/재고정보/inventory_status_*.csv"
-  delete: "C:/OSIS_AUTO/삭제정보/delete_status_*.csv"
-  irregular: "C:/OSIS_AUTO/비정형오더/irregular_order_*.csv"
+  inbound: "C:/OSIS_AUTO/Inbound Status/inbound_merged_{date}.csv"
+  outbound: "C:/OSIS_AUTO/Outbound Status/outbound_all_{date}.csv"
+  inventory: "C:/OSIS_AUTO/inventory_status/inventory_status_{date}.csv"
+  delete: "C:/OSIS_AUTO/Delete Status/delete_status_{date}.csv"
+  irregular: "C:/OSIS_AUTO/IrregularOrder Status/irregular_order_{date}.csv"
 
 # 갱신 주기 (초)
 refresh_intervals:
@@ -15,7 +18,7 @@ refresh_intervals:
   inventory: 60        # 재고 정보
   alerts: 60           # 알림 평가
 
-# 캠시 설정
+# 캐시 설정
 cache:
   enabled: true
   ttl: 300             # 5분
