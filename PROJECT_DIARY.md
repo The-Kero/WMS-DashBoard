@@ -1549,3 +1549,49 @@ config = load_config_with_date('config.yaml')
 - InventoryCollector 개발 시작
 
 ---
+
+
+## 2025-10-20 15:07 (일요일)
+**작업:** GitHub 커밋 및 푸시 완료 (Config 날짜 자동화)
+
+**커밋 정보:**
+- 커밋 해시: 7cc1d7e
+- 브랜치: main
+- 커밋 메시지: "feat: Config 날짜 자동화 시스템 추가 및 백엔드 경로 수정"
+
+**변경된 파일 (9개):**
+1. PROJECT_DIARY.md (작업 일지 업데이트)
+2. dashboard/config/config.example.yaml (경로 수정)
+3. dashboard/config/data_sources.yaml (완전 재작성, 96줄)
+4. dashboard/src/utils/__init__.py (신규, 16줄)
+5. dashboard/src/utils/config_utils.py (신규, 110줄)
+6. BACKEND_FILENAME_STATUS.md (신규, 137줄)
+7. OUTBOUND_COLLECTOR_확인가이드.md (신규, 230줄)
+8. check_backend_filenames.py (신규, 92줄)
+9. test_config_date_replacement.py (신규, 153줄)
+
+**통계:**
+- 총 변경: 903줄 추가, 19줄 삭제
+- 신규 파일: 6개
+- 수정 파일: 3개
+
+**GitHub 푸시:**
+- 원격 저장소: https://github.com/The-Kero/WMS-DashBoard.git
+- 상태: 성공 ✅
+- 커밋 히스토리:
+  - 7cc1d7e: Config 날짜 자동화 시스템 추가 (최신) ⭐
+  - b0c2cd7: OutboundCollector 수정 완료
+  - c392583: 3개 모듈 날짜 자동화 완료
+
+**완료된 작업 요약:**
+- ✅ OutboundCollector 백엔드 반영 (25개 컬럼)
+- ✅ Config 날짜 자동화 시스템 구축
+- ✅ 5개 모듈 경로 통일
+- ✅ 테스트 스크립트 작성
+- ✅ 문서화 완료
+
+**다음 작업:**
+- InventoryCollector 개발 시작 (Phase 1 Day 8-9)
+- 예상 소요 시간: 3-4시간
+
+---
