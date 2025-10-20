@@ -5,5 +5,6 @@
 from .base import BaseCollector
 from .inbound import InboundCollector
 from .outbound import OutboundCollector
+from .inventory import InventoryCollector
 
-__all__ = ['BaseCollector', 'InboundCollector', 'OutboundCollector']
+__all__ = ['BaseCollector', 'InboundCollector', 'OutboundCollector', 'InventoryCollector']

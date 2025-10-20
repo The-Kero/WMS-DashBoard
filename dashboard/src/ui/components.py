@@ -244,3 +244,276 @@ def display_top_outbound_products(df: pd.DataFrame):
     # 데이터 테이블
     with st.expander("상세 데이터 보기"):
         st.dataframe(df, use_container_width=True)
+
+
+
+# ============================================================================
+# 재고 관련 UI 컴포넌트
+# ============================================================================
+
+def display_inventory_metrics(summary: Dict[str, Any]):
+    """
+    재고 4대 핵심 지표를 카드 형태로 표시
+    
+    Args:
+        summary: 재고 요약 정보 딕셔너리
+    """
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric(
+            label="🔢 총 상품 수",
+            value=f"{summary.get('총_상품_수', 0):,}개",
+            help="관리 중인 전체 상품 종류"
+        )
+    
+    with col2:
+        st.metric(
+            label="📦 총 재고 수량",
+            value=f"{summary.get('총_재고_수량', 0):,}개",
+            help="창고 내 전체 재고 수량"
+        )
+    
+    with col3:
+        total_value = summary.get('총_재고_금액', 0)
+        if total_value >= 100_000_000:  # 1억 이상
+            display_value = f"{total_value / 100_000_000:.1f}억원"
+        else:
+            display_value = f"{total_value / 10_000:.0f}만원"
+        
+        st.metric(
+            label="💰 총 재고 금액",
+            value=display_value,
+            help="재고수량 × 단가"
+        )
+    
+    with col4:
+        danger_count = summary.get('위험_상품_수', 0)
+        st.metric(
+            label="⚠️ 위험 상품",
+            value=f"{danger_count}개",
+            delta=f"유효비 ≤ 20%",
+            delta_color="inverse",  # 빨간색으로 표시
+            help="유효유통비 20% 이하 긴급 조치 필요"
+        )
+
+
+def display_inventory_summary_cards(summary: Dict[str, Any]):
+    """
+    재고 보조 지표 표시
+    
+    Args:
+        summary: 재고 요약 정보 딕셔너리
+    """
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        avg_ratio = summary.get('평균_유효유통비', 0)
+        st.info(f"📊 **평균 유효유통비**: {avg_ratio}%")
+    
+    with col2:
+        location_count = summary.get('로케이션_수', 0)
+        st.info(f"📍 **로케이션 수**: {location_count:,}개")
+    
+    with col3:
+        available = summary.get('가용_수량', 0)
+        st.info(f"✅ **가용 수량**: {available:,}개")
+
+
+def display_expiring_items_table(df: pd.DataFrame):
+    """
+    유효기한 임박 상품 테이블 표시 (빨간색 강조)
+    
+    Args:
+        df: 유효기한 임박 상품 DataFrame
+    """
+    st.subheader("🚨 유효기한 임박 상품 (유효비 ≤ 20%)")
+    
+    if df.empty:
+        st.success("✅ 위험 상품 없음 (모든 상품 유효비 > 20%)")
+        return
+    
+    # 경고 메시지
+    st.warning(f"⚠️ 총 {len(df)}개 상품이 유효기한 임박 상태입니다. 즉시 조치가 필요합니다!")
+    
+    # 컬럼 선택 및 이름 변경
+    display_df = df.copy()
+    display_df['소비기한'] = pd.to_datetime(display_df['소비기한']).dt.strftime('%Y-%m-%d')
+    
+    # 재고금액 포맷팅
+    display_df['재고금액_표시'] = display_df['재고금액'].apply(lambda x: f"₩{int(x):,}")
+    
+    # 표시할 컬럼 선택
+    display_columns = {
+        '로케이션': '로케이션',
+        '상품': '상품코드',
+        '상품명': '상품명',
+        '소비기한': '소비기한',
+        '재고수량': '재고수량',
+        '유효유통비(%)': '유효비(%)',
+        '재고금액_표시': '재고금액'
+    }
+    
+    final_df = display_df[list(display_columns.keys())].rename(columns=display_columns)
+    
+    # 테이블 표시 (높이 조정)
+    st.dataframe(
+        final_df,
+        use_container_width=True,
+        height=min(400, len(final_df) * 35 + 38)  # 동적 높이
+    )
+
+
+def display_low_stock_items_table(df: pd.DataFrame):
+    """
+    재고 부족 상품 테이블 표시
+    
+    Args:
+        df: 재고 부족 상품 DataFrame
+    """
+    st.subheader("📉 재고 부족 상품 (가용수량 ≤ 10개)")
+    
+    if df.empty:
+        st.success("✅ 재고 부족 상품 없음")
+        return
+    
+    # 주의 메시지
+    st.info(f"ℹ️ 총 {len(df)}개 상품이 재고 부족 상태입니다.")
+    
+    # 컬럼 선택 및 이름 변경
+    display_df = df.copy()
+    
+    # 재고금액 포맷팅
+    display_df['재고금액_표시'] = display_df['재고금액'].apply(lambda x: f"₩{int(x):,}")
+    
+    # 표시할 컬럼 선택
+    display_columns = {
+        '로케이션': '로케이션',
+        '상품': '상품코드',
+        '상품명': '상품명',
+        '가용수량': '가용수량',
+        '재고수량': '재고수량',
+        '유효유통비(%)': '유효비(%)',
+        '재고금액_표시': '재고금액'
+    }
+    
+    final_df = display_df[list(display_columns.keys())].rename(columns=display_columns)
+    
+    # 테이블 표시
+    st.dataframe(
+        final_df,
+        use_container_width=True,
+        height=min(400, len(final_df) * 35 + 38)
+    )
+
+
+def display_top_inventory_by_location(df: pd.DataFrame):
+    """
+    상위 로케이션별 재고 차트 표시
+    
+    Args:
+        df: 로케이션별 재고 집계 DataFrame
+    """
+    st.subheader("📍 상위 로케이션 (재고금액 기준)")
+    
+    if df.empty:
+        st.warning("데이터가 없습니다")
+        return
+    
+    # 상위 10개만 표시
+    top_10 = df.head(10).copy()
+    
+    # 재고금액을 만원 단위로 변환
+    top_10['재고금액_만원'] = (top_10['총_재고금액'] / 10_000).round(0)
+    
+    # 막대 차트
+    st.bar_chart(
+        top_10.set_index('로케이션')['재고금액_만원'],
+        use_container_width=True,
+        color="#4CAF50"  # 초록색
+    )
+    
+    st.caption("단위: 만원")
+    
+    # 데이터 테이블
+    with st.expander("상세 데이터 보기"):
+        # 재고금액 포맷팅
+        display_df = df.copy()
+        display_df['총_재고금액'] = display_df['총_재고금액'].apply(lambda x: f"₩{int(x):,}")
+        st.dataframe(display_df, use_container_width=True)
+
+
+def display_top_inventory_by_product(df: pd.DataFrame):
+    """
+    상위 재고 상품 차트 표시
+    
+    Args:
+        df: 상품별 재고 집계 DataFrame
+    """
+    st.subheader("🏆 상위 재고 상품 (재고금액 기준)")
+    
+    if df.empty:
+        st.warning("데이터가 없습니다")
+        return
+    
+    # 상품명 표시를 위한 처리 (상위 10개)
+    top_10 = df.head(10).copy()
+    top_10['상품_표시'] = top_10['상품명'].str[:20]  # 20자로 제한
+    
+    # 재고금액을 만원 단위로 변환
+    top_10['재고금액_만원'] = (top_10['총_재고금액'] / 10_000).round(0)
+    
+    # 막대 차트
+    st.bar_chart(
+        top_10.set_index('상품_표시')['재고금액_만원'],
+        use_container_width=True,
+        color="#2196F3"  # 파란색
+    )
+    
+    st.caption("단위: 만원")
+    
+    # 데이터 테이블
+    with st.expander("상세 데이터 보기"):
+        # 재고금액 포맷팅
+        display_df = df.copy()
+        display_df['총_재고금액'] = display_df['총_재고금액'].apply(lambda x: f"₩{int(x):,}")
+        st.dataframe(display_df, use_container_width=True)
+
+
+def display_effective_ratio_distribution(df: pd.DataFrame):
+    """
+    유효유통비 구간별 분포 차트 표시
+    
+    Args:
+        df: 유효비 구간별 분포 DataFrame
+    """
+    st.subheader("📊 유효유통비 구간별 분포")
+    
+    if df.empty:
+        st.warning("데이터가 없습니다")
+        return
+    
+    # 파이 차트용 데이터 준비
+    chart_data = df.set_index('유효비_구간')['상품_수']
+    
+    # 색상 정의 (위험 -> 우수)
+    colors = ['#FF4444', '#FF9800', '#FFC107', '#8BC34A', '#4CAF50']
+    
+    # 차트 표시
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        st.bar_chart(
+            chart_data,
+            use_container_width=True,
+            color=colors[0]  # Streamlit 기본 차트는 단색
+        )
+    
+    with col2:
+        st.write("**구간별 상품 수**")
+        for idx, row in df.iterrows():
+            st.write(f"• {row['유효비_구간']}: **{int(row['상품_수'])}개**")
+    
+    # 총 상품 수 표시
+    total = df['상품_수'].sum()
+    st.caption(f"총 {int(total)}개 상품")
