@@ -517,3 +517,227 @@ def display_effective_ratio_distribution(df: pd.DataFrame):
     # 총 상품 수 표시
     total = df['상품_수'].sum()
     st.caption(f"총 {int(total)}개 상품")
+
+
+# ============================================================================
+# 재고(Inventory) 탭 컴포넌트
+# ============================================================================
+
+def display_inventory_metrics(summary: Dict[str, Any]):
+    """
+    재고 핵심 지표를 카드 형태로 표시
+    
+    Args:
+        summary: 재고 요약 정보 딕셔너리
+    """
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric(
+            label="📦 총 상품 수",
+            value=f"{summary.get('총_상품수', 0):,}개"
+        )
+    
+    with col2:
+        st.metric(
+            label="📊 총 가용수량",
+            value=f"{summary.get('총_가용수량', 0):,}개"
+        )
+    
+    with col3:
+        total_value = summary.get('총_재고금액', 0)
+        if total_value >= 100_000_000:  # 1억 이상
+            value_str = f"{total_value/100_000_000:.1f}억원"
+        elif total_value >= 10_000_000:  # 1천만 이상
+            value_str = f"{total_value/10_000_000:.1f}천만원"
+        else:
+            value_str = f"{total_value:,}원"
+        
+        st.metric(
+            label="💰 총 재고 금액",
+            value=value_str
+        )
+    
+    with col4:
+        risky_count = summary.get('위험_상품수', 0)
+        st.metric(
+            label="⚠️ 위험 상품",
+            value=f"{risky_count}개",
+            delta=None,
+            delta_color="inverse" if risky_count > 0 else "normal"
+        )
+
+
+def display_inventory_summary(summary: Dict[str, Any]):
+    """
+    재고 추가 요약 정보 표시
+    
+    Args:
+        summary: 재고 요약 정보 딕셔너리
+    """
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("#### 📈 평균 유효유통비")
+        avg_ratio = summary.get('평균_유효비', 0)
+        
+        # 유효비에 따른 색상
+        if avg_ratio >= 70:
+            color = "green"
+            status = "양호"
+        elif avg_ratio >= 40:
+            color = "orange"
+            status = "보통"
+        else:
+            color = "red"
+            status = "주의"
+        
+        st.markdown(f"### :{color}[{avg_ratio}%] ({status})")
+    
+    with col2:
+        st.markdown("#### 📊 유효비 구간별 분포")
+        distribution = summary.get('유효비_구간별_분포', {})
+        
+        if distribution:
+            # 데이터프레임으로 변환
+            df_dist = pd.DataFrame([
+                {"구간": k, "상품수": v}
+                for k, v in distribution.items()
+            ])
+            
+            # 구간 순서 정렬
+            order = ['위험(≤20%)', '주의(21-50%)', '정상(51-100%)']
+            df_dist['구간'] = pd.Categorical(df_dist['구간'], categories=order, ordered=True)
+            df_dist = df_dist.sort_values('구간')
+            
+            # 바 차트
+            st.bar_chart(df_dist.set_index('구간'))
+
+
+def display_risky_products_table(df: pd.DataFrame):
+    """
+    유효비 위험 상품 테이블 표시 (빨간색 강조)
+    
+    Args:
+        df: 위험 상품 DataFrame
+    """
+    if df.empty:
+        st.success("✅ 위험 상품이 없습니다!")
+        return
+    
+    st.markdown(f"#### ⚠️ 유효비 위험 상품 ({len(df)}개)")
+    st.warning("유효유통비가 20% 이하인 상품들입니다. 빠른 조치가 필요합니다.")
+    
+    # 테이블 표시용 데이터 준비
+    display_df = df.copy()
+    
+    # 재고금액 포맷
+    display_df['재고금액'] = display_df['재고금액'].apply(lambda x: f"{int(x):,}원")
+    display_df['단가'] = display_df['단가'].apply(lambda x: f"{int(x):,}원")
+    
+    # 유효비에 따라 스타일 적용
+    def highlight_risky(row):
+        ratio = row['유효유통비(%)']
+        if ratio <= 10:
+            return ['background-color: #ffcccc'] * len(row)  # 진한 빨강
+        elif ratio <= 20:
+            return ['background-color: #ffe6e6'] * len(row)  # 연한 빨강
+        return [''] * len(row)
+    
+    styled_df = display_df.style.apply(highlight_risky, axis=1)
+    st.dataframe(styled_df, use_container_width=True, height=300)
+
+
+def display_inventory_table(df: pd.DataFrame, show_filters: bool = True):
+    """
+    전체 재고 목록 테이블 표시
+    
+    Args:
+        df: 재고 DataFrame
+        show_filters: 필터 옵션 표시 여부
+    """
+    st.markdown("#### 📋 전체 재고 목록")
+    
+    if show_filters:
+        # 필터 옵션
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            # 유효비 필터
+            ratio_filter = st.selectbox(
+                "유효비 필터",
+                ["전체", "위험(≤20%)", "주의(21-50%)", "정상(51-100%)"]
+            )
+        
+        with col2:
+            # 정렬 기준
+            sort_by = st.selectbox(
+                "정렬 기준",
+                ["유효유통비(%)", "가용수량", "재고금액"]
+            )
+        
+        with col3:
+            # 정렬 순서
+            sort_order = st.radio(
+                "정렬 순서",
+                ["오름차순", "내림차순"],
+                horizontal=True
+            )
+        
+        # 필터 적용
+        filtered_df = df.copy()
+        
+        if ratio_filter == "위험(≤20%)":
+            filtered_df = filtered_df[filtered_df['유효유통비(%)'] <= 20]
+        elif ratio_filter == "주의(21-50%)":
+            filtered_df = filtered_df[(filtered_df['유효유통비(%)'] > 20) & 
+                                     (filtered_df['유효유통비(%)'] <= 50)]
+        elif ratio_filter == "정상(51-100%)":
+            filtered_df = filtered_df[filtered_df['유효유통비(%)'] > 50]
+        
+        # 재고금액 계산 (정렬용)
+        if '재고금액' not in filtered_df.columns:
+            filtered_df['재고금액'] = filtered_df['가용수량'] * filtered_df['단가']
+        
+        # 정렬 적용
+        ascending = (sort_order == "오름차순")
+        filtered_df = filtered_df.sort_values(sort_by, ascending=ascending)
+        
+        st.caption(f"총 {len(filtered_df)}개 상품")
+    else:
+        filtered_df = df
+    
+    # 테이블 표시용 데이터 준비
+    display_df = filtered_df.copy()
+    
+    # 금액 포맷
+    if '재고금액' in display_df.columns:
+        display_df['재고금액'] = display_df['재고금액'].apply(lambda x: f"{int(x):,}원")
+    display_df['단가'] = display_df['단가'].apply(lambda x: f"{int(x):,}원")
+    
+    # 테이블 표시
+    st.dataframe(display_df, use_container_width=True, height=400)
+
+
+def display_low_stock_table(df: pd.DataFrame):
+    """
+    가용수량 부족 상품 테이블 표시
+    
+    Args:
+        df: 가용수량 부족 상품 DataFrame
+    """
+    if df.empty:
+        st.info("가용수량 부족 상품이 없습니다.")
+        return
+    
+    st.markdown(f"#### 📦 가용수량 부족 상품 ({len(df)}개)")
+    st.info("가용수량이 10개 이하인 상품들입니다.")
+    
+    # 테이블 표시용 데이터 준비
+    display_df = df.copy()
+    
+    # 재고금액 포맷
+    display_df['재고금액'] = display_df['재고금액'].apply(lambda x: f"{int(x):,}원")
+    display_df['단가'] = display_df['단가'].apply(lambda x: f"{int(x):,}원")
+    
+    st.dataframe(display_df, use_container_width=True, height=300)

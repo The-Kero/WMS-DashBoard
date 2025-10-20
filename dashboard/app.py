@@ -23,12 +23,10 @@ from src.ui.components import (
     display_top_destinations,
     display_top_outbound_products,
     display_inventory_metrics,
-    display_inventory_summary_cards,
-    display_expiring_items_table,
-    display_low_stock_items_table,
-    display_top_inventory_by_location,
-    display_top_inventory_by_product,
-    display_effective_ratio_distribution,
+    display_inventory_summary,
+    display_risky_products_table,
+    display_inventory_table,
+    display_low_stock_table,
     show_error,
     show_success
 )
@@ -171,41 +169,66 @@ def render_inventory_tab(sample_file: str):
         st.divider()
         display_inventory_metrics(summary)
         
-        # 보조 지표
+        # 추가 요약 정보 (평균 유효비, 유효비 구간별 분포)
         st.divider()
-        display_inventory_summary_cards(summary)
+        display_inventory_summary(summary)
         
-        # 유효기한 임박 상품 (위험)
+        # 유효비 위험 상품 (≤ 20%)
         st.divider()
-        expiring = collector.get_expiring_soon(threshold=20)
-        display_expiring_items_table(expiring)
+        risky = collector.get_risky_products()
+        display_risky_products_table(risky)
         
-        # 재고 부족 상품 (선택 사항)
-        if st.checkbox("📉 재고 부족 상품 보기", value=False):
+        # 가용수량 부족 상품 (선택 사항)
+        if st.checkbox("📦 가용수량 부족 상품 보기 (≤10개)", value=False):
             st.divider()
-            low_stock = collector.get_low_stock(threshold=10)
-            display_low_stock_items_table(low_stock)
+            low_stock = collector.get_low_stock_products(threshold=10)
+            display_low_stock_table(low_stock)
         
-        # 로케이션별 & 상품별 재고 차트
+        # 재고금액 상위 상품
         st.divider()
-        col1, col2 = st.columns(2)
+        col1, col2 = st.columns([1, 1])
         
         with col1:
-            by_location = collector.get_by_location()
-            display_top_inventory_by_location(by_location)
+            st.markdown("#### 💰 재고금액 TOP 10")
+            top_value = collector.get_top_value_products(n=10)
+            
+            # 표시용 포맷
+            display_top = top_value.copy()
+            display_top['재고금액'] = display_top['재고금액'].apply(lambda x: f"{int(x):,}원")
+            display_top['단가'] = display_top['단가'].apply(lambda x: f"{int(x):,}원")
+            
+            st.dataframe(display_top, use_container_width=True, height=400)
         
         with col2:
-            by_product = collector.get_by_product(n=10)
-            display_top_inventory_by_product(by_product)
+            st.markdown("#### 📊 총 재고 금액")
+            total_value = collector.calculate_total_value()
+            
+            # 큰 숫자로 표시
+            if total_value >= 100_000_000:  # 1억 이상
+                value_str = f"{total_value/100_000_000:.2f}억원"
+            elif total_value >= 10_000_000:  # 1천만 이상
+                value_str = f"{total_value/10_000_000:.2f}천만원"
+            else:
+                value_str = f"{total_value:,}원"
+            
+            st.markdown(f"### {value_str}")
+            st.caption(f"정확한 금액: {total_value:,}원")
+            
+            # 간단한 통계
+            st.markdown("---")
+            st.markdown("**재고 통계:**")
+            st.write(f"- 총 상품 수: {summary.get('총_상품수', 0):,}개")
+            st.write(f"- 총 가용수량: {summary.get('총_가용수량', 0):,}개")
+            st.write(f"- 평균 유효비: {summary.get('평균_유효비', 0)}%")
         
-        # 유효비 구간별 분포
+        # 전체 재고 목록 (필터/정렬 가능)
         st.divider()
-        distribution = collector.get_effective_ratio_distribution()
-        display_effective_ratio_distribution(distribution)
         
-        # 전체 데이터 테이블
-        st.divider()
-        display_data_table(df, title="📋 재고 데이터 전체 목록", height=400)
+        # 재고금액 컬럼 추가
+        df_with_value = df.copy()
+        df_with_value['재고금액'] = df_with_value['가용수량'] * df_with_value['단가']
+        
+        display_inventory_table(df_with_value, show_filters=True)
         
         # 추가 정보
         with st.expander("🔍 데이터 상세 정보"):
@@ -236,6 +259,11 @@ def main():
     st.title("📦 WMS 대시보드")
     st.caption("창고관리 시스템 실시간 현황판 (Phase 1 - MVP)")
     
+    # 기본 파일 경로 (절대 경로)
+    default_inbound = str(project_root / "tests" / "fixtures" / "sample_inbound.csv")
+    default_outbound = str(project_root / "tests" / "fixtures" / "sample_outbound.csv")
+    default_inventory = str(project_root / "tests" / "fixtures" / "sample_inventory.csv")
+    
     # 사이드바
     with st.sidebar:
         st.header("⚙️ 설정")
@@ -243,17 +271,17 @@ def main():
         # 샘플 데이터 경로
         inbound_file = st.text_input(
             "입고 데이터 파일",
-            value="tests/fixtures/sample_inbound.csv"
+            value=default_inbound
         )
         
         outbound_file = st.text_input(
             "출고 데이터 파일",
-            value="tests/fixtures/sample_outbound.csv"
+            value=default_outbound
         )
         
         inventory_file = st.text_input(
             "재고 데이터 파일",
-            value="tests/fixtures/sample_inventory.csv"
+            value=default_inventory
         )
         
         # 새로고침 버튼
