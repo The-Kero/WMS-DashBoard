@@ -1078,3 +1078,178 @@ Phase 1 진행률:
 - 프로덕션 환경 배포 준비 완료 ✅
 
 ---
+
+
+## 2025-10-20 10:33 (일요일)
+**작업:** GitHub 커밋 및 푸시 완료
+
+**커밋 내용:**
+- 커밋 메시지: "docs: 백엔드 모듈 백업 시스템 추가 및 테스트 완료"
+- 커밋 해시: bc69ad6
+
+**변경된 파일 (1개):**
+1. PROJECT_DIARY.md (+210줄)
+
+**커밋 상세:**
+- 백엔드 4개 모듈 백업 시스템 추가 완료 기록
+- 5개 모듈 통합 테스트 결과 기록
+- CSV 파일명 통일 사항 기록
+- 백업 시스템 사양 문서화
+
+**GitHub 푸시:**
+- 원격 저장소: https://github.com/The-Kero/WMS-DashBoard.git
+- 브랜치: main
+- 상태: 성공 ✅
+
+**커밋 히스토리:**
+- bc69ad6: 백엔드 모듈 백업 시스템 추가 및 테스트 완료 (최신)
+- 05dc60f: Phase1 Day7 완료 - OutboundCollector 및 출고 탭 통합
+- 1e6e5b8: Update PROJECT_STATUS - Day 6 complete
+
+**다음 단계:**
+- InventoryCollector 개발 시작 (Phase 1 Day 8-9)
+
+---
+
+
+## 2025-10-20 10:41 (일요일)
+**작업:** 5개 백엔드 모듈 폴더 정리 완료
+
+**삭제된 파일 (21개):**
+
+### 1. Inbound Status (3개 삭제)
+- ❌ inbound_merged_20251014_111457.csv (구버전)
+- ❌ inbound_merged_20251014_155058.csv (구버전)
+- ❌ inbound_merged_20251020_093948.csv (타임스탬프 방식)
+- ✅ inbound_merged_20251020.csv (최신 유지)
+
+### 2. Delete Status (1개 삭제)
+- ❌ delete_status_20251015_160738.csv (구버전)
+
+### 3. IrregularOrder Status (3개 삭제)
+- ❌ irregular_order_20251015_183315.csv (타임스탬프 방식)
+- ❌ irregular_order_20251015_183837.csv (타임스탬프 방식)
+- ❌ TEST_RESULT.md (테스트 파일)
+- ✅ irregular_order_20251020.csv (최신 유지)
+
+### 4. Outbound Status (13개 삭제)
+- ❌ outbound_XX_20251019.csv (11개 - 이전 날짜)
+- ❌ outbound_all_20251019.csv (통합 파일)
+- ❌ outbound_20251019.log (이전 로그)
+- ✅ outbound_XX_20251020.csv (최신 유지)
+- ✅ outbound_20251020.log (최신 로그 유지)
+
+### 5. inventory_status (1개 삭제)
+- ❌ inventory_status_20251019.csv (이전 날짜)
+- ✅ inventory_status_20251020.csv (최신 유지)
+
+**정리 결과:**
+- 각 모듈 폴더에 최신 날짜(20251020) CSV 파일만 유지
+- 구버전 및 타임스탬프 방식 파일 모두 제거
+- backup/ 폴더는 모두 유지 (안전 백업)
+- 설정/문서 파일 유지 (login.txt, test.txt, README 등)
+
+**폴더별 최종 상태:**
+- Inbound Status: 7개 파일 (필수만 유지)
+- Delete Status: 5개 파일 (깔끔)
+- IrregularOrder Status: 7개 파일 + 1개 폴더
+- Outbound Status: 15개 파일 (최신 CSV만)
+- inventory_status: 5개 파일 (깔끔)
+
+**디스크 공간 절약:** 약 20MB (구버전 데이터 제거)
+
+---
+
+
+## 2025-10-20 10:46 (일요일)
+**작업:** 5개 핵심 모듈 실행 및 최신 데이터 수집 완료
+
+**실행 결과:**
+1. ✅ Inbound Status - 실행 완료 (1초)
+   - 파일: inbound_merged_20251020.csv
+   - 레코드: 0건 (오늘은 입고 예정 없음)
+   - 제외 상품: 25개
+
+2. ✅ Outbound Status - 실행 완료 (5.4초)
+   - 파일: outbound_all_20251020.csv
+   - 레코드: 4,312건 (헤더 제외 4,313건)
+   - 타입별 분포:
+     * 타입 08 (폐기출고): 133건
+     * 타입 15 (가출고): 3,299건 ⭐ (76%)
+     * 타입 16 (회수): 7건
+     * 타입 17 (반품출고): 128건
+     * 타입 18 (샘플출고): 741건
+     * 타입 52 (타점출고): 3건
+     * 타입 53 (타점이동출고): 1건
+   - 출하금액 총계: 45,725,984원 (약 4,573만원)
+
+3. ✅ inventory_status - 실행 완료 (1초)
+   - 파일: inventory_status_20251020.csv
+   - 레코드: 917건 (헤더 제외 918건)
+   - 컬럼: 12개 (로케이션, 상품, 상품명, 단위규격, 소비기한, 입수량, 가용수량, 가용박스수량, 가용잔량, 재고수량, 유효유통비(%), 단가)
+
+4. ✅ Delete Status - 실행 완료 (5초)
+   - 파일: 생성되지 않음
+   - 레코드: 0건 (오늘은 삭제 데이터 없음)
+
+5. ✅ IrregularOrder Status - 실행 완료 (1초)
+   - 파일: irregular_order_20251020.csv
+   - 레코드: 5건 (헤더 제외 6건)
+   - 샘플상품 위주 (실온 2건, 냉장 3건)
+
+**총 소요 시간:** 약 13.4초 (모든 모듈 순차 실행)
+
+**데이터 상태 요약:**
+- 입고: 예정 없음 (주말 또는 입고 완료)
+- 출고: 4,312건 (가출고 76%, 활발한 출고 진행 중)
+- 재고: 917건 (정상 운영)
+- 삭제: 없음 (양호)
+- 비정형: 5건 (소량, 샘플 위주)
+
+**다음 단계:**
+- 사용자가 데이터를 확인하고 수정 사항 지시 예정
+
+---
+
+
+## 2025-10-20 11:14 (일요일)
+**작업:** 3개 모듈 날짜 자동화 완료
+
+**수정 완료 모듈:**
+1. ✅ **Inbound Status** (오늘, offset=0)
+   - test.txt 템플릿화 ({QUERY_DATE} 플레이스홀더)
+   - generate_request_packet() 함수 추가
+   - 테스트 결과: 조회 날짜 20251020 (오늘) ✅, 97건 수집
+
+2. ✅ **Delete Status** (내일, offset=1)
+   - test.txt 템플릿화 ({QUERY_DATE} 플레이스홀더)
+   - generate_request_packet() 함수 추가
+   - 테스트 결과: 조회 날짜 20251021 (내일) ✅, 13건 수집
+
+3. ✅ **IrregularOrder Status** (내일, offset=1)
+   - test.txt 템플릿화 ({QUERY_DATE} 플레이스홀더)
+   - generate_request_packet() 함수 추가
+   - 테스트 결과: 조회 날짜 20251021 (내일) ✅, 0건 (정상)
+
+**자동화 방식:**
+- 출고 모듈의 날짜 자동 계산 시스템을 다른 3개 모듈에 적용
+- test.txt의 하드코딩된 날짜(YYYYMMDD)를 플레이스홀더({QUERY_DATE})로 변경
+- Python 코드에 날짜 자동 계산 로직 추가
+- 실행 시마다 datetime.now() + timedelta(days=offset)로 자동 계산
+
+**모듈별 날짜 설정:**
+- Inbound Status: 항상 당일 (offset=0)
+- Delete Status: 항상 내일 (offset=1)
+- IrregularOrder Status: 항상 내일 (offset=1)
+- Outbound Status: 타입별로 다름 (이미 자동화되어 있음)
+
+**장점:**
+- 매일 실행해도 수동 수정 불필요
+- 운영 자동화 가능
+- 날짜 오류 방지
+
+**다음 단계:**
+- 5개 모듈 모두 자동화 완료 ✅
+- 프론트엔드 대시보드 개발 계속 진행 예정
+
+---
