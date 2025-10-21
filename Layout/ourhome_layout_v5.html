@@ -29,12 +29,14 @@
             justify-content: space-between;
             padding: 0 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            position: relative;
         }
         
         .header .leftSection {
             display: flex;
             align-items: center;
             gap: 15px;
+            flex: 1;
         }
         
         .header .logoContainer {
@@ -58,9 +60,22 @@
             font-weight: bold;
         }
         
+        .header .updateInfo {
+            font-size: 16px;
+            color: #B0B8C4;
+            margin-left: auto;
+        }
+        
+        .header .centerSection {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
         .header .time {
             font-size: 20px;
             color: #FFFFFF;
+            font-weight: bold;
         }
         
         /* 메인 컨테이너 */
@@ -386,8 +401,11 @@
                 <img src="ourhome_ci.png" alt="아워홈 로고" class="logo">
             </div>
             <h1>WMS 동서울물류센터 냉장파트</h1>
+            <div class="updateInfo">마지막 업데이트 : 방금</div>
         </div>
-        <div class="time" id="currentTime"></div>
+        <div class="centerSection">
+            <div class="time" id="currentTime"></div>
+        </div>
     </div>
     
     <!-- 메인 -->
