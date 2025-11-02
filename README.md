@@ -2,6 +2,39 @@
 
 창고관리 시스템(WMS) 실시간 현황판
 
+---
+
+## ⚠️ 【중요】프로젝트 상태 확인 필수 절차
+
+**이 프로젝트를 다룰 때 가장 먼저 확인해야 할 것:**
+
+```
+1. PROJECT_DIARY.md는 항상 끝부분부터 읽기!
+   → read_file(offset=-100) 으로 최신 100줄 먼저 확인
+
+2. 왜 중요한가?
+   - 파일이 1783줄로 길어져서 최신 정보는 끝에 있음
+   - 앞부분(1000줄)만 읽으면 오래된 정보를 현재로 착각
+   - 이미 완료된 작업을 "다음 작업"이라고 착각하는 치명적 오류 발생
+
+3. 반드시 확인할 것:
+   - 최신 작업 날짜 (2025-10-20)
+   - Phase 진행률 (현재: 60%)
+   - 완료된 Collector (현재: 3/5 - Inbound, Outbound, Inventory)
+   - 다음 작업 내용 (DeleteCollector 개발)
+
+4. 의심스러우면 전체 파일 나눠 읽기:
+   - read_file(offset=0, length=1000)
+   - read_file(offset=1000, length=783)
+```
+
+**이 규칙을 지키지 않으면:**
+- ❌ 완료된 작업을 "다음 작업"이라고 착각
+- ❌ 사용자에게 혼란과 불신 초래  
+- ❌ 프로젝트 진행에 차질
+
+---
+
 ## 📌 프로젝트 개요
 
 물류 현장에서 필요한 **실시간 재고 정보**와 **긴급 알림**을 한 화면에 표시하여,  
@@ -10,7 +43,8 @@
 - **개발 도구**: Streamlit (Python)
 - **개발 기간**: 8주 (40일)
 - **개발 팀**: 4명 (풀스택, UX/UI, 데이터, 데브옵스)
-- **현재 단계**: Phase 1 - MVP 개발 (40% 완료)
+- **현재 단계**: Phase 1 - MVP 개발 (60% 완료) ✅
+- **최종 업데이트**: 2025-10-20 22:10
 
 ---
 
@@ -37,326 +71,324 @@
 
 ### 🖥️ 프론트엔드: Streamlit 대시보드
 **위치:** `C:\Projects\WMS-DashBoard\dashboard\`  
-**상태:** 🚧 개발 중 (Phase 1: 40%)
+**상태:** 🚧 개발 중 (Phase 1: 60%)
 
 백엔드에서 수집한 데이터를 시각화하는 웹 기반 현황판
 
 **완성된 탭 (3/5):**
 - ✅ 📦 입고 현황 - 입고 예정 및 진행 상황
 - ✅ 🚚 출고 현황 - 10개 타입 출고 분석 및 출하금액
-- ✅ 📊 재고 현황 - 4대 핵심 지표, 유효기한 관리 (2025-10-20 완성)
+- ✅ 📊 재고 현황 - 4대 핵심 지표, 유효기한 관리 (2025-10-20 완성!)
 - ⏳ 🗑️ 삭제 현황 - 삭제 처리된 오더 추적 (다음 작업)
 - ⏳ 📋 비정형 오더 - 특수 오더 관리
 
 ---
 
-## ✨ 주요 기능
+## 📊 현재 정확한 진행 상황 (2025-10-20 22:10 기준)
 
-### 📦 입고 대시보드
-**핵심 지표:**
-- 총 입고건수, 총 입고수량
-- 공급사 수, 상품 종류
+### Phase 0: ✅ 100% 완료
+- 환경 구축, 샘플 데이터, BaseCollector, InboundCollector 프로토타입
 
-**주요 기능:**
-- 상위 공급사 TOP 5 차트
-- 입고 예정일 필터링
-- 전체 입고 데이터 테이블
+### Phase 1: 🚧 60% 완료 (Day 9/15)
+
+**완료된 작업:**
+- ✅ Day 6: OutboundCollector 기본 구조
+- ✅ Day 7: OutboundCollector UI 통합 (출고 탭)
+- ✅ Day 8-9: InventoryCollector 개발 + 재고 탭 완성 ← 최신!
+
+**완료된 Collector (3/5):**
+- ✅ InboundCollector (입고)
+- ✅ OutboundCollector (출고)
+- ✅ InventoryCollector (재고) ← 최신 완료!
+
+**완료된 대시보드 탭 (3/5):**
+- ✅ 입고 현황 탭
+- ✅ 출고 현황 탭
+- ✅ 재고 현황 탭 ← 최신 완료!
+
+**다음 작업:**
+- **Day 10-11: DeleteCollector 개발** (삭제 대시보드) ← 다음!
+- Day 12-13: IrregularCollector 개발 (비정형 오더 대시보드)
+- Day 14-15: 실제 데이터 연동 + 통합 테스트
+
+### Phase 2: ⏳ 대기 중 (예정)
+- 실시간 자동 새로고침, 알림 시스템, 성능 최적화 등
 
 ---
 
-### 🚚 출고 대시보드
-**핵심 지표:**
-- 총 출고건수, 총 오더수량
+## 💡 주요 기능 (Phase 1 - MVP)
+
+### 1. 📦 입고 현황 탭 ✅
+**4대 핵심 지표:**
+- 총 입고 건수
+- 총 입고 수량
+- 평균 입고 수량
+- 공급처 수
+
+**주요 기능:**
+- 공급처별 입고량 TOP 10
+- 상품별 입고량 TOP 10
+- 입고 데이터 전체 목록
+
+---
+
+### 2. 🚚 출고 현황 탭 ✅
+**4대 핵심 지표:**
+- 총 출고 건수
+- 총 출고 수량
 - 총 출하금액 (재고 단가 연동)
-- 배송처 수, 상품 종류
+- 출고처 수
 
 **10개 출고 타입:**
-| 타입 | 명칭 | 조회날짜 |
-|------|------|----------|
-| 04 | 지방 캘리스코 출고 | 당일+1 |
-| 05 | 한익스, 키즈 출고 | 당일+1 |
-| 08 | 지방 삼각유부,델리치 50% 출고 | 당일+1 |
-| 14 | 자사 캘리스코 출고 | 당일+1 |
-| 15 | 자사 물품 출고 | 당일+1 |
-| 16 | 지방 (직접 발주 상품) 출고 | 당일 |
-| 17 | 지방 (자동 발주 상품) 출고 | 당일+1 |
-| 18 | 자사 삼각유부,델리치 50% 출고 | 당일+1 |
-| 52 | 지방 캘리스코 출고 | 당일 |
-| 53 | 지방 삼각유부,델리치 50% 출고 | 당일 |
+- 04: 지방 캘리스코 출고
+- 05: 한익스, 키즈 출고
+- 08: 지방 삼각유부,델리치 50% 출고
+- 14: 자사 캘리스코 출고
+- 15: 자사 물품 출고
+- 16: 지방 (직접 발주 상품) 출고
+- 17: 지방 (자동 발주 상품) 출고
+- 18: 자사 삼각유부,델리치 50% 출고
+- 52: 지방 캘리스코 출고
+- 53: 지방 삼각유부,델리치 50% 출고
 
 **주요 기능:**
-- 상위 배송처 TOP 5
-- 상위 출고 상품 TOP 5
-- 출하금액 유효/N/A 통계
-- 전체 출고 데이터 테이블
+- 출고처별 출고량 TOP 10
+- 상품별 출고량 TOP 10
+- 출고유형별 집계 및 차트
+- 출하금액 자동 계산 및 통계
 
 ---
 
-### 📊 재고 대시보드 ⭐ (NEW! 2025-10-20)
+### 3. 📊 재고 현황 탭 ✅ (최신 완성!)
+**4대 핵심 지표:**
+- 총 상품 수
+- 총 가용수량
+- 총 재고금액
+- 위험 상품 수 (유효유통비 ≤ 20%)
 
-#### 4대 핵심 지표
-- 🔢 **총 상품 수** - 관리 중인 상품 종류
-- 📦 **총 가용수량** - 출고 가능한 실제 재고량 (재고수량과 다름!)
-- 💰 **총 재고 금액** - (가용수량 × 단가) 자동 계산
-- ⚠️ **위험 상품 수** - 유효유통비 ≤ 20% 긴급 조치 필요
+**주요 기능:**
+- 평균 유효유통비 (색상 표시)
+- 유효비 구간별 분포 차트
+- 위험 상품 목록 (빨간색 강조)
+- 가용수량 부족 상품 필터
+- 재고금액 TOP 10
+- 전체 재고 목록 (필터/정렬 기능)
 
-#### 재고 관리 기능
-1. **📈 평균 유효유통비**
-   - 색상 표시: 양호(녹색) / 보통(주황) / 주의(빨강)
-   - 재고 전체의 신선도 상태 파악
-
-2. **📊 유효비 구간별 분포**
-   - 위험(≤20%) / 주의(21-50%) / 정상(51-100%)
-   - 바 차트로 시각화
-
-3. **🚨 유효비 위험 상품 테이블**
-   - 유효비 ≤ 20% 상품 목록
-   - 빨간색 배경 강조 (유효비에 따라 농도 차이)
-   - 즉시 조치 필요 경고 메시지
-
-4. **📦 가용수량 부족 상품** (선택 옵션)
-   - 가용수량 ≤ 10개 상품 목록
-   - 재고 보충 필요
-
-5. **💰 재고금액 TOP 10**
-   - 재고금액 상위 10개 상품
-   - 총 재고 금액 통계
-
-6. **📋 전체 재고 목록** (고급 기능)
-   - 필터: 위험/주의/정상 구간별
-   - 정렬: 유효비/가용수량/재고금액
-   - 오름차순/내림차순 변경 가능
+**완성 날짜:** 2025-10-20
 
 ---
 
-### 🔜 예정 기능 (Phase 1 남은 작업)
-- 🗑️ 삭제 현황 대시보드 (Day 10-11)
-- 📋 비정형 오더 대시보드 (Day 12-13)
-- 🔗 실제 데이터 연동 (Day 14-15)
-
-### 🔜 예정 기능 (Phase 2+)
-- 🚨 10종 긴급 알림 시스템
-- 🕐 시간대별 레이아웃 자동 전환
-- 📈 성능 최적화 및 캐싱
-- 📤 데이터 내보내기 (Excel, PDF)
-- ⚙️ 사용자 설정 저장
+### 4. 🗑️ 삭제 현황 탭 ⏳ (다음 작업)
+**예정 기능:**
+- 삭제 건수 및 금액
+- 삭제 사유별 집계
+- 삭제 상품 목록
 
 ---
 
-## 🗂️ 프로젝트 구조
-
-```
-WMS 대시보드 프로젝트 (전체)
-│
-├── 🔧 백엔드 데이터 수집 (C:\OSIS_AUTO\) - 100% ✅
-│   ├── Inbound Status/          (입고 정보)
-│   ├── Outbound Status/         (출고 정보 - 10개 타입)
-│   ├── inventory_status/        (재고 정보 - 422개 상품)
-│   ├── Delete Status/           (삭제 정보)
-│   └── IrregularOrder Status/   (비정형 오더)
-│
-└── 🖥️ 프론트엔드 대시보드 (C:\Projects\WMS-DashBoard\) - 40% 🚧
-    ├── dashboard/
-    │   ├── src/
-    │   │   ├── data/
-    │   │   │   └── collectors/
-    │   │   │       ├── base.py            ✅ (88 lines)
-    │   │   │       ├── inbound.py         ✅ (123 lines)
-    │   │   │       ├── outbound.py        ✅ (185 lines)
-    │   │   │       ├── inventory.py       ✅ (203 lines) NEW!
-    │   │   │       ├── delete.py          ⏳
-    │   │   │       └── irregular.py       ⏳
-    │   │   └── ui/
-    │   │       └── components.py          ✅ (745 lines)
-    │   │           - 입고 컴포넌트 4개   ✅
-    │   │           - 출고 컴포넌트 4개   ✅
-    │   │           - 재고 컴포넌트 5개   ✅ NEW!
-    │   ├── tests/
-    │   │   ├── fixtures/
-    │   │   │   ├── sample_inbound.csv     ✅
-    │   │   │   ├── sample_outbound.csv    ✅
-    │   │   │   ├── sample_inventory.csv   ✅
-    │   │   │   ├── sample_delete.csv      ✅
-    │   │   │   └── sample_irregular.csv   ✅
-    │   │   ├── test_inbound_collector.py  ✅
-    │   │   ├── test_outbound_collector.py ✅
-    │   │   └── test_inventory_collector.py ✅ NEW!
-    │   ├── app.py                         ✅ (322 lines)
-    │   ├── requirements.txt               ✅
-    │   └── venv/                          ✅
-    │
-    ├── PROJECT_STATUS.md                  ✅ (공식 진행 상황)
-    ├── PROJECT_DIARY.md                   ✅ (작업 일지)
-    └── README.md                          ✅ (이 파일)
-```
+### 5. 📋 비정형 오더 탭 ⏳ (예정)
+**예정 기능:**
+- 비정형 오더 건수
+- 처리 상태별 집계
+- 특이사항 목록
 
 ---
 
 ## 🚀 빠른 시작
 
-### 1. 환경 설정
+### 1. 필수 요구사항
+- Python 3.8 이상
+- pip (Python 패키지 관리자)
+
+### 2. 설치
 ```bash
-# 프로젝트 루트로 이동
+# 저장소 클론
 cd C:\Projects\WMS-DashBoard\dashboard
 
-# 가상환경 활성화 (Windows)
+# 가상환경 활성화
 venv\Scripts\activate
 
-# 의존성 설치
+# 패키지 설치
 pip install -r requirements.txt
 ```
 
-### 2. 샘플 데이터로 실행
+### 3. 실행
 ```bash
 # Streamlit 앱 실행
 streamlit run app.py
-
-# 브라우저가 자동으로 열립니다
-# http://localhost:8501
 ```
 
-### 3. 대시보드 사용
-- **입고 탭**: 입고 예정 및 진행 상황 확인
-- **출고 탭**: 10개 타입별 출고 현황 및 출하금액
-- **재고 탭**: 4대 핵심 지표, 유효기한 관리, 위험 상품 경고 ⭐
+브라우저에서 자동으로 `http://localhost:8501` 열림
 
----
-
-## 📊 개발 단계
-
-### ✅ Phase 0: 사전 조사 및 환경 구축 (완료)
-- 기존 시스템 분석
-- 현장 인터뷰
-- Git 저장소 생성
-- BaseCollector 추상 클래스 설계
-- 샘플 데이터 확보
-
-### 🚧 Phase 1: MVP 개발 (40% 완료)
-**Day 6-9 완료:**
-- ✅ OutboundCollector 개발
-- ✅ 출고 탭 UI 통합
-- ✅ InventoryCollector 개발 (2025-10-20)
-- ✅ 재고 탭 UI 통합 (2025-10-20)
-- ✅ 3개 탭 시스템 완성
-
-**Day 10-15 예정:**
-- ⏳ DeleteCollector 개발 (Day 10-11)
-- ⏳ IrregularCollector 개발 (Day 12-13)
-- ⏳ 실제 데이터 연동 (Day 14-15)
-- ⏳ 통합 테스트 및 버그 수정
-
-```
-Phase 1 진행률: 40%
-━━━━━━━━░░░░░░░░░░░░
-
-Day 6  ████ ✅
-Day 7  ████ ✅
-Day 8  ████ ✅
-Day 9  ████ ✅ (재고 탭)
-Day 10 ░░░░ 다음
-Day 11 ░░░░
-Day 12 ░░░░
-Day 13 ░░░░
-Day 14 ░░░░
-Day 15 ░░░░
-```
-
-### ⏳ Phase 2: 고도화 (예정)
-- 실시간 데이터 갱신
-- 10종 긴급 알림 시스템
-- 시간대별 레이아웃 자동 전환
-- 성능 최적화
-- 사용자 설정 관리
-
-### ⏳ Phase 3: 확장 (예정)
-- 모바일 최적화
-- 데이터 내보내기 (Excel, PDF)
-- 이력 관리 및 추세 분석
-- API 개발
-
----
-
-## 🛠️ 기술 스택
-
-### 백엔드
-- **Python 3.12**
-- **Pandas** - 데이터 처리
-- **파일 시스템** - CSV 기반 데이터 수집
-
-### 프론트엔드
-- **Streamlit** - 웹 대시보드 프레임워크
-- **Pandas** - 데이터 처리
-- **Plotly** - 인터랙티브 차트 (예정)
-
-### 개발 도구
-- **Git/GitHub** - 버전 관리
-- **VSCode** - 코드 에디터
-- **pytest** - 단위 테스트 (예정)
-
----
-
-## 📈 프로젝트 진행률
-
-### 전체 진행률: 24%
-```
-Phase 0: 사전 조사        ████████████████████ 100% ✅
-Phase 1: MVP 개발         ████████░░░░░░░░░░░░  40% 🚧
-Phase 2: 고도화           ░░░░░░░░░░░░░░░░░░░░   0% ⏳
-Phase 3: 확장             ░░░░░░░░░░░░░░░░░░░░   0% ⏳
-```
-
-### 백엔드 시스템: 100% ✅
-```
-Inbound Status       ████████████████████ 100% ✅
-Outbound Status      ████████████████████ 100% ✅
-inventory_status     ████████████████████ 100% ✅
-Delete Status        ████████████████████ 100% ✅
-IrregularOrder       ████████████████████ 100% ✅
-```
-
-### 프론트엔드 시스템: 40% 🚧
-```
-BaseCollector        ████████████████████ 100% ✅
-InboundCollector     ████████████████████ 100% ✅
-OutboundCollector    ████████████████████ 100% ✅
-InventoryCollector   ████████████████████ 100% ✅ NEW!
-DeleteCollector      ░░░░░░░░░░░░░░░░░░░░   0% 다음
-IrregularCollector   ░░░░░░░░░░░░░░░░░░░░   0%
+### 4. 데이터 소스 설정 (Phase 1 Day 14-15에 진행 예정)
+```yaml
+# config/data_sources.yaml 예시
+inbound:
+  path: "C:/OSIS_AUTO/Inbound Status/inbound_merged_YYYYMMDD.csv"
+  
+outbound:
+  path: "C:/OSIS_AUTO/Outbound Status/outbound_XX_YYYYMMDD.csv"
+  
+inventory:
+  path: "C:/OSIS_AUTO/inventory_status/inventory_status_YYYYMMDD.csv"
 ```
 
 ---
 
-## 📝 주요 성과
+## 📁 프로젝트 구조
 
-### Phase 0
-- ✅ 확장 가능한 아키텍처 설계 (BaseCollector 추상 클래스)
-- ✅ 5종 샘플 데이터 확보 및 구조 분석
-- ✅ InboundCollector 프로토타입 완성
-
-### Phase 1 (진행 중)
-- ✅ OutboundCollector 완성 (Day 6-7)
-- ✅ InventoryCollector 완성 (Day 8-9) ⭐
-- ✅ 3개 탭 대시보드 완성 (입고/출고/재고)
-- ✅ 백엔드 백업 시스템 추가 (4개 모듈)
-- ✅ 출고 출하금액 자동 계산 기능
-- ✅ 재고 유효비 위험 상품 빨간색 강조
-- ✅ 재고 필터/정렬 기능 구현
+```
+C:\Projects\WMS-DashBoard\
+│
+├── dashboard/                      # Streamlit 대시보드
+│   ├── app.py                     # 메인 앱 (3개 탭 완성)
+│   ├── requirements.txt           # 패키지 의존성
+│   │
+│   ├── config/                    # 설정 파일
+│   │   ├── config.example.yaml   # 설정 예시
+│   │   └── data_sources.yaml     # 데이터 소스 설정
+│   │
+│   ├── src/                       # 소스 코드
+│   │   ├── data/collectors/       # 데이터 수집기
+│   │   │   ├── base.py           # 추상 베이스 클래스
+│   │   │   ├── inbound.py        # 입고 수집기 ✅
+│   │   │   ├── outbound.py       # 출고 수집기 ✅
+│   │   │   ├── inventory.py      # 재고 수집기 ✅ (최신!)
+│   │   │   ├── delete.py         # 삭제 수집기 (다음 작업)
+│   │   │   └── irregular.py      # 비정형 수집기 (예정)
+│   │   │
+│   │   ├── business/             # 비즈니스 로직
+│   │   ├── ui/                   # UI 계층
+│   │   │   └── components.py     # Streamlit 컴포넌트
+│   │   └── utils/                # 유틸리티
+│   │
+│   └── tests/                    # 테스트
+│       ├── fixtures/             # 샘플 데이터 (5종)
+│       └── test_*.py             # 단위 테스트
+│
+├── docs/                         # 문서
+├── scripts/                      # 스크립트
+├── PROJECT_STATUS.md             # 진행 상황 (상세)
+├── PROJECT_DIARY.md              # 작업 일지 (1783줄)
+└── README.md                     # 프로젝트 개요 (이 파일)
+```
 
 ---
 
-## 🔗 관련 링크
+## 🔧 백엔드 시스템 (C:\OSIS_AUTO\)
 
-- **GitHub**: https://github.com/The-Kero/WMS-DashBoard
-- **프로젝트 상태**: [PROJECT_STATUS.md](PROJECT_STATUS.md)
-- **작업 일지**: [PROJECT_DIARY.md](PROJECT_DIARY.md)
+### 5개 핵심 모듈 상태: ✅ 100% 완성
+
+#### 1. Inbound Status (입고 정보)
+- 파일: `inbound_merged_YYYYMMDD.csv`
+- 백업 시스템: ✅
+
+#### 2. Outbound Status (출고 정보)
+- 파일: `outbound_XX_YYYYMMDD.csv` (10개 타입)
+- 출하금액 자동 계산: ✅
+- 백업 시스템: ✅
+- 최근 데이터: 10,261건, 약 7,942만원
+
+#### 3. inventory_status (재고 정보)
+- 파일: `inventory_status_YYYYMMDD.csv`
+- 백업 시스템: ✅ (최초 구현)
+- 최근 데이터: 422개 상품, 200,847개 재고
+- 유효유통비 자동 계산: ✅
+
+#### 4. Delete Status (삭제 정보)
+- 파일: `delete_status_YYYYMMDD.csv`
+- 백업 시스템: ✅
+
+#### 5. IrregularOrder Status (비정형 오더)
+- 파일: `irregular_order_YYYYMMDD.csv`
+- 백업 시스템: ✅
+
+---
+
+## 📈 개발 단계별 체크리스트
+
+### Phase 0: 사전 조사 및 환경 구축 ✅ 완료
+```
+[████████████████████] 100%
+```
+- [x] 기존 5개 프로그램 분석
+- [x] 현장 인터뷰
+- [x] Git 저장소 생성
+- [x] 샘플 데이터 확보
+- [x] BaseCollector 작성
+- [x] InboundCollector 프로토타입
+- [x] 메인 앱 작성 (app.py)
+
+---
+
+### Phase 1: MVP 개발 🚧 진행 중 (60%)
+```
+[████████████░░░░░░░░] 60%
+```
+
+**완료 (Day 6-9):**
+- [x] OutboundCollector 개발 (Day 6)
+- [x] OutboundCollector UI 통합 (Day 7)
+- [x] InventoryCollector 개발 (Day 8-9) ✅
+- [x] 재고 탭 완성 (Day 8-9) ✅
+
+**다음 작업 (Day 10-11):**
+- [ ] DeleteCollector 개발
+- [ ] 삭제 탭 통합
+
+**예정 (Day 12-15):**
+- [ ] IrregularCollector 개발 (Day 12-13)
+- [ ] 실제 데이터 연동 (Day 14-15)
+- [ ] 통합 테스트 (Day 14-15)
+
+---
+
+### Phase 2: 확장 및 최적화 ⏳ 대기 중
+```
+[░░░░░░░░░░░░░░░░░░░░] 0%
+```
+- [ ] 실시간 자동 새로고침
+- [ ] 알림 시스템
+- [ ] 데이터 필터링 및 검색
+- [ ] 엑셀 내보내기
+- [ ] 반응형 레이아웃
+- [ ] 성능 최적화
+
+---
+
+## 📚 관련 문서
+
+- [PROJECT_STATUS.md](PROJECT_STATUS.md) - 상세 진행 상황 및 작업 내역
+- [PROJECT_DIARY.md](PROJECT_DIARY.md) - 일별 작업 일지 (1783줄, **끝부분부터 읽기!**)
+- `docs/architecture.md` - 시스템 아키텍처
+- `docs/api_reference.md` - API 레퍼런스
+- `docs/user_guide.md` - 사용자 가이드
+
+---
+
+## 🤝 기여 가이드
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
 
 ## 📞 문의
 
-프로젝트 관련 문의사항은 GitHub Issues를 활용해주세요.
+프로젝트 관련 문의사항은 GitHub Issues를 통해 남겨주세요.
 
 ---
 
-**마지막 업데이트:** 2025-10-20 21:22 (일요일)  
-**작성자:** 4명 전문가 팀 (풀스택/UX디자이너/데이터엔지니어/데브옵스)
+## 🔗 관련 링크
+
+- **GitHub:** https://github.com/The-Kero/WMS-DashBoard.git
+- **로컬 경로:** C:\Projects\WMS-DashBoard\
+- **백엔드 경로:** C:\OSIS_AUTO\
+
+---
+
+**마지막 업데이트:** 2025-10-20 22:10 (일요일)  
+**다음 작업:** DeleteCollector 개발 (Day 10-11)
