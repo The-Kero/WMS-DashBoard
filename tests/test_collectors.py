@@ -152,3 +152,85 @@ class TestInboundCollector:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])
+
+
+class TestDeleteCollector:
+    """DeleteCollector 테스트"""
+    
+    @pytest.fixture
+    def delete_csv_path(self):
+        """테스트용 CSV 경로"""
+        return r"C:\OSIS_AUTO\Delete Status\delete_status_20251029.csv"
+    
+    @pytest.fixture
+    def delete_collector(self, delete_csv_path):
+        """DeleteCollector 인스턴스"""
+        from dashboard.src.data.collectors.delete import DeleteCollector
+        return DeleteCollector(delete_csv_path, encoding='utf-8-sig')
+    
+    def test_required_columns(self):
+        """필수 컬럼 15개 확인"""
+        from dashboard.src.data.collectors.delete import DeleteCollector
+        expected_columns = [
+            '삭제처리일', '삭제처리시간', '상품', '상품명', '단위 및 규격',
+            '삭제수량', '주문일자', '배송군', '배송처', '배송처명',
+            '라벨출력', '출하바코드', 'To로케이션', '알림여부', '알림시각'
+        ]
+        assert DeleteCollector.REQUIRED_COLUMNS == expected_columns
+        assert len(DeleteCollector.REQUIRED_COLUMNS) == 15
+    
+    def test_file_exists(self, delete_collector):
+        """파일 존재 확인"""
+        assert delete_collector.file_exists()
+    
+    def test_load_data(self, delete_collector):
+        """데이터 로드 테스트"""
+        df = delete_collector.load_data()
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) > 0
+        assert '삭제처리시간_time' in df.columns
+        assert '삭제수량' in df.columns
+        assert df['삭제수량'].dtype in ['int64', 'float64']
+    
+    def test_validate(self, delete_collector):
+        """데이터 검증 테스트"""
+        df = delete_collector.load_data()
+        assert delete_collector.validate(df) == True
+    
+    def test_count_after_18(self, delete_collector):
+        """18시 이후 카운트 테스트"""
+        count = delete_collector.count_after_18()
+        assert isinstance(count, int)
+        assert count >= 0
+    
+    def test_get_urgent_deletes(self, delete_collector):
+        """긴급 삭제 조회 테스트"""
+        urgent = delete_collector.get_urgent_deletes()
+        assert isinstance(urgent, pd.DataFrame)
+        # 18시 이후 + 알림Y 조건 확인
+        if len(urgent) > 0:
+            assert all(urgent['알림여부'] == 'Y')
+    
+    def test_get_summary(self, delete_collector):
+        """요약 정보 테스트"""
+        summary = delete_collector.get_summary()
+        assert '총삭제건수' in summary
+        assert '18시이후건수' in summary
+        assert '긴급알림건수' in summary
+        assert '총삭제수량' in summary
+        assert '배송처수' in summary
+        assert summary['총삭제건수'] > 0
+        assert isinstance(summary['평균삭제수량'], float)
+    
+    def test_get_top_products(self, delete_collector):
+        """상위 삭제 상품 테스트"""
+        top_products = delete_collector.get_top_products(5)
+        assert isinstance(top_products, pd.DataFrame)
+        if len(top_products) > 0:
+            assert '삭제수량' in top_products.columns
+            assert '삭제건수' in top_products.columns
+            assert len(top_products) <= 5
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v", "--tb=short"])
