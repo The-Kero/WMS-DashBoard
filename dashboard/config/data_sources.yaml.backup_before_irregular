@@ -9,21 +9,20 @@ sources:
   - name: inbound
     enabled: true
     description: "입고 정보"
-    path: "C:/OSIS_AUTO/Inbound Status/integrated_inbound_{date}.csv"
+    path: "C:/OSIS_AUTO/Inbound Status/inbound_merged_{date}.csv"
     refresh_interval: 30
     required_columns:
-      - 입고예정일
       - 입고예정번호
+      - 공급사
       - 공급사명
       - 입고유형
+      - 입고예정일
+      - 로케이션
       - 상품
       - 상품명
       - 단위및규격
       - 소비기한
-      - 기본로케이션
-      - 입고예정수량
-      - 총입고수량
-      - 진척률
+      - 입고수량
     
   - name: outbound
     enabled: true
@@ -78,13 +77,12 @@ sources:
     path: "C:/OSIS_AUTO/IrregularOrder Status/irregular_order_{date}.csv"
     refresh_interval: 60
     required_columns:
-      - 상세내용
-      - 출고센터명
-      - 입고센터명
+      - 상세내역
+      - 공급처명
+      - 입고처명
       - 상품명
-      - 입출수량
-      - 라벨출력
-      - 최초입력시각
+      - 오더수량
+      - 현황
 
   # 새 모듈 추가 예시 (현재 비활성화)
   # - name: new_module

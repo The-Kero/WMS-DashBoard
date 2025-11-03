@@ -1,7 +1,7 @@
 """
 InboundCollector: 입고정보 데이터 수집기
 
-입고예정번호, 공급사, 입고예정일, 상품정보 등을 수집
+입고예정번호, 공급사명, 입고예정일, 상품정보, 진척률 등을 수집
 """
 
 import pandas as pd
@@ -12,9 +12,9 @@ class InboundCollector(BaseCollector):
     """입고정보 수집기"""
     
     REQUIRED_COLUMNS = [
-        '입고예정번호', '공급사', '공급사명', '입고유형',
-        '입고예정일', '로케이션', '상품', '상품명',
-        '단위및규격', '소비기한', '입고수량'
+        '입고예정일', '입고예정번호', '공급사명', '입고유형',
+        '상품', '상품명', '단위및규격', '소비기한',
+        '기본로케이션', '입고예정수량', '총입고수량', '진척률'
     ]
     
     def load_data(self) -> pd.DataFrame:
@@ -31,7 +31,7 @@ class InboundCollector(BaseCollector):
         if not self.file_exists():
             raise FileNotFoundError(f"파일을 찾을 수 없습니다: {self.file_path}")
         
-        # CSV 읽기
+        # CSV 읽기 (BOM 처리)
         df = pd.read_csv(self.file_path, encoding=self.encoding)
         
         # 데이터 검증
@@ -41,7 +41,9 @@ class InboundCollector(BaseCollector):
         # 데이터 타입 변환
         df['입고예정일'] = pd.to_datetime(df['입고예정일'], format='%Y%m%d', errors='coerce')
         df['소비기한'] = pd.to_datetime(df['소비기한'], format='%Y%m%d', errors='coerce')
-        df['입고수량'] = pd.to_numeric(df['입고수량'], errors='coerce')
+        df['입고예정수량'] = pd.to_numeric(df['입고예정수량'], errors='coerce')
+        df['총입고수량'] = pd.to_numeric(df['총입고수량'], errors='coerce')
+        df['진척률'] = pd.to_numeric(df['진척률'], errors='coerce')
         
         return df
     
@@ -77,10 +79,20 @@ class InboundCollector(BaseCollector):
         """
         df = self.get_data()
         
+        # 진척률 기반 통계
+        입고완료 = df[df['진척률'] >= 100.0]
+        진행중 = df[(df['진척률'] > 0) & (df['진척률'] < 100.0)]
+        미입고 = df[df['진척률'] == 0.0]
+        
         return {
             '총_입고건수': len(df),
-            '총_입고수량': df['입고수량'].sum(),
-            '공급사_수': df['공급사'].nunique(),
+            '입고완료건수': len(입고완료),
+            '진행중건수': len(진행중),
+            '미입고건수': len(미입고),
+            '총_입고예정수량': df['입고예정수량'].sum(),
+            '총_입고수량': df['총입고수량'].sum(),
+            '평균_진척률': df['진척률'].mean(),
+            '공급사_수': df['공급사명'].nunique(),
             '상품_종류': df['상품'].nunique(),
             '최근_입고예정일': df['입고예정일'].max(),
             '최초_입고예정일': df['입고예정일'].min(),
@@ -97,8 +109,32 @@ class InboundCollector(BaseCollector):
             공급사별 입고수량 DataFrame
         """
         df = self.get_data()
-        return (df.groupby(['공급사', '공급사명'])['입고수량']
-                .sum()
-                .sort_values(ascending=False)
+        return (df.groupby('공급사명')
+                .agg({
+                    '총입고수량': 'sum',
+                    '입고예정번호': 'count'
+                })
+                .rename(columns={'입고예정번호': '입고건수'})
+                .sort_values('총입고수량', ascending=False)
                 .head(n)
                 .reset_index())
+    
+    def get_pending_inbounds(self) -> pd.DataFrame:
+        """
+        미입고 또는 진행중인 입고 목록
+        
+        Returns:
+            진척률 < 100% 입고 DataFrame
+        """
+        df = self.get_data()
+        return df[df['진척률'] < 100.0].sort_values('입고예정일')
+    
+    def get_completed_inbounds(self) -> pd.DataFrame:
+        """
+        입고 완료된 목록
+        
+        Returns:
+            진척률 100% 입고 DataFrame
+        """
+        df = self.get_data()
+        return df[df['진척률'] >= 100.0].sort_values('입고예정일', ascending=False)
