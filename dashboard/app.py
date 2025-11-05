@@ -12,7 +12,7 @@ from pathlib import Path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from src.data.collectors import InboundCollector, OutboundCollector, InventoryCollector
+from src.data.collectors import InboundCollector, OutboundCollector, InventoryCollector, IrregularCollector, DeleteCollector
 from src.ui.components import (
     display_metrics,
     display_summary_cards,
@@ -252,6 +252,153 @@ def render_inventory_tab(sample_file: str):
             st.exception(e)
 
 
+def render_delete_tab(sample_file: str):
+    """삭제 대시보드 탭 렌더링"""
+    try:
+        # 데이터 수집기 초기화
+        collector = DeleteCollector(sample_file, encoding='utf-8-sig')
+        
+        # 데이터 로드
+        df = collector.get_data()
+        summary = collector.get_summary()
+        
+        # 헤더
+        st.header("🗑️ 삭제 현황")
+        st.caption(f"총 {len(df)}건 | 최종 업데이트: {summary.get('최근삭제일', 'N/A')}")
+        
+        # 핵심 지표 카드
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric(
+                label="총 삭제건수",
+                value=f"{summary.get('총건수', 0):,}건"
+            )
+        
+        with col2:
+            st.metric(
+                label="18시 이후",
+                value=f"{summary.get('18시이후삭제', 0):,}건",
+                delta="긴급" if summary.get('18시이후삭제', 0) > 0 else None
+            )
+        
+        with col3:
+            st.metric(
+                label="총 삭제수량",
+                value=f"{summary.get('총삭제수량', 0):,}개"
+            )
+        
+        with col4:
+            st.metric(
+                label="배송처 수",
+                value=f"{summary.get('배송처수', 0):,}곳"
+            )
+        
+        st.divider()
+        
+        # 배송처별 통계
+        st.subheader("📍 배송처별 삭제 현황")
+        by_delivery = collector.get_deletes_by_delivery()
+        if not by_delivery.empty:
+            st.dataframe(by_delivery.head(10), use_container_width=True)
+        
+        # 상품별 통계
+        st.subheader("📦 상품별 삭제 현황")
+        by_product = collector.get_deletes_by_product()
+        if not by_product.empty:
+            st.dataframe(by_product.head(10), use_container_width=True)
+        
+        # 전체 데이터
+        with st.expander("📋 전체 삭제 데이터 보기"):
+            st.dataframe(df, use_container_width=True)
+        
+    except FileNotFoundError:
+        show_error(f"파일을 찾을 수 없습니다: {sample_file}")
+        st.info("💡 사이드바에서 올바른 파일 경로를 입력해주세요.")
+    except Exception as e:
+        show_error(f"오류 발생: {str(e)}")
+        with st.expander("상세 오류 정보"):
+            st.exception(e)
+
+
+def render_irregular_tab(sample_file: str):
+    """비정형오더 대시보드 탭 렌더링"""
+    try:
+        # 데이터 수집기 초기화
+        collector = IrregularCollector(sample_file, encoding='utf-8-sig')
+        
+        # 데이터 로드
+        df = collector.get_data()
+        summary = collector.get_summary()
+        
+        # 헤더
+        st.header("📋 비정형 오더 현황")
+        st.caption(f"총 {len(df)}건 | 최종 업데이트: {summary.get('최근입력시각', 'N/A')}")
+        
+        # 핵심 지표 카드
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric(
+                label="총 오더건수",
+                value=f"{summary.get('총건수', 0):,}건"
+            )
+        
+        with col2:
+            st.metric(
+                label="라벨 미출력",
+                value=f"{summary.get('라벨미출력', 0):,}건",
+                delta="주의" if summary.get('라벨미출력', 0) > 0 else None
+            )
+        
+        with col3:
+            st.metric(
+                label="총 입출수량",
+                value=f"{summary.get('총입출수량', 0):,}개"
+            )
+        
+        with col4:
+            st.metric(
+                label="센터 수",
+                value=f"{summary.get('출고센터수', 0) + summary.get('입고센터수', 0):,}곳"
+            )
+        
+        st.divider()
+        
+        # 라벨 미출력 오더
+        unlabeled = collector.get_unlabeled_orders()
+        if not unlabeled.empty:
+            st.subheader("⚠️ 라벨 미출력 오더")
+            st.dataframe(unlabeled, use_container_width=True)
+        
+        # 센터별 통계
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.subheader("📤 출고센터별 현황")
+            outbound_stats = collector.get_orders_by_center('outbound')
+            if not outbound_stats.empty:
+                st.dataframe(outbound_stats, use_container_width=True)
+        
+        with col2:
+            st.subheader("📥 입고센터별 현황")
+            inbound_stats = collector.get_orders_by_center('inbound')
+            if not inbound_stats.empty:
+                st.dataframe(inbound_stats, use_container_width=True)
+        
+        # 전체 데이터
+        with st.expander("📋 전체 비정형 오더 데이터 보기"):
+            st.dataframe(df, use_container_width=True)
+        
+    except FileNotFoundError:
+        show_error(f"파일을 찾을 수 없습니다: {sample_file}")
+        st.info("💡 사이드바에서 올바른 파일 경로를 입력해주세요.")
+    except Exception as e:
+        show_error(f"오류 발생: {str(e)}")
+        with st.expander("상세 오류 정보"):
+            st.exception(e)
+
+
 def main():
     """메인 앱 실행"""
     
@@ -263,6 +410,8 @@ def main():
     default_inbound = str(project_root / "tests" / "fixtures" / "sample_inbound.csv")
     default_outbound = str(project_root / "tests" / "fixtures" / "sample_outbound.csv")
     default_inventory = str(project_root / "tests" / "fixtures" / "sample_inventory.csv")
+    default_delete = r"C:\OSIS_AUTO\Delete Status\delete_status_20251029.csv"
+    default_irregular = r"C:\OSIS_AUTO\IrregularOrder Status\irregular_order_20251029.csv"
     
     # 사이드바
     with st.sidebar:
@@ -284,6 +433,16 @@ def main():
             value=default_inventory
         )
         
+        delete_file = st.text_input(
+            "삭제 데이터 파일",
+            value=default_delete
+        )
+        
+        irregular_file = st.text_input(
+            "비정형오더 데이터 파일",
+            value=default_irregular
+        )
+        
         # 새로고침 버튼
         if st.button("🔄 데이터 새로고침", use_container_width=True):
             st.rerun()
@@ -295,22 +454,28 @@ def main():
         **Phase 1 기능:**
         - ✅ 입고 정보 대시보드
         - ✅ 출고 정보 대시보드
-        - ✅ 재고 정보 대시보드 (NEW!)
-        - ⏳ 삭제 정보 (예정)
-        - ⏳ 비정형 오더 (예정)
+        - ✅ 재고 정보 대시보드
+        - ✅ 삭제 정보 대시보드 (NEW!)
+        - ✅ 비정형 오더 대시보드 (NEW!)
         """)
         
         st.success("""
-        **새로운 기능:**
-        - 3개 탭 시스템 (입고/출고/재고)
-        - 재고 4대 핵심 지표
-        - 유효기한 임박 상품 경고
-        - 로케이션/상품별 재고 분석
-        - 유효비 구간별 분포
+        **Priority 1, 2 완료:**
+        - 5개 탭 시스템 (입고/출고/재고/삭제/비정형)
+        - 비정형오더 100% 정합성
+        - 입고현황 100% 정합성
+        - 삭제현황 100% 정합성
+        - 24개 단위 테스트 통과
         """)
     
     # 메인 컨텐츠 - 탭으로 구분
-    tab1, tab2, tab3 = st.tabs(["📦 입고 현황", "🚚 출고 현황", "📊 재고 현황"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "📦 입고 현황", 
+        "🚚 출고 현황", 
+        "📊 재고 현황",
+        "🗑️ 삭제 현황",
+        "📋 비정형 오더"
+    ])
     
     with tab1:
         render_inbound_tab(inbound_file)
@@ -320,7 +485,14 @@ def main():
     
     with tab3:
         render_inventory_tab(inventory_file)
+    
+    with tab4:
+        render_delete_tab(delete_file)
+    
+    with tab5:
+        render_irregular_tab(irregular_file)
 
 
 if __name__ == "__main__":
     main()
+

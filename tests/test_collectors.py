@@ -150,10 +150,6 @@ class TestInboundCollector:
         assert len(top_suppliers) <= 3
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-v", "--tb=short"])
-
-
 class TestDeleteCollector:
     """DeleteCollector 테스트"""
     
@@ -188,7 +184,7 @@ class TestDeleteCollector:
         df = delete_collector.load_data()
         assert isinstance(df, pd.DataFrame)
         assert len(df) > 0
-        assert '삭제처리시간_time' in df.columns
+        assert '삭제시각' in df.columns  # time 객체로 변환된 컬럼
         assert '삭제수량' in df.columns
         assert df['삭제수량'].dtype in ['int64', 'float64']
     
@@ -214,22 +210,25 @@ class TestDeleteCollector:
     def test_get_summary(self, delete_collector):
         """요약 정보 테스트"""
         summary = delete_collector.get_summary()
-        assert '총삭제건수' in summary
-        assert '18시이후건수' in summary
-        assert '긴급알림건수' in summary
+        assert '총건수' in summary
+        assert '18시이후삭제' in summary
+        assert '알림완료' in summary
+        assert '알림미완료' in summary
         assert '총삭제수량' in summary
         assert '배송처수' in summary
-        assert summary['총삭제건수'] > 0
-        assert isinstance(summary['평균삭제수량'], float)
+        assert summary['총건수'] > 0
+        # numpy types도 허용
+        import numpy as np
+        assert isinstance(summary['총삭제수량'], (int, float, np.integer, np.floating))
     
-    def test_get_top_products(self, delete_collector):
-        """상위 삭제 상품 테스트"""
-        top_products = delete_collector.get_top_products(5)
-        assert isinstance(top_products, pd.DataFrame)
-        if len(top_products) > 0:
-            assert '삭제수량' in top_products.columns
-            assert '삭제건수' in top_products.columns
-            assert len(top_products) <= 5
+    def test_get_deletes_by_delivery(self, delete_collector):
+        """배송처별 통계 테스트"""
+        by_delivery = delete_collector.get_deletes_by_delivery()
+        assert isinstance(by_delivery, pd.DataFrame)
+        if len(by_delivery) > 0:
+            assert '배송처명' in by_delivery.columns
+            assert '삭제건수' in by_delivery.columns
+            assert '총삭제수량' in by_delivery.columns
 
 
 if __name__ == "__main__":
