@@ -1,0 +1,11 @@
+# WMS Dashboard - TV Monitor Layout v9 (실제 데이터 연동)
+FROM nginx:alpine
+
+# HTML 파일을 nginx 기본 디렉토리로 복사
+COPY Layout/ourhome_layout_v9.html /usr/share/nginx/html/index.html
+COPY Layout/ourhome_ci.png /usr/share/nginx/html/ourhome_ci.png
+
+# 포트 노출
+EXPOSE 80
+
+# Nginx 실행 (기본 CMD 사용)

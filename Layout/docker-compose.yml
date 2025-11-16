@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  wms-dashboard:
+    build: .
+    container_name: wms-dashboard-v6
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      - wms-network
+
+networks:
+  wms-network:
+    driver: bridge

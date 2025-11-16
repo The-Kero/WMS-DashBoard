@@ -1,0 +1,85 @@
+{
+    "date": "20251116",
+    "card2": {
+        "totalCount": 50,
+        "progressRate": 36.0,
+        "inboundRiskyCount": 1,
+        "riskyItems": [],
+        "testMode": false
+    },
+    "card3": {
+        "totalCount": 5,
+        "urgentCount": 0,
+        "warningCount": 5,
+        "riskyItems": [
+            {
+                "location": "K040901",
+                "productCode": "27576687",
+                "productName": "(갓잇)블랙페퍼마요",
+                "expiryDate": "20251204",
+                "stockQty": 59,
+                "validityRatio": 15.0
+            },
+            {
+                "location": "K041101",
+                "productCode": "27576700",
+                "productName": "★(갓잇)치폴레소스",
+                "expiryDate": "20251204",
+                "stockQty": 33,
+                "validityRatio": 15.0
+            },
+            {
+                "location": "K100001",
+                "productCode": "25961874",
+                "productName": "[Careplus] 토마토스파게티소스 행복한맛남",
+                "expiryDate": "20251201",
+                "stockQty": 15,
+                "validityRatio": 16.0
+            },
+            {
+                "location": "K050801",
+                "productCode": "41126073",
+                "productName": "쫄면사리",
+                "expiryDate": "20251215",
+                "stockQty": 8,
+                "validityRatio": 17.0
+            },
+            {
+                "location": "K100001",
+                "productCode": "25961874",
+                "productName": "[Careplus] 토마토스파게티소스 행복한맛남",
+                "expiryDate": "20251201",
+                "stockQty": 10,
+                "validityRatio": 18.0
+            }
+        ]
+    },
+    "card5": {
+        "amount": 71412437,
+        "compare": 20.0,
+        "totalLabel": 6090,
+        "unprintedLabel": 0,
+        "irregularTotal": 2,
+        "irregularUnprinted": 2
+    },
+    "card6": {
+        "amount": 15673557,
+        "compare": -0.4,
+        "unprintedPicking": 8,
+        "destinations": {
+            "jeju": 157,
+            "jecheon": 8,
+            "honam": 193,
+            "gumi": 15,
+            "gyeryong": 185,
+            "eumseong": 66,
+            "yongin2": 1456,
+            "yongin3": 26,
+            "ansan": 336,
+            "yangsan": 350,
+            "yangsan2": 2111,
+            "hanex": 4,
+            "kids": 1
+        }
+    }
+}
