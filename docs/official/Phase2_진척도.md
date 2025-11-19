@@ -406,16 +406,16 @@ CollectorService가 import하는 Collector 모듈들이 실제로 존재하지 �
 - 예상 시간: 8시간 → **10시간**
 - 실제 소요: 1.5시간 (진행중)
 
-**Day 1 상태:** 🔄 진행중 (1.15 Collector 모듈 작성 대기)
-  - [ ] /api/inbound
-  - [ ] /api/outbound
-  - [ ] /api/inventory
-  - [ ] /api/delete
-  - [ ] /api/irregular
-- [ ] ✅ JSON 응답 구조 정상 (success, summary, data)
-- [ ] ✅ logs/app.log 파일 생성 확인
-- [ ] ✅ 에러 로그 없음
-- [ ] ✅ Git 커밋 완료
+**Day 1 상태:** ✅ 완료
+  - [x] /api/inbound
+  - [x] /api/outbound
+  - [x] /api/inventory
+  - [x] /api/delete
+  - [x] /api/irregular
+- [x] ✅ JSON 응답 구조 정상 (success, summary, data)
+- [x] ✅ logs/app.log 파일 생성 확인
+- [x] ✅ 에러 로그 없음
+- [x] ✅ Git 커밋 완료
 
 **Day 1 최종 완료율**: 100% (80/80개 완료) ✅  
 **실제 소요시간**: 1.5시간 ⚡  
@@ -714,29 +714,31 @@ CollectorService가 import하는 Collector 모듈들이 실제로 존재하지 �
 ---
 
 ### 🌅 오전 2부 (10:45-12:00) - 응답 구조 작성
-- [ ] 2.3.1 빈 줄 추가
-- [ ] 2.3.2 `# 응답 구성` 주석
-- [ ] 2.3.3 `response = { 'success': True, 'cards': [] }` 시작
-- [ ] 2.3.4 카드2 (입고) dict 작성
-- [ ] 2.3.5 카드2 data 필드 (totalCount, progressRate) 추가
-- [ ] 2.3.6 cards 리스트에 추가
-- [ ] 2.3.7 빈 줄 추가
-- [ ] 2.3.8 카드3 (재고) dict 작성
-- [ ] 2.3.9 카드3 data 필드 (totalCount, urgentCount) 추가
-- [ ] 2.3.10 risky_products Top 10 추가
-- [ ] 2.3.11 cards 리스트에 추가
-- [ ] 2.3.12 빈 줄 추가
-- [ ] 2.3.13 카드5 (자사출고) dict 작성
-- [ ] 2.3.14 카드5 data 필드 (amount, totalLabel) 추가
-- [ ] 2.3.15 irregular 데이터 추가
-- [ ] 2.3.16 cards 리스트에 추가
-- [ ] 2.3.17 빈 줄 추가
-- [ ] 2.3.18 카드6 (지방출고) dict 작성
-- [ ] 2.3.19 카드6 data 필드 (amount, destinations) 추가
-- [ ] 2.3.20 cards 리스트에 추가
-- [ ] 2.3.21 빈 줄 추가
-- [ ] 2.3.22 timestamp 필드 추가
-- [ ] 2.3.23 `return jsonify(response)` 추가
+- [x] 2.3.1 빈 줄 추가
+- [x] 2.3.2 `# 응답 구성` 주석
+- [x] 2.3.3 `response = { 'success': True, 'cards': [] }` 시작
+- [x] 2.3.4 카드2 (입고) dict 작성
+- [x] 2.3.5 카드2 data 필드 (totalCount, progressRate) 추가
+- [x] 2.3.6 cards 리스트에 추가
+- [x] 2.3.7 빈 줄 추가
+- [x] 2.3.8 카드3 (재고) dict 작성
+- [x] 2.3.9 카드3 data 필드 (totalCount, urgentCount) 추가
+- [x] 2.3.10 risky_products Top 10 추가
+- [x] 2.3.11 cards 리스트에 추가
+- [x] 2.3.12 빈 줄 추가
+- [x] 2.3.13 카드5 (자사출고) dict 작성
+- [x] 2.3.14 카드5 data 필드 (amount, totalLabel) 추가
+- [x] 2.3.15 irregular 데이터 추가
+- [x] 2.3.16 cards 리스트에 추가
+- [x] 2.3.17 빈 줄 추가
+- [x] 2.3.18 카드6 (지방출고) dict 작성
+- [x] 2.3.19 카드6 data 필드 (amount, destinations) 추가
+- [x] 2.3.20 cards 리스트에 추가
+- [x] 2.3.21 빈 줄 추가
+- [x] 2.3.22 timestamp 필드 추가
+- [x] 2.3.23 `return jsonify(response)` 추가
+
+**완료 시간**: 2025-11-19 20:00 (이미 완료됨)
 
 
 ---
