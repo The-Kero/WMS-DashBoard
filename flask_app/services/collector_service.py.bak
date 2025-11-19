@@ -1,0 +1,115 @@
+"""
+Collector Service
+5개 Collector를 통합 관리하는 서비스
+"""
+
+import sys
+from pathlib import Path
+from datetime import datetime
+import logging
+
+# Collector 모듈 경로 추가
+dashboard_path = Path(__file__).parent.parent.parent / "dashboard"
+sys.path.insert(0, str(dashboard_path))
+
+# Collector import
+from src.data.collectors.inbound import InboundCollector
+from src.data.collectors.outbound import OutboundCollector
+from src.data.collectors.inventory import InventoryCollector
+from src.data.collectors.delete import DeleteCollector
+from src.data.collectors.irregular import IrregularCollector
+
+logger = logging.getLogger(__name__)
+
+
+class CollectorService:
+    """Collector 통합 관리 서비스"""
+    
+    def __init__(self, data_path: str = "C:/OSIS_AUTO"):
+        self.data_path = data_path
+    
+    def get_inbound_data(self):
+        """입고 데이터 조회"""
+        # 임시: 어제 날짜 사용 (테스트용)
+        from datetime import timedelta
+        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
+        file_path = f"{self.data_path}/Inbound Status/integrated_inbound_{yesterday}.csv"
+        
+        collector = InboundCollector(file_path=file_path, encoding='utf-8-sig')
+        data = collector.get_data()
+        
+        if data.empty:
+            raise ValueError("입고 데이터가 비어있습니다")
+        
+        return {
+            'summary': collector.get_summary(),
+            'data': data.to_dict('records')
+        }
+    
+    def get_outbound_data(self):
+        """출고 데이터 조회"""
+        # 임시: 어제 날짜 사용 (테스트용)
+        from datetime import timedelta
+        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
+        file_path = f"{self.data_path}/Outbound Status/outbound_all_{yesterday}.csv"
+        
+        collector = OutboundCollector(file_path=file_path, encoding='utf-8-sig')
+        data = collector.get_data()
+        
+        if data.empty:
+            raise ValueError("출고 데이터가 비어있습니다")
+        
+        return {
+            'summary': collector.get_summary(),
+            'data': data.to_dict('records')
+        }
+    
+    def get_inventory_data(self):
+        """재고 데이터 조회"""
+        # 임시: 어제 날짜 사용 (테스트용)
+        from datetime import timedelta
+        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
+        file_path = f"{self.data_path}/inventory_status/inventory_status_{yesterday}.csv"
+        
+        collector = InventoryCollector(file_path=file_path, encoding='utf-8-sig')
+        data = collector.get_data()
+        
+        if data.empty:
+            raise ValueError("재고 데이터가 비어있습니다")
+        
+        return {
+            'summary': collector.get_summary(),
+            'data': data.to_dict('records')
+        }
+    
+    def get_delete_data(self):
+        """삭제 데이터 조회"""
+        today = datetime.now().strftime("%Y%m%d")
+        file_path = f"{self.data_path}/Delete Status/delete_{today}.csv"
+        
+        collector = DeleteCollector(file_path=file_path, encoding='utf-8-sig')
+        data = collector.get_data()
+        
+        if data.empty:
+            raise ValueError("삭제 데이터가 비어있습니다")
+        
+        return {
+            'summary': collector.get_summary(),
+            'data': data.to_dict('records')
+        }
+    
+    def get_irregular_data(self):
+        """비정형 오더 데이터 조회"""
+        today = datetime.now().strftime("%Y%m%d")
+        file_path = f"{self.data_path}/IrregularOrder Status/irregular_order_{today}.csv"
+        
+        collector = IrregularCollector(file_path=file_path, encoding='utf-8-sig')
+        data = collector.get_data()
+        
+        if data.empty:
+            raise ValueError("비정형 오더 데이터가 비어있습니다")
+        
+        return {
+            'summary': collector.get_summary(),
+            'data': data.to_dict('records')
+        }
