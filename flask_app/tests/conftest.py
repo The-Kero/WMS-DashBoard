@@ -32,12 +32,12 @@ def sample_outbound_csv():
     today = datetime.now().strftime("%Y%m%d")
     base_path = "C:/OSIS_AUTO/Outbound Status"
     
-    today_file = f"{base_path}/outbound_merged_{today}.csv"
+    today_file = f"{base_path}/outbound_all_{today}.csv"
     if Path(today_file).exists():
         return today_file
     
     yesterday = datetime.now().replace(day=datetime.now().day-1).strftime("%Y%m%d")
-    yesterday_file = f"{base_path}/outbound_merged_{yesterday}.csv"
+    yesterday_file = f"{base_path}/outbound_all_{yesterday}.csv"
     return yesterday_file
 
 @pytest.fixture
@@ -52,6 +52,34 @@ def sample_inventory_csv():
     
     yesterday = datetime.now().replace(day=datetime.now().day-1).strftime("%Y%m%d")
     yesterday_file = f"{base_path}/inventory_status_{yesterday}.csv"
+    return yesterday_file
+
+@pytest.fixture
+def sample_delete_csv():
+    """실제 삭제 현황 CSV 파일 경로"""
+    today = datetime.now().strftime("%Y%m%d")
+    base_path = "C:/OSIS_AUTO/Delete Status"
+    
+    today_file = f"{base_path}/delete_status_{today}.csv"
+    if Path(today_file).exists():
+        return today_file
+    
+    yesterday = datetime.now().replace(day=datetime.now().day-1).strftime("%Y%m%d")
+    yesterday_file = f"{base_path}/delete_status_{yesterday}.csv"
+    return yesterday_file
+
+@pytest.fixture
+def sample_irregular_csv():
+    """실제 비정형 오더 CSV 파일 경로"""
+    today = datetime.now().strftime("%Y%m%d")
+    base_path = "C:/OSIS_AUTO/IrregularOrder Status"
+    
+    today_file = f"{base_path}/irregular_order_{today}.csv"
+    if Path(today_file).exists():
+        return today_file
+    
+    yesterday = datetime.now().replace(day=datetime.now().day-1).strftime("%Y%m%d")
+    yesterday_file = f"{base_path}/irregular_order_{yesterday}.csv"
     return yesterday_file
 
 @pytest.fixture
