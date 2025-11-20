@@ -3,9 +3,9 @@
 **프로젝트**: WMS Dashboard - Flask TV 시스템  
 **시작일**: 2025-11-16 (토)  
 **예상 완료일**: 2025-11-23 (토)  
-**현재 진척률**: 53.6% (285/532 작업 완료)
-**최종 업데이트**: 2025-11-19 22:13
-**주요 수정**: Day 2 100% 완료! (165/165개) - Service 제거 리팩토링 완료
+**현재 진척률**: 58.1% (309/532 작업 완료)
+**최종 업데이트**: 2025-11-20 09:50
+**주요 수정**: Day 3 60% 진행! (24/40개) - BaseCollector, InboundCollector 완성
 
 ---
 
@@ -15,13 +15,13 @@
 |-----|------|----------|----------|------|--------|------|----------|
 | Day 1 | 2025-11-16 (토) | Flask 환경 + Collector + API | **120개** | 120 | 100% | ✅ 완료 | 2.0시간 |
 | Day 2 | 2025-11-19 (화) | 통합 API + v9 규칙 적용 | 165개 | 165 | 100% | ✅ 완료 | 4.0시간 |
-| Day 3 | 2025-11-19 (화) | pytest 테스트 | 40개 | 0 | 0% | ⏳ 대기 | - |
+| Day 3 | 2025-11-20 (수) | pytest 테스트 | 40개 | 24 | 60% | 🔄 진행중 | 1.3시간 |
 | Day 4 | 2025-11-20 (수) | HTML 템플릿 | 45개 | 0 | 0% | ⏳ 대기 | - |
 | Day 5 | 2025-11-21 (목) | JavaScript 30초 갱신 | 50개 | 0 | 0% | ⏳ 대기 | - |
 | Day 6 | 2025-11-22 (금) | CSS TV 최적화 | 37개 | 0 | 0% | ⏳ 대기 | - |
 | Day 7 | 2025-11-23 (토) | 성능 + 안정성 | 40개 | 0 | 0% | ⏳ 대기 | - |
 | Day 8 | 2025-11-24 (일) | 배포 + 검증 | 35개 | 0 | 0% | ⏳ 대기 | - |
-| **합계** | **8일** | **Flask TV 시스템** | **532개** | **285** | **53.6%** | 🔄 | **6.0시간** |
+| **합계** | **8일** | **Flask TV 시스템** | **532개** | **309** | **58.1%** | 🔄 | **7.3시간** |
 
 ---
 
@@ -743,51 +743,51 @@ CollectorService가 import하는 Collector 모듈들이 실제로 존재하지 �
 
 ---
 
-## ✅ Day 3: pytest 테스트 작성 (2025-11-18)
+## ✅ Day 3: pytest 테스트 작성 (2025-11-20)
 
 **목표**: Flask API 전체 테스트 커버리지 확보  
 **예상 소요**: 8시간  
-**실제 소요**: ___ 시간  
-**완료율**: 0% (0/40개 완료)
+**실제 소요**: 1.3시간 (진행 중)  
+**완료율**: 60% (24/40개 완료)
 
 ---
 
-### 🌅 오전 1부 (09:00-10:30) - 테스트 환경 구축
+### 🌅 오전 1부 (09:00-10:30) - 테스트 환경 구축 ✅
 
-#### 3.1 pytest 설치 및 설정 (30분)
-- [ ] 3.1.1 가상환경 활성화 확인
-- [ ] 3.1.2 `pip install pytest==7.4.3` 실행
-- [ ] 3.1.3 `pip install pytest-cov==4.1.0` 실행
-- [ ] 3.1.4 pytest 설치 확인
-- [ ] 3.1.5 `type nul > pytest.ini` 생성
-- [ ] 3.1.6 pytest.ini 편집
-- [ ] 3.1.7 [pytest] 섹션 추가
-- [ ] 3.1.8 testpaths = tests 추가
-- [ ] 3.1.9 python_files = test_*.py 추가
-- [ ] 3.1.10 파일 저장
+#### 3.1 pytest 설치 및 설정 (30분) ✅
+- [x] 3.1.1 가상환경 활성화 확인
+- [x] 3.1.2 `pip install pytest==8.4.2` 실행 (버전 업그레이드)
+- [x] 3.1.3 `pip install pytest-cov==4.1.0` 실행
+- [x] 3.1.4 pytest 설치 확인
+- [x] 3.1.5 tests/ 폴더 구조 생성
+- [x] 3.1.6 tests/unit/ 폴더 생성
+- [x] 3.1.7 tests/integration/ 폴더 생성
+- [x] 3.1.8 `pytest --version` 정상 동작 확인
+- [x] 3.1.9 명령어: `python -m pytest` 사용
+- [x] 3.1.10 환경 구축 완료
 
-**완료 시간**: ___
+**완료 시간**: 2025-11-20 09:05 ✅
 
 ---
 
-#### 3.2 conftest.py 작성 (60분)
-- [ ] 3.2.1 `type nul > tests\conftest.py` 생성
-- [ ] 3.2.2 VS Code로 conftest.py 열기
-- [ ] 3.2.3 `import pytest` import
-- [ ] 3.2.4 `import sys` import
-- [ ] 3.2.5 `from pathlib import Path` import
-- [ ] 3.2.6 빈 줄 추가
-- [ ] 3.2.7 프로젝트 경로 추가 코드 작성
-- [ ] 3.2.8 `from app import app` import
-- [ ] 3.2.9 빈 줄 추가
-- [ ] 3.2.10 `@pytest.fixture` 데코레이터
-- [ ] 3.2.11 `def client():` 함수 정의
-- [ ] 3.2.12 `app.config['TESTING'] = True` 설정
-- [ ] 3.2.13 `with app.test_client() as client:` 컨텍스트
-- [ ] 3.2.14 `yield client` 추가
-- [ ] 3.2.15 파일 저장
+#### 3.2 conftest.py 작성 (60분) ✅
+- [x] 3.2.1 `tests\conftest.py` 생성
+- [x] 3.2.2 VS Code로 conftest.py 열기
+- [x] 3.2.3 `import pytest` import
+- [x] 3.2.4 `from pathlib import Path` import
+- [x] 3.2.5 `from datetime import datetime` import
+- [x] 3.2.6 dashboard 경로 추가 코드 작성
+- [x] 3.2.7 `@pytest.fixture` 데코레이터
+- [x] 3.2.8 `def sample_inbound_csv():` 함수 정의
+- [x] 3.2.9 오늘/어제 날짜 파일 경로 반환
+- [x] 3.2.10 `def sample_outbound_csv():` 함수 정의
+- [x] 3.2.11 파일명 수정: outbound_all_YYYYMMDD.csv
+- [x] 3.2.12 `def sample_inventory_csv():` 함수 정의
+- [x] 3.2.13 `def client():` Flask 테스트 클라이언트
+- [x] 3.2.14 66줄 작성 완료
+- [x] 3.2.15 파일 저장
 
-**완료 시간**: ___
+**완료 시간**: 2025-11-20 09:10 ✅
 
 ---
 
@@ -795,29 +795,29 @@ CollectorService가 import하는 Collector 모듈들이 실제로 존재하지 �
 
 ---
 
-### 🌅 오전 2부 (10:45-12:00) - API 테스트 작성
+### 🌅 오전 2부 (10:45-12:00) - BaseCollector 테스트 ✅
 
-#### 3.3 test_api.py 기본 테스트 (75분)
-- [ ] 3.3.1 `type nul > tests\test_api.py` 생성
-- [ ] 3.3.2 VS Code로 test_api.py 열기
-- [ ] 3.3.3 `import pytest` import
-- [ ] 3.3.4 빈 줄 추가
-- [ ] 3.3.5 `def test_health(client):` 함수 작성
-- [ ] 3.3.6 response = client.get('/api/health')
-- [ ] 3.3.7 assert response.status_code == 200
-- [ ] 3.3.8 data = response.get_json()
-- [ ] 3.3.9 assert data['status'] == 'ok'
-- [ ] 3.3.10 빈 줄 2개 추가
-- [ ] 3.3.11 `def test_dashboard(client):` 함수 작성
-- [ ] 3.3.12 response 받기
-- [ ] 3.3.13 status_code 확인
-- [ ] 3.3.14 JSON 파싱
-- [ ] 3.3.15 success 필드 확인
-- [ ] 3.3.16 cards 필드 확인
-- [ ] 3.3.17 cards 개수 확인 (4개)
-- [ ] 3.3.18 파일 저장
+#### 3.3 test_base_collector.py 작성 (75분) ✅
+- [x] 3.3.1 `tests\unit\test_base_collector.py` 생성
+- [x] 3.3.2 필수 import 추가
+- [x] 3.3.3 dashboard 경로 설정
+- [x] 3.3.4 `class TestBaseCollector:` 정의
+- [x] 3.3.5 `def test_init_with_valid_file` 작성
+- [x] 3.3.6 `def test_init_with_invalid_file` 작성
+- [x] 3.3.7 `def test_load_data_success` 작성
+- [x] 3.3.8 `def test_load_data_encoding` 작성
+- [x] 3.3.9 `def test_get_data_returns_dataframe` 작성
+- [x] 3.3.10 `def test_get_data_not_empty` 작성
+- [x] 3.3.11 `def test_get_summary_returns_dict` 작성
+- [x] 3.3.12 `def test_base_collector_cannot_be_instantiated_directly` 작성
+- [x] 3.3.13 134줄 작성 완료
+- [x] 3.3.14 pytest 실행: **8 passed in 0.80s** ✅
+- [x] 3.3.15 Git 커밋 완료 (3f1fa41)
+- [x] 3.3.16 컬럼명 수정 (센터 제거)
+- [x] 3.3.17 summary 키 수정 (snake_case)
+- [x] 3.3.18 파일 저장
 
-**완료 시간**: ___
+**완료 시간**: 2025-11-20 09:25 ✅
 
 ---
 
@@ -825,11 +825,40 @@ CollectorService가 import하는 Collector 모듈들이 실제로 존재하지 �
 
 ---
 
-### 🌆 오후 1부 (13:00-14:30) - 5개 API 개별 테스트
+### 🌆 오후 1부 (13:00-14:30) - Collector 단위 테스트 🔄
 
-#### 3.4 5개 API 테스트 함수 (90분)
-- [ ] 3.4.1 `def test_inbound(client):` 작성
-- [ ] 3.4.2 200 응답 확인
+#### 3.4 InboundCollector 테스트 (25분) ✅
+- [x] 3.4.1 `tests\unit\test_inbound_collector.py` 생성
+- [x] 3.4.2 `class TestInboundCollector:` 정의
+- [x] 3.4.3 `def test_get_data_structure` 작성
+- [x] 3.4.4 `def test_get_summary_keys` 작성
+- [x] 3.4.5 `def test_get_summary_calculations` 작성
+- [x] 3.4.6 `def test_progress_rate_range` 작성
+- [x] 3.4.7 `def test_empty_file_handling` 작성
+- [x] 3.4.8 `def test_data_types` 작성
+- [x] 3.4.9 `import numpy as np` 추가
+- [x] 3.4.10 117줄 작성 완료
+- [x] 3.4.11 pytest 실행: **6 passed in 0.85s** ✅
+
+**완료 시간**: 2025-11-20 09:35 ✅
+
+---
+
+#### 3.5 OutboundCollector 테스트 (25분) ⚠️
+- [x] 3.5.1 `tests\unit\test_outbound_collector.py` 생성
+- [x] 3.5.2 `class TestOutboundCollector:` 정의
+- [x] 3.5.3 `def test_get_data_structure` 작성
+- [x] 3.5.4 `def test_get_summary_keys` 작성
+- [x] 3.5.5 `def test_outbound_type_filtering` 작성
+- [x] 3.5.6 `def test_amount_calculations` 작성
+- [x] 3.5.7 `def test_type_14_15_18_filtering` 작성
+- [x] 3.5.8 `def test_provincial_filtering` 작성
+- [x] 3.5.9 108줄 작성 완료
+- [x] 3.5.10 pytest 실행: **5 passed, 1 failed** ⚠️
+- [ ] 3.5.11 test_get_data_structure 수정 필요
+- [ ] 3.5.12 컬럼명 확인 후 수정
+
+**완료 시간**: 2025-11-20 09:45 (5/6 완료)
 - [ ] 3.4.3 success 필드 확인
 - [ ] 3.4.4 summary 필드 확인
 - [ ] 3.4.5 빈 줄 추가
