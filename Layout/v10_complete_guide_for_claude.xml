@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  v10 작업 완전 가이드 (Claude 전용)
+  
+  목적: 대화 시작 시 이 파일만 읽으면 v10 작업 100% 가능
+  작성일: 2025-11-20
+  통합 문서: 4개 (Phase2_진척도.md, v10_guide_for_claude.xml, ourhome_layout_v9.html, v9_데이터적용_요약가이드.md)
+  
+  핵심 원칙:
+  1. Collector 절대 수정 금지 (100% 재사용)
+  2. 체크박스 순서대로 진행
+  3. AI 판단 금지 (진척률/금액 정상 범위 판단 안 함)
+  4. 카드6 미발행 피킹리스트 계산 시 오더수량 > 0 조건 필수
+-->
+
+<v10_complete_guide>
+  
+  <!-- ============================================ -->
+  <!-- 1. 프로젝트 현황 (Phase2_진척도.md) -->
+  <!-- ============================================ -->
+  <project_status>
+    <current_phase>Phase 2 - Flask TV 시스템</current_phase>
+    <start_date>2025-11-16</start_date>
+    <target_date>2025-11-23</target_date>
+    
+    <progress>
+      <overall>
+        <total_tasks>532</total_tasks>
+        <completed>329</completed>
+        <percentage>61.7%</percentage>
+        <elapsed_time>7.3시간</elapsed_time>
+      </overall>
+      
+      <by_day>
+        <day id="1" status="완료">
+          <title>Flask 환경 + Collector + API</title>
+          <tasks>120/120</tasks>
+          <time>2.0시간</time>
+        </day>
+        
+        <day id="2" status="완료">
+          <title>통합 API + v9 규칙 적용</title>
+          <tasks>165/165</tasks>
+          <time>4.0시간</time>
+        </day>
+        
+        <day id="3" status="완료">
+          <title>pytest 테스트</title>
+          <tasks>40/40</tasks>
+          <time>1.3시간</time>
+        </day>
+        
+        <day id="4" status="대기" current="true">
+          <title>HTML 템플릿</title>
+          <tasks>0/45</tasks>
+          <expected_time>4-6시간</expected_time>
+          <requirements>
+            <requirement priority="1">v10.html 파일 필수 (케로님 작업)</requirement>
+            <requirement priority="2">v10_설계서.md 파일 필수 (케로님 작업)</requirement>
+          </requirements>
+        </day>
+      </by_day>
+    </progress>
+  </project_status>
+  
+  <!-- ============================================ -->
+  <!-- 2. 현재 API 구조 -->
+  <!-- ============================================ -->
+  <api_structure>
+    <endpoint>/api/dashboard</endpoint>
+    
+    <card id="2" category="입고">
+      <field name="totalCount" type="int">입고 총 건수</field>
+      <field name="progressRate" type="float">평균 진척률 %</field>
+      <field name="inboundRiskyCount" type="int">입고유의상품 건수</field>
+      <field name="riskyItems" type="array">입고유의 상품 리스트</field>
+    </card>
+    
+    <card id="3" category="재고">
+      <field name="totalCount" type="int">전체 유의상품</field>
+      <field name="urgentCount" type="int">긴급 (≤10%)</field>
+      <field name="warningCount" type="int">주의 (11~20%)</field>
+      <field name="riskyItems" type="array">피킹유의 상품 리스트</field>
+    </card>
+    
+    <card id="5" category="자사출고">
+      <field name="amount" type="int">자사 출하금액</field>
+      <field name="compare" type="float">전일 대비 %</field>
+      <field name="totalLabel" type="int">총 라벨 건수</field>
+      <field name="unprintedLabel" type="int">미발행 라벨</field>
+      <field name="irregularTotal" type="int">비정형 라벨 총 건수</field>
+      <field name="irregularUnprinted" type="int">비정형 미출력</field>
+    </card>
+    
+    <card id="6" category="지방출고">
+      <field name="amount" type="int">지방 출하금액</field>
+      <field name="compare" type="float">전일 대비 %</field>
+      <field name="unprintedPicking" type="int">미발행 피킹리스트 (⚠️ 오더수량>0 조건)</field>
+      <field name="destinations" type="object">13개 배송처 (jeju, jecheon, honam, gumi, gyeryong, eumseong, yongin2, yongin3, ansan, yangsan, yangsan2, hanex, kids)</field>
+    </card>
+  </api_structure>
+  
+  <!-- ============================================ -->
+  <!-- 3. v9 레이아웃 핵심 -->
+  <!-- ============================================ -->
+  <v9_layout>
+    <structure>
+      <header height="60px">로고 + 타이틀 + 시간</header>
+      <main>
+        <cards layout="3x2_grid" size="360x480px" gap="20px">
+          <card id="1">냉장창고 도어1 온도 (SVG 게이지)</card>
+          <card id="2">금일 입고 사항 (메트릭 + 유의상품 리스트)</card>
+          <card id="3">금일 피킹 유의 상품 (메트릭 + 리스트 + 자동스크롤)</card>
+          <card id="4">냉장직원 스케줄</card>
+          <card id="5">금일 자사 출고 사항 (금액 + 라벨 + 비정형)</card>
+          <card id="6">금일 지방 출고 사항 (금액 + 피킹리스트 + 13개 배송처)</card>
+        </cards>
+        <notification flex="1">알림 로그</notification>
+      </main>
+    </structure>
+    
+    <auto_scroll>
+      <trigger>리스트 아이템 4개 이상</trigger>
+      <speed>1px / 0.1초</speed>
+      <direction>왕복 (위↔아래)</direction>
+      <wait_time>양 끝에서 3초</wait_time>
+    </auto_scroll>
+    
+    <colors>
+      <background>#E8EAED</background>
+      <card>#FFFFFF</card>
+      <warning>#F05E5E</warning>
+      <success>#60CB2E</success>
+    </colors>
+    
+    <fonts>
+      <title>18px</title>
+      <large_number>32-56px</large_number>
+      <item_text>13-14px</item_text>
+    </fonts>
+  </v9_layout>
+  
+  <!-- ============================================ -->
+  <!-- 4. TV 스펙 제약사항 (100인치) -->
+  <!-- ============================================ -->
+  <tv_constraints>
+    <hardware>
+      <resolution width="1920" height="1080"/>
+      <viewing_distance unit="meter">10</viewing_distance>
+      <operation>24/7 무인 운영</operation>
+      <interaction>없음</interaction>
+    </hardware>
+    
+    <font_requirements critical="true">
+      <큰숫자 min="72px" recommended="80-96px">출하금액, 건수</큰숫자>
+      <카드타이틀 min="32px" recommended="36-42px">카드 제목</카드타이틀>
+      <서브텍스트 min="24px" recommended="28-32px">전일 대비, 단위</서브텍스트>
+      <테이블셀 min="20px" recommended="24-28px">리스트 아이템</테이블셀>
+    </font_requirements>
+    
+    <card_limit>
+      <min>6</min>
+      <optimal>8-10</optimal>
+      <max>12</max>
+      <forbidden>13+</forbidden>
+      <reason>12개 초과 시 큰 숫자(72px) 표시 공간 부족</reason>
+    </card_limit>
+    
+    <color_contrast min_ratio="5:1" standard="WCAG AA"/>
+    
+    <layout_options>
+      <grid pattern="3x2" cards="6" status="recommended"/>
+      <grid pattern="4x2" cards="8" status="recommended"/>
+      <grid pattern="3x3" cards="9" status="recommended"/>
+      <grid pattern="4x3" cards="12" status="maximum"/>
+    </layout_options>
+  </tv_constraints>
+  
+  <!-- ============================================ -->
+  <!-- 5. 절대 규칙 -->
+  <!-- ============================================ -->
+  <absolute_rules>
+    <rule id="1" priority="critical">
+      <title>Collector 절대 수정 금지</title>
+      <content>Phase 1 완성된 5개 Collector는 코드 수정 0%, import만으로 100% 재사용</content>
+    </rule>
+    
+    <rule id="2" priority="critical">
+      <title>AI 판단 금지</title>
+      <content>진척률, 금액 정상 범위 판단 안 함. "이상하다/정상이다" 판단 금지. 모든 결과를 케로님께 보고.</content>
+      <example>
+        ❌ "progressRate가 0이면 이상합니다"
+        ✅ "progressRate가 0.0으로 나왔습니다. 확인 부탁드립니다."
+      </example>
+    </rule>
+    
+    <rule id="3" priority="critical">
+      <title>카드6 미발행 피킹리스트 계산 규칙</title>
+      <content>
+        🚨 케로님이 3번 설명하신 규칙!
+        
+        ❌ 잘못된 계산: 피킹리스트 == 'N'인 모든 건수
+        ✅ 올바른 계산: 피킹리스트 == 'N' AND 오더수량 > 0
+        
+        이유: 오더수량이 0이면 피킹할 물량이 없음 → 리스트 안 뽑는게 정상
+      </content>
+      <code>
+card6_unpublished_picking = len(
+  card6_data[
+    (card6_data['피킹 리스트'] == 'N') &amp; 
+    (card6_data['오더수량*'] > 0)
+  ]
+)
+      </code>
+    </rule>
+    
+    <rule id="4" priority="high">
+      <title>체크박스 순서대로 진행</title>
+      <content>Phase2_진척도.md 순서 준수, 건너뛰기 금지</content>
+    </rule>
+  </absolute_rules>
+  
+  <!-- ============================================ -->
+  <!-- 6. Day 4 구현 프로세스 -->
+  <!-- ============================================ -->
+  <day4_process>
+    <prerequisites>
+      <file priority="1">v10.html (케로님 작성)</file>
+      <file priority="2">v10_설계서.md (케로님 작성)</file>
+    </prerequisites>
+    
+    <step id="1" duration="10분">
+      <title>v10 파일 확인 및 분석</title>
+      <tasks>
+        <task>desktop-commander:read_file로 v10.html 읽기</task>
+        <task>desktop-commander:read_file로 v10_설계서.md 읽기</task>
+        <task>구조 분석: 카드 개수, 배치, 데이터 소스</task>
+        <task>API 수정 필요 여부 확인</task>
+      </tasks>
+    </step>
+    
+    <step id="2" duration="30분-1시간" conditional="true">
+      <title>API 확장 (필요 시만)</title>
+      <condition>v10 설계서에서 추가 데이터 필요로 판단된 경우</condition>
+      <file>C:\Projects\WMS-DashBoard\flask_app\api\dashboard.py</file>
+    </step>
+    
+    <step id="3" duration="2-3시간">
+      <title>dashboard.html 작성</title>
+      <file>C:\Projects\WMS-DashBoard\flask_app\templates\dashboard.html</file>
+      
+      <jinja2_patterns>
+        <pattern type="단순값">
+          <before>&lt;div class="value">67&lt;/div></before>
+          <after>&lt;div class="value">{{ card2.totalCount }}&lt;/div></after>
+        </pattern>
+        
+        <pattern type="반복문">
+          <before>&lt;div class="item">...&lt;/div></before>
+          <after>
+{% for item in card3.riskyItems %}
+  &lt;div class="item">{{ item.productName }}&lt;/div>
+{% endfor %}
+          </after>
+        </pattern>
+        
+        <pattern type="조건부">
+          <before>&lt;div class="status-urgent">긴급&lt;/div></before>
+          <after>
+{% if item.validityRatio &lt;= 10 %}
+  &lt;div class="status-urgent">긴급&lt;/div>
+{% endif %}
+          </after>
+        </pattern>
+        
+        <pattern type="숫자포맷">
+          <jinja>{{ "{:,}".format(card5.amount) }}</jinja>
+          <result>61,777,004</result>
+        </pattern>
+        
+        <pattern type="날짜포맷">
+          <description>YYYYMMDD → YY.MM.DD</description>
+          <jinja>{{ item.expiryDate[2:4] }}.{{ item.expiryDate[4:6] }}.{{ item.expiryDate[6:8] }}</jinja>
+          <example>20251204 → 25.12.04</example>
+        </pattern>
+      </jinja2_patterns>
+    </step>
+    
+    <step id="4" duration="1-2시간">
+      <title>dashboard.css 작성</title>
+      <file>C:\Projects\WMS-DashBoard\flask_app\static\css\dashboard.css</file>
+      
+      <requirements>
+        <req>v10 그리드 시스템 (설계에 따라)</req>
+        <req>큰 숫자: font-size 72px 이상</req>
+        <req>카드 타이틀: font-size 32px 이상</req>
+        <req>색상 대비율: 5:1 이상</req>
+      </requirements>
+    </step>
+    
+    <step id="5" duration="15분">
+      <title>Flask 라우트 연결</title>
+      <file>C:\Projects\WMS-DashBoard\flask_app\app.py</file>
+      <code>
+from flask import render_template
+
+@app.route('/')
+def index():
+    return render_template('dashboard.html')
+      </code>
+    </step>
+    
+    <step id="6" duration="30분">
+      <title>통합 테스트</title>
+      <tests>
+        <test>Flask 서버 실행</test>
+        <test>localhost:5000 접속</test>
+        <test>모든 카드 표시 확인</test>
+        <test>데이터 정확성 검증</test>
+        <test>F12 콘솔 에러 확인</test>
+      </tests>
+    </step>
+    
+    <step id="7" duration="15분">
+      <title>Git 커밋</title>
+      <commands>
+        <cmd>git add .</cmd>
+        <cmd>git commit -m "Phase 2 Day 4: v10 레이아웃 HTML 완성"</cmd>
+      </commands>
+    </step>
+  </day4_process>
+  
+  <!-- ============================================ -->
+  <!-- 7. 트러블슈팅 -->
+  <!-- ============================================ -->
+  <troubleshooting>
+    <issue id="1">
+      <symptom>v10.html 파일 없음</symptom>
+      <action>케로님께 "v10 설계 가이드를 제공해 드릴까요?" 보고</action>
+    </issue>
+    
+    <issue id="2">
+      <symptom>Jinja2 TemplateSyntaxError</symptom>
+      <solution>에러 라인 번호 확인 → {% endfor %} 누락, {{ 닫기 누락 검토</solution>
+    </issue>
+    
+    <issue id="3">
+      <symptom>화면에 "undefined" 표시</symptom>
+      <solution>Jinja2 변수명과 API 응답 키 일치 확인 (예: totalCount vs total_count)</solution>
+    </issue>
+    
+    <issue id="4">
+      <symptom>CSS 적용 안 됨</symptom>
+      <solution>경로 확인: /static/css/dashboard.css, 브라우저 캐시 삭제 (Ctrl+F5)</solution>
+    </issue>
+  </troubleshooting>
+  
+  <!-- ============================================ -->
+  <!-- 8. 파일 경로 -->
+  <!-- ============================================ -->
+  <file_paths>
+    <v10_design>
+      <path>C:\Projects\WMS-DashBoard\Layout\v10.html</path>
+      <path>C:\Projects\WMS-DashBoard\Layout\v10_설계서.md</path>
+    </v10_design>
+    
+    <flask>
+      <path>C:\Projects\WMS-DashBoard\flask_app\app.py</path>
+      <path>C:\Projects\WMS-DashBoard\flask_app\api\dashboard.py</path>
+      <path>C:\Projects\WMS-DashBoard\flask_app\templates\dashboard.html</path>
+      <path>C:\Projects\WMS-DashBoard\flask_app\static\css\dashboard.css</path>
+    </flask>
+  </file_paths>
+  
+  <!-- ============================================ -->
+  <!-- 9. 완료 체크리스트 -->
+  <!-- ============================================ -->
+  <completion_checklist>
+    <critical>
+      <item>localhost:5000 접속 성공</item>
+      <item>모든 카드 표시 확인</item>
+      <item>데이터 정상 바인딩</item>
+      <item>폰트 크기 제약 준수 (큰 숫자 72px+)</item>
+      <item>색상 대비율 5:1 이상</item>
+    </critical>
+    
+    <success_criteria>
+      <criterion>v10 설계서와 100% 일치</criterion>
+      <criterion>TV 제약사항 모두 준수</criterion>
+      <criterion>Day 4 체크박스 45개 완료</criterion>
+    </success_criteria>
+  </completion_checklist>
+  
+</v10_complete_guide>

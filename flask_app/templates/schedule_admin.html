@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📅 냉장파트 스케줄 관리</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            min-height: 100vh;
+            padding: 30px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            color: #1f2937;
+        }
+        
+        .calendar-container {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .calendar-header h2 { font-size: 24px; color: #1f2937; }
+        .nav-btn {
+            background: #e5e7eb;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .nav-btn:hover { background: #d1d5db; }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            margin-bottom: 8px;
+        }
+        .weekday {
+            text-align: center;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 18px;
+            color: #6b7280;
+        }
+        .weekday.sun { color: #ef4444; }
+        .weekday.sat { color: #3b82f6; }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        
+        .day-cell {
+            aspect-ratio: 1.4;
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            position: relative;
+            min-height: 100px;
+        }
+        .day-cell:hover { background: #e5e7eb; }
+        .day-cell.empty { background: transparent; cursor: default; }
+        .day-cell.today { background: #dbeafe; border: 2px solid #3b82f6; }
+        .day-cell.past { opacity: 0.5; }
+        
+        .day-number { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
+        .day-cell.sun .day-number { color: #ef4444; }
+        .day-cell.sat .day-number { color: #3b82f6; }
+        
+        .day-events { display: flex; flex-direction: column; gap: 2px; }
+        .event-dot {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .event-dot.birthday { background: #FFE4E1; color: #C71585; }
+        .event-dot.leave { background: #E0FFE0; color: #228B22; }
+        .event-dot.education { background: #FFF8DC; color: #B8860B; }
+        .event-dot.event { background: #F0F8FF; color: #4169E1; }
+        
+        .event-more { font-size: 12px; color: #6b7280; font-weight: bold; }
+        
+        /* 팝업 */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .popup-overlay.active { display: flex; }
+        
+        .popup {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            width: 420px;
+            max-width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .popup-header h3 { font-size: 20px; color: #1f2937; }
+        .popup-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+        
+        .event-list { margin-bottom: 20px; }
+        .event-list-title { font-size: 14px; color: #6b7280; margin-bottom: 12px; }
+        .event-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .event-item.birthday { background: #FFE4E1; }
+        .event-item.leave { background: #E0FFE0; }
+        .event-item.education { background: #FFF8DC; }
+        .event-item.event { background: #F0F8FF; }
+        
+        .event-item-left { display: flex; align-items: center; gap: 8px; }
+        .event-item-icon { font-size: 16px; }
+        .event-item-text { font-size: 14px; color: #374151; }
+        
+        .btn-delete {
+            background: #fee2e2;
+            border: none;
+            color: #dc2626;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .btn-delete:hover { background: #fecaca; }
+        
+        .no-events {
+            color: #9ca3af;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        /* 새 일정 입력 */
+        .new-event { display: flex; flex-direction: column; gap: 10px; }
+        .input-row { display: flex; gap: 8px; }
+        .new-event input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        .new-event input:focus { outline: none; border-color: #3b82f6; }
+        .new-event select {
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            background: #fff;
+        }
+        .btn-add {
+            padding: 12px 20px;
+            background: #3b82f6;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-add:hover { background: #2563eb; }
+        
+        .back-link { text-align: center; margin-top: 30px; }
+        .back-link a { color: #6b7280; text-decoration: none; font-size: 16px; }
+        .back-link a:hover { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 냉장파트 스케줄 관리</h1>
+        
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <button class="nav-btn" onclick="prevMonth()">◀</button>
+                <h2 id="currentMonth">2025년 12월</h2>
+                <button class="nav-btn" onclick="nextMonth()">▶</button>
+            </div>
+            
+            <div class="weekdays">
+                <div class="weekday sun">일</div>
+                <div class="weekday">월</div>
+                <div class="weekday">화</div>
+                <div class="weekday">수</div>
+                <div class="weekday">목</div>
+                <div class="weekday">금</div>
+                <div class="weekday sat">토</div>
+            </div>
+            
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+        
+        <div class="back-link">
+            <a href="/">← 대시보드로 돌아가기</a>
+        </div>
+    </div>
+    
+    <!-- 팝업 -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup">
+            <div class="popup-header">
+                <h3 id="popupDate">12월 5일 (금)</h3>
+                <button class="popup-close" onclick="closePopup()">×</button>
+            </div>
+            
+            <div class="event-list">
+                <div class="event-list-title">등록된 일정</div>
+                <div id="eventList"></div>
+            </div>
+            
+            <div class="new-event">
+                <div class="input-row">
+                    <input type="text" id="newEventInput" placeholder="일정 내용 입력...">
+                    <select id="eventType">
+                        <option value="leave">🏖️ 월차</option>
+                        <option value="birthday">🎂 생일</option>
+                        <option value="education">📚 교육</option>
+                        <option value="event">📌 기타</option>
+                    </select>
+                </div>
+                <button class="btn-add" onclick="addEvent()">일정 추가</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let scheduleData = [];
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth() + 1;
+        let selectedDate = null;
+        
+        const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+        const typeIcons = {
+            birthday: '🎂',
+            leave: '🏖️',
+            education: '📚',
+            event: '📌'
+        };
+        
+        // 서버에서 스케줄 로드
+        async function loadSchedule() {
+            try {
+                const res = await fetch('/api/schedule');
+                const data = await res.json();
+                if (data.success) {
+                    scheduleData = data.data;
+                    renderCalendar();
+                }
+            } catch (e) {
+                console.error('스케줄 로드 실패:', e);
+            }
+        }
+        
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            document.getElementById('currentMonth').textContent = 
+                `${currentYear}년 ${currentMonth}월`;
+            
+            const firstDay = new Date(currentYear, currentMonth - 1, 1);
+            const lastDay = new Date(currentYear, currentMonth, 0);
+            const startDayOfWeek = firstDay.getDay();
+            const totalDays = lastDay.getDate();
+            
+            const today = new Date();
+            const todayStr = formatDate(today);
+            
+            for (let i = 0; i < startDayOfWeek; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'day-cell empty';
+                grid.appendChild(cell);
+            }
+            
+            for (let day = 1; day <= totalDays; day++) {
+                const cell = document.createElement('div');
+                const dateStr = `${currentYear}-${String(currentMonth).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const dayOfWeek = (startDayOfWeek + day - 1) % 7;
+                
+                let cellClass = 'day-cell';
+                if (dayOfWeek === 0) cellClass += ' sun';
+                if (dayOfWeek === 6) cellClass += ' sat';
+                if (dateStr === todayStr) cellClass += ' today';
+                if (dateStr < todayStr) cellClass += ' past';
+                
+                cell.className = cellClass;
+                cell.onclick = () => openPopup(dateStr, day, dayOfWeek);
+                
+                const dayNum = document.createElement('div');
+                dayNum.className = 'day-number';
+                dayNum.textContent = day;
+                cell.appendChild(dayNum);
+                
+                const events = scheduleData.filter(e => e.date === dateStr);
+                if (events.length > 0) {
+                    const eventsDiv = document.createElement('div');
+                    eventsDiv.className = 'day-events';
+                    
+                    events.slice(0, 2).forEach(event => {
+                        const dot = document.createElement('div');
+                        dot.className = 'event-dot ' + (event.type || 'event');
+                        const icon = typeIcons[event.type] || '📌';
+                        dot.textContent = icon + ' ' + (event.content.length > 5 
+                            ? event.content.substring(0, 5) + '..' 
+                            : event.content);
+                        eventsDiv.appendChild(dot);
+                    });
+                    
+                    if (events.length > 2) {
+                        const more = document.createElement('div');
+                        more.className = 'event-more';
+                        more.textContent = `+${events.length - 2}건`;
+                        eventsDiv.appendChild(more);
+                    }
+                    
+                    cell.appendChild(eventsDiv);
+                }
+                
+                grid.appendChild(cell);
+            }
+        }
+        
+        function formatDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+        
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+            renderCalendar();
+        }
+        
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+            renderCalendar();
+        }
+        
+        function openPopup(dateStr, day, dayOfWeek) {
+            selectedDate = dateStr;
+            document.getElementById('popupDate').textContent = 
+                `${currentMonth}월 ${day}일 (${dayNames[dayOfWeek]})`;
+            
+            renderEventList();
+            document.getElementById('newEventInput').value = '';
+            document.getElementById('popupOverlay').classList.add('active');
+        }
+        
+        function closePopup() {
+            document.getElementById('popupOverlay').classList.remove('active');
+            selectedDate = null;
+        }
+        
+        function renderEventList() {
+            const listDiv = document.getElementById('eventList');
+            const events = scheduleData.filter(e => e.date === selectedDate);
+            
+            if (events.length === 0) {
+                listDiv.innerHTML = '<div class="no-events">등록된 일정이 없습니다</div>';
+                return;
+            }
+            
+            listDiv.innerHTML = events.map((event, idx) => {
+                const icon = typeIcons[event.type] || '📌';
+                return `
+                    <div class="event-item ${event.type || 'event'}">
+                        <div class="event-item-left">
+                            <span class="event-item-icon">${icon}</span>
+                            <span class="event-item-text">${event.content}</span>
+                        </div>
+                        <button class="btn-delete" onclick="deleteEvent('${event.content}')">삭제</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        async function addEvent() {
+            const input = document.getElementById('newEventInput');
+            const typeSelect = document.getElementById('eventType');
+            const content = input.value.trim();
+            
+            if (!content) {
+                alert('일정 내용을 입력해주세요.');
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/schedule', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: selectedDate,
+                        content: content,
+                        type: typeSelect.value
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    await loadSchedule();
+                    renderEventList();
+                    input.value = '';
+                } else {
+                    alert('추가 실패: ' + data.error);
+                }
+            } catch (e) {
+                alert('오류 발생: ' + e.message);
+            }
+        }
+        
+        async function deleteEvent(content) {
+            if (!confirm(`"${content}" 일정을 삭제하시겠습니까?`)) return;
+            
+            try {
+                const res = await fetch('/api/schedule', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: selectedDate,
+                        content: content
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    await loadSchedule();
+                    renderEventList();
+                } else {
+                    alert('삭제 실패: ' + data.error);
+                }
+            } catch (e) {
+                alert('오류 발생: ' + e.message);
+            }
+        }
+        
+        // 팝업 외부 클릭 시 닫기
+        document.getElementById('popupOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closePopup();
+        });
+        
+        // Enter 키로 일정 추가
+        document.getElementById('newEventInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addEvent();
+        });
+        
+        // 초기 로드
+        loadSchedule();
+    </script>
+</body>
+</html>

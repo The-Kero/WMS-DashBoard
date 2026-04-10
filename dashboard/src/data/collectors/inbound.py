@@ -1,140 +1,30 @@
 """
-InboundCollector: 입고정보 데이터 수집기
+InboundCollector - 입고 현황 데이터 수집기
 
-입고예정번호, 공급사명, 입고예정일, 상품정보, 진척률 등을 수집
+역할: 입고 CSV 파일을 읽어 요약 통계 제공
 """
-
-import pandas as pd
-from .base import BaseCollector
+from .base_collector import BaseCollector
 
 
 class InboundCollector(BaseCollector):
-    """입고정보 수집기"""
-    
-    REQUIRED_COLUMNS = [
-        '입고예정일', '입고예정번호', '공급사명', '입고유형',
-        '상품', '상품명', '단위및규격', '소비기한',
-        '기본로케이션', '입고예정수량', '총입고수량', '진척률'
-    ]
-    
-    def load_data(self) -> pd.DataFrame:
-        """
-        CSV 파일에서 입고 데이터 로드
-        
-        Returns:
-            입고 데이터 DataFrame
-            
-        Raises:
-            FileNotFoundError: 파일이 존재하지 않을 때
-            ValueError: 데이터 검증 실패 시
-        """
-        if not self.file_exists():
-            raise FileNotFoundError(f"파일을 찾을 수 없습니다: {self.file_path}")
-        
-        # CSV 읽기 (BOM 처리)
-        df = pd.read_csv(self.file_path, encoding=self.encoding)
-        
-        # 데이터 검증
-        if not self.validate(df):
-            raise ValueError("입고 데이터 검증 실패")
-        
-        # 데이터 타입 변환
-        df['입고예정일'] = pd.to_datetime(df['입고예정일'], format='%Y%m%d', errors='coerce')
-        df['소비기한'] = pd.to_datetime(df['소비기한'], format='%Y%m%d', errors='coerce')
-        df['입고예정수량'] = pd.to_numeric(df['입고예정수량'], errors='coerce')
-        df['총입고수량'] = pd.to_numeric(df['총입고수량'], errors='coerce')
-        df['진척률'] = pd.to_numeric(df['진척률'], errors='coerce')
-        
-        return df
-    
-    def validate(self, df: pd.DataFrame) -> bool:
-        """
-        입고 데이터 유효성 검증
-        
-        Args:
-            df: 검증할 DataFrame
-            
-        Returns:
-            유효성 여부
-        """
-        # 필수 컬럼 확인
-        missing_columns = set(self.REQUIRED_COLUMNS) - set(df.columns)
-        if missing_columns:
-            print(f"❌ 누락된 컬럼: {missing_columns}")
-            return False
-        
-        # 빈 데이터 확인
-        if df.empty:
-            print("❌ 데이터가 비어있습니다")
-            return False
-        
-        return True
+    """입고 현황 Collector"""
     
     def get_summary(self) -> dict:
         """
-        입고 데이터 요약 정보
+        입고 현황 요약 통계
         
         Returns:
-            요약 정보 딕셔너리
+            dict: {
+                'total_count': 총 입고 건수,
+                'progress_rate': 평균 진척률 (%),
+                'unique_products': 고유 상품 수
+            }
         """
-        df = self.get_data()
-        
-        # 진척률 기반 통계
-        입고완료 = df[df['진척률'] >= 100.0]
-        진행중 = df[(df['진척률'] > 0) & (df['진척률'] < 100.0)]
-        미입고 = df[df['진척률'] == 0.0]
+        if self._data is None:
+            self._data = self._read_csv()
         
         return {
-            '총_입고건수': len(df),
-            '입고완료건수': len(입고완료),
-            '진행중건수': len(진행중),
-            '미입고건수': len(미입고),
-            '총_입고예정수량': df['입고예정수량'].sum(),
-            '총_입고수량': df['총입고수량'].sum(),
-            '평균_진척률': df['진척률'].mean(),
-            '공급사_수': df['공급사명'].nunique(),
-            '상품_종류': df['상품'].nunique(),
-            '최근_입고예정일': df['입고예정일'].max(),
-            '최초_입고예정일': df['입고예정일'].min(),
+            'total_count': len(self._data),
+            'progress_rate': float(self._data['진척률'].mean()) if '진척률' in self._data.columns else 0.0,
+            'unique_products': self._data['상품'].nunique() if '상품' in self._data.columns else 0
         }
-    
-    def get_top_suppliers(self, n: int = 5) -> pd.DataFrame:
-        """
-        상위 공급사 목록
-        
-        Args:
-            n: 반환할 공급사 수
-            
-        Returns:
-            공급사별 입고수량 DataFrame
-        """
-        df = self.get_data()
-        return (df.groupby('공급사명')
-                .agg({
-                    '총입고수량': 'sum',
-                    '입고예정번호': 'count'
-                })
-                .rename(columns={'입고예정번호': '입고건수'})
-                .sort_values('총입고수량', ascending=False)
-                .head(n)
-                .reset_index())
-    
-    def get_pending_inbounds(self) -> pd.DataFrame:
-        """
-        미입고 또는 진행중인 입고 목록
-        
-        Returns:
-            진척률 < 100% 입고 DataFrame
-        """
-        df = self.get_data()
-        return df[df['진척률'] < 100.0].sort_values('입고예정일')
-    
-    def get_completed_inbounds(self) -> pd.DataFrame:
-        """
-        입고 완료된 목록
-        
-        Returns:
-            진척률 100% 입고 DataFrame
-        """
-        df = self.get_data()
-        return df[df['진척률'] >= 100.0].sort_values('입고예정일', ascending=False)

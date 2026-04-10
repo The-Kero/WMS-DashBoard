@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS 대시보드 v10 (카드 재배치)</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background: #E8EAED;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+        }
+        
+        /* ========================================
+           헤더
+           ======================================== */
+        .header {
+            background: #3B4458;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        
+        .header .leftSection {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+        
+        .header .logoContainer {
+            background: #3B4458;
+            padding: 5px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header .logo {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            color: #FFFFFF;
+            font-weight: bold;
+        }
+        
+        .header .updateInfo {
+            font-size: 16px;
+            color: #B0B8C4;
+            margin-left: auto;
+        }
+        
+        .header .centerSection {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .header .time {
+            font-size: 20px;
+            color: #FFFFFF;
+            font-weight: bold;
+        }
+        
+        /* ========================================
+           메인 컨테이너
+           ======================================== */
+        .mainList {
+            padding: 20px;
+            height: calc(1080px - 60px);
+            display: flex;
+            gap: 20px;
+        }
+        
+        /* 좌측 카드 영역 (3x2 그리드) */
+        .cardsSection {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .cardRow {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        /* 우측 알림 로그 영역 */
+        .rightSection {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* ========================================
+           카드 기본 스타일
+           ======================================== */
+        .gaugeItem {
+            background: #FFFFFF;
+            border: 2px solid #D1D5DB;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            width: 360px;
+            height: 480px;
+        }
+        
+        /* 경고 상태 */
+        .gaugeItem.ingWarning {
+            background: #FFF5F5;
+            border: 4px solid #F05E5E;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(240, 94, 94, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(240, 94, 94, 0);
+            }
+        }
+        
+        /* 제목 */
+        .gaugeItem h2 {
+            font-size: 18px;
+            color: #4B5563;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .gaugeItem.ingWarning h2 {
+            color: #F05E5E;
+        }
+        
+        /* ========================================
+           카드 2: 입고 현황
+           ======================================== */
+        .inbound-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .metrics-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #E8EAED;
+        }
+        
+        .metric-box {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .metric-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3B4458;
+        }
+        
+        .metric-unit {
+            font-size: 16px;
+            color: #999;
+            margin-left: 4px;
+        }
+        
+        .progress-bar-container {
+            margin-top: 8px;
+            width: 100%;
+            height: 6px;
+            background: #E8EAED;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #60CB2E;
+            transition: width 0.5s ease;
+        }
+        
+        /* 입고 유의상품 영역 */
+        .risky-section {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #F05E5E;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #F05E5E;
+        }
+        
+        .section-count {
+            font-size: 13px;
+            background: #FEE2E2;
+            color: #F05E5E;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .risky-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 210px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 5px;
+        }
+        
+        /* 스크롤바 스타일 */
+        .risky-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .risky-list::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 3px;
+        }
+        
+        .risky-list::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+        
+        .risky-list::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        .risky-item {
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #FFFBFB 0%, #FEF2F2 100%);
+            border-left: 3px solid #F87171;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .risky-item:hover {
+            background: #FEF2F2;
+            border-left-color: #DC2626;
+            transform: translateX(3px);
+        }
+        
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        
+        .item-icon {
+            font-size: 16px;
+        }
+        
+        .item-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1F2937;
+        }
+        
+        .item-details {
+            font-size: 12px;
+            color: #6B7280;
+            padding-left: 24px;
+        }
+        
+        .item-details .separator {
+            margin: 0 6px;
+            color: #D1D5DB;
+        }
+        
+        .item-details .date {
+            color: #DC2626;
+            font-weight: 600;
+        }
+        
+        /* ========================================
+           카드 5: 피킹 유의 상품 (740px 폭 확대!)
+           ======================================== */
+        .gaugeItem.card5-wide {
+            width: 740px; /* 360px → 740px */
+            grid-column: span 2; /* 2칸 차지 */
+        }
+        
+        .picking-metrics {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #E8EAED;
+        }
+        
+        .picking-metric-box {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #FCA5A5;
+        }
+        
+        .picking-metric-box.total {
+            background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+        }
+        
+        .picking-metric-box.urgent {
+            background: linear-gradient(135deg, #FEE2E2 0%, #FEF2F2 100%);
+        }
+        
+        .picking-metric-box.warning {
+            background: linear-gradient(135deg, #FEF9C3 0%, #FEF3C7 100%);
+            border-color: #FCD34D;
+        }
+        
+        .picking-metric-label {
+            font-size: 11px;
+            color: #991B1B;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        
+        .picking-metric-box.warning .picking-metric-label {
+            color: #78350F;
+        }
+        
+        .picking-metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #DC2626;
+        }
+        
+        .picking-metric-box.warning .picking-metric-value {
+            color: #CA8A04;
+        }
+        
+        .item-location {
+            font-size: 13px;
+            font-weight: 700;
+            color: #7C3AED;
+            background: #F5F3FF;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .item-details .ratio {
+            font-weight: 600;
+            color: #DC2626;
+            background: #FEE2E2;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        /* ========================================
+           카드 4: 스케줄
+           ======================================== */
+        .schedule-content-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        
+        .schedule-group {
+            margin-bottom: 12px;
+        }
+        
+        .group-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+        }
+        
+        .group-title-text {
+            flex: 1;
+        }
+        
+        .group-count {
+            font-size: 11px;
+            background: #E8EAED;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: #666;
+            font-weight: normal;
+        }
+        
+        /* 오늘 그룹 - 강조 */
+        .schedule-group.today {
+            background: linear-gradient(135deg, #FFFACD 0%, #FFF9E6 100%);
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #FFD700;
+        }
+        
+        .schedule-group.today .group-title {
+            font-size: 16px;
+            color: #FF8C00;
+            border-bottom: 2px solid #FFD700;
+        }
+        
+        .schedule-group.today .group-count {
+            background: #FFD700;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        /* 내일 그룹 */
+        .schedule-group.tomorrow {
+            background: linear-gradient(135deg, #E6F3FF 0%, #F0F8FF 100%);
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #B0D4FF;
+        }
+        
+        .schedule-group.tomorrow .group-title {
+            font-size: 14px;
+            color: #1E90FF;
+            border-bottom: 1px solid #B0D4FF;
+        }
+        
+        .schedule-group.tomorrow .group-count {
+            background: #B0D4FF;
+            color: #333;
+        }
+        
+        /* 이번 주 그룹 */
+        .schedule-group.this-week {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #E8EAED;
+        }
+        
+        .schedule-group.this-week .group-title {
+            font-size: 13px;
+            color: #3B4458;
+            border-bottom: 1px solid #E8EAED;
+        }
+        
+        /* 이벤트 리스트 */
+        .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        
+        .event-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 8px;
+            font-size: 13px;
+            line-height: 1.4;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .event-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(3px);
+        }
+        
+        .event-icon {
+            font-size: 18px;
+            margin-right: 10px;
+            min-width: 24px;
+            flex-shrink: 0;
+            text-align: center;
+        }
+        
+        .event-text {
+            color: #333;
+            flex: 1;
+        }
+        
+        /* 유형별 색상 */
+        .event-item.birthday .event-icon { color: #FF69B4; }
+        .event-item.leave .event-icon { color: #87CEEB; }
+        .event-item.education .event-icon { color: #FFA500; }
+        .event-item.vacation .event-icon { color: #90EE90; }
+        .event-item.other .event-icon { color: #C0C0C0; }
+        
+        .schedule-content-main::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .schedule-content-main::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 3px;
+        }
+        
+        .schedule-content-main::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+        
+        .schedule-content-main::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        /* ========================================
+           카드 5 & 6: 출고 현황
+           ======================================== */
+        .outbound-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 출하금액 영역 */
+        .amount-section {
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #E8EAED;
+            margin-bottom: 15px;
+        }
+        
+        .amount-section.card6-amount {
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .amount-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .amount-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3B4458;
+            margin-bottom: 12px;
+        }
+        
+        .amount-compare {
+            font-size: 16px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .amount-compare.positive {
+            color: #60CB2E;
+        }
+        
+        .amount-compare.negative {
+            color: #F05E5E;
+        }
+        
+        /* 라벨 건수 영역 (카드5) */
+        .label-section-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .label-section {
+            text-align: center;
+            padding: 2px 0 18px 0;
+            border-bottom: 1px solid #E8EAED;
+        }
+        
+        .label-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .label-text {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .label-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3B4458;
+        }
+        
+        .label-value.success {
+            color: #60CB2E;
+        }
+        
+        .label-value.danger {
+            color: #F05E5E;
+        }
+        
+        /* 비정형 라벨 - 2줄 구조 */
+        .irregular-section {
+            text-align: center;
+            padding: 10px 0;
+        }
+        
+        .irregular-total {
+            margin-bottom: 8px;
+        }
+        
+        .irregular-unprinted {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .irregular-unprinted.success {
+            color: #60CB2E;
+        }
+        
+        .irregular-unprinted.warning {
+            color: #F59E0B;
+        }
+        
+        /* 미발행 피킹리스트 영역 (카드6) */
+        .picking-section-card6 {
+            text-align: center;
+            padding: 2px 0 18px 0;
+            border-bottom: 2px solid #E8EAED;
+            margin-bottom: 10px;
+        }
+        
+        .picking-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .picking-text {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .picking-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .picking-value.success {
+            color: #60CB2E;
+        }
+        
+        .picking-value.danger {
+            color: #F05E5E;
+        }
+        
+        /* 배송처별 수량 영역 (카드6) */
+        .destination-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3px 12px;
+            font-size: 13px;
+        }
+        
+        .destination-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2px 0;
+        }
+        
+        .destination-name {
+            color: #4B5563;
+        }
+        
+        .destination-value {
+            font-weight: bold;
+            color: #3B4458;
+            font-size: 18px;
+        }
+        
+        /* 한익스,키즈 - 작은 글씨 */
+        .destination-item.small .destination-name {
+            font-size: 11px;
+        }
+        
+        .destination-item.small .destination-value {
+            font-size: 15px;
+        }
+        
+        /* ========================================
+           알림 로그 카드
+           ======================================== */
+        .notificationCard {
+            background: #FFFFFF;
+            border: 2px solid #D1D5DB;
+            border-radius: 12px;
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .notificationCard h2 {
+            font-size: 22px;
+            color: #4B5563;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notificationCard h2::before {
+            content: "📋";
+            font-size: 24px;
+        }
+        
+        /* 알림 리스트 */
+        .notificationList {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .notificationList::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .notificationList::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 4px;
+        }
+        
+        .notificationList::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 4px;
+        }
+        
+        .notificationList::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        /* 알림 아이템 */
+        .notificationItem {
+            background: #F9FAFB;
+            border-left: 4px solid #60CB2E;
+            padding: 12px 15px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .notificationItem:hover {
+            background: #F3F4F6;
+            transform: translateX(2px);
+        }
+        
+        .notificationItem.warning {
+            border-left-color: #F59E0B;
+            background: #FFFBEB;
+        }
+        
+        .notificationItem.error {
+            border-left-color: #F05E5E;
+            background: #FFF5F5;
+        }
+        
+        .notificationItem .time {
+            font-size: 13px;
+            color: #9CA3AF;
+            margin-bottom: 5px;
+        }
+        
+        .notificationItem .message {
+            font-size: 15px;
+            color: #4B5563;
+            line-height: 1.4;
+        }
+        
+        .notificationItem.warning .message {
+            color: #92400E;
+        }
+        
+        .notificationItem.error .message {
+            color: #991B1B;
+        }
+        
+        /* ========================================
+           팝업 레이어
+           ======================================== */
+        .pageLayer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+        }
+        
+        .pageLayer.active {
+            display: block;
+        }
+        
+        .pageMask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        .pageInner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            min-width: 500px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .pageInner.typeWarning {
+            border: 3px solid #F05E5E;
+        }
+        
+        .topBox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .topBox img {
+            width: 48px;
+            height: 48px;
+            margin-right: 15px;
+        }
+        
+        .topBox h2 {
+            font-size: 32px;
+            color: #F05E5E;
+            font-weight: bold;
+        }
+        
+        .middleBox {
+            font-size: 24px;
+            color: #2C365C;
+            line-height: 1.6;
+        }
+        
+        /* ========================================
+           스크롤바
+           ======================================== */
+        .risky-section::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .risky-section::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 3px;
+        }
+        
+        .risky-section::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+        
+        .risky-section::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <div class="header">
+        <div class="leftSection">
+            <div class="logoContainer">
+                <img src="ourhome_ci.png" alt="아워홈 로고" class="logo">
+            </div>
+            <h1>WMS 동서울물류센터 냉장파트</h1>
+            <div class="updateInfo">마지막 업데이트 : 방금</div>
+        </div>
+        <div class="centerSection">
+            <div class="time" id="currentTime"></div>
+        </div>
+    </div>
+    
+    <!-- 메인 -->
+    <div class="mainList">
+        
+        <!-- 좌측 카드 영역 (3x2 그리드) -->
+        <div class="cardsSection">
+            
+            <!-- 상단 3개: 카드2(입고), 카드5(자사), 카드6(지방) -->
+            <div class="cardRow">
+                
+                <!-- 카드 2: 금일 입고 사항 (원래 1행 2열 → 1행 1열로 이동) -->
+                <div class="gaugeItem" id="card1">
+                    <h2>📦 금일 입고 사항</h2>
+                    <div class="inbound-content">
+                        <!-- 메트릭 -->
+                        <div class="metrics-section">
+                            <div class="metric-box">
+                                <div class="metric-label">총 건수</div>
+                                <div class="metric-value" id="totalCount">24<span class="metric-unit">건</span></div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">진행률</div>
+                                <div class="metric-value" id="progressRate">75<span class="metric-unit">%</span></div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" id="progressBar" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 입고 유의상품 -->
+                        <div class="risky-section">
+                            <div class="section-header">
+                                <div class="section-title">🚨 입고 유의상품</div>
+                                <div class="section-count" id="inboundRiskyCount">3건</div>
+                            </div>
+                            <div class="risky-list" id="inboundRiskyList">
+                                <div class="risky-item">
+                                    <div class="item-header">
+                                        <span class="item-icon">🔴</span>
+                                        <span class="item-name">케찹통</span>
+                                    </div>
+                                    <div class="item-details">
+                                        EA(450ml)<span class="separator">|</span><span class="date">2025-11-30</span>
+                                    </div>
+                                </div>
+                                <div class="risky-item">
+                                    <div class="item-header">
+                                        <span class="item-icon">🔴</span>
+                                        <span class="item-name">떡볶이양념장</span>
+                                    </div>
+                                    <div class="item-details">
+                                        PK(2kg)<span class="separator">|</span><span class="date">2025-11-15</span>
+                                    </div>
+                                </div>
+                                <div class="risky-item">
+                                    <div class="item-header">
+                                        <span class="item-icon">🟠</span>
+                                        <span class="item-name">삼각유부</span>
+                                    </div>
+                                    <div class="item-details">
+                                        EA(500g)<span class="separator">|</span><span class="date">2025-12-01</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 카드 5: 금일 자사 출고 사항 (원래 2행 2열 → 1행 2열로 이동) -->
+                <div class="gaugeItem" id="card2">
+                    <h2>🚚 금일 자사 출고 사항</h2>
+                    <div class="outbound-content">
+                        <!-- 출하금액 영역 -->
+                        <div class="amount-section">
+                            <div class="amount-label">현시각 출하 금액 :</div>
+                            <div class="amount-value" id="card2AmountValue">63,591,852 원</div>
+                            <div class="amount-compare negative" id="card2AmountCompare">
+                                <span>전일 대비:</span>
+                                <span id="card2CompareValue">-5.1%</span>
+                                <span id="card2CompareIcon">🔻</span>
+                                <span style="background:#FEF3C7; color:#D97706; padding:2px 8px; border-radius:8px; font-size:11px; font-weight:600; border:1px solid #FCD34D; margin-left:6px;">예시</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 라벨 건수 영역 -->
+                        <div class="label-section-wrapper">
+                            <div class="label-section">
+                                <div class="label-row">
+                                    <span class="label-text">총 라벨 건수 :</span>
+                                    <span class="label-value" id="card2TotalLabel">5,928 건</span>
+                                </div>
+                            </div>
+                            
+                            <div class="label-section">
+                                <div class="label-row">
+                                    <span class="label-text">미발행 라벨 건수 :</span>
+                                    <span class="label-value success" id="card2UnprintedLabel">0 건 ✅</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 비정형 라벨 건수 -->
+                            <div class="irregular-section">
+                                <div class="label-row irregular-total">
+                                    <span class="label-text">비정형 라벨 건수 :</span>
+                                    <span class="label-value" id="card2IrregularTotal">10 건</span>
+                                </div>
+                                <div class="irregular-unprinted warning" id="card2IrregularUnprinted">
+                                    (미출력 3 건) ⚠️
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 카드 6: 금일 지방 출고 사항 (원래 2행 3열 → 1행 3열로 이동) -->
+                <div class="gaugeItem" id="card3">
+                    <h2>🚛 금일 지방 출고 사항</h2>
+                    <div class="outbound-content">
+                        <!-- 출하금액 영역 -->
+                        <div class="amount-section card6-amount">
+                            <div class="amount-label">현시각 출하 금액 :</div>
+                            <div class="amount-value" id="card3AmountValue">16,948,585 원</div>
+                            <div class="amount-compare negative" id="card3AmountCompare">
+                                <span>전일 대비:</span>
+                                <span id="card3CompareValue">-15.1%</span>
+                                <span id="card3CompareIcon">🔻</span>
+                                <span style="background:#FEF3C7; color:#D97706; padding:2px 8px; border-radius:8px; font-size:11px; font-weight:600; border:1px solid #FCD34D; margin-left:6px;">예시</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 미발행 피킹리스트 -->
+                        <div class="picking-section-card6">
+                            <div class="picking-row">
+                                <span class="picking-text">미발행 피킹리스트 :</span>
+                                <span class="picking-value danger" id="card3PickingValue">11 건 ⚠️</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 배송처별 수량 (12개) -->
+                        <div class="destination-section" id="card3DestinationList">
+                            <!-- 좌측 6개 -->
+                            <div class="destination-item">
+                                <span class="destination-name">제주:</span>
+                                <span class="destination-value" id="dest-jeju">64</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">제천:</span>
+                                <span class="destination-value" id="dest-jecheon">153</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">호남:</span>
+                                <span class="destination-value" id="dest-honam">116</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">구미:</span>
+                                <span class="destination-value" id="dest-gumi">28</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">계룡:</span>
+                                <span class="destination-value" id="dest-gyeryong">1,230</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">음성:</span>
+                                <span class="destination-value" id="dest-eumseong">1</span>
+                            </div>
+                            
+                            <!-- 우측 6개 -->
+                            <div class="destination-item">
+                                <span class="destination-name">용인2:</span>
+                                <span class="destination-value" id="dest-yongin2">743</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">용인3:</span>
+                                <span class="destination-value" id="dest-yongin3">13</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">안산:</span>
+                                <span class="destination-value" id="dest-ansan">396</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">양산:</span>
+                                <span class="destination-value" id="dest-yangsan">37</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">양산2:</span>
+                                <span class="destination-value" id="dest-yangsan2">114</span>
+                            </div>
+                            <div class="destination-item small">
+                                <span class="destination-name">한익스,키즈:</span>
+                                <span class="destination-value" id="dest-hanex">3, 4</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- 하단 2개: 카드4(스케줄), 카드3(재고 - 760px 폭!) -->
+            <div class="cardRow">
+                
+                <!-- 카드 4: 냉장파트 스케줄 (제목 변경!) -->
+                <div class="gaugeItem" id="card4">
+                    <h2>📅 냉장파트 스케줄</h2>
+                    <div class="schedule-content-main">
+                        <!-- 오늘 그룹 -->
+                        <div class="schedule-group today">
+                            <div class="group-title">
+                                <span class="group-title-text">오늘 (11/09 토)</span>
+                                <span class="group-count">1건</span>
+                            </div>
+                            <div class="event-list">
+                                <div class="event-item birthday">
+                                    <span class="event-icon">🎂</span>
+                                    <span class="event-text">홍길동 생일</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 내일 그룹 -->
+                        <div class="schedule-group tomorrow">
+                            <div class="group-title">
+                                <span class="group-title-text">내일 (11/10 일)</span>
+                                <span class="group-count">1건</span>
+                            </div>
+                            <div class="event-list">
+                                <div class="event-item leave">
+                                    <span class="event-icon">🏖️</span>
+                                    <span class="event-text">김철수 월차 (개인 사유)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 이번 주 그룹 -->
+                        <div class="schedule-group this-week">
+                            <div class="group-title">
+                                <span class="group-title-text">이번 주</span>
+                                <span class="group-count">4건</span>
+                            </div>
+                            <div class="event-list">
+                                <div class="event-item education">
+                                    <span class="event-icon">📚</span>
+                                    <span class="event-text">안전보건교육 (11/12 화 14:00)</span>
+                                </div>
+                                <div class="event-item birthday">
+                                    <span class="event-icon">🎂</span>
+                                    <span class="event-text">이영희 생일 (11/14 목)</span>
+                                </div>
+                                <div class="event-item vacation">
+                                    <span class="event-icon">✈️</span>
+                                    <span class="event-text">박민수 휴가 (11/15 금)</span>
+                                </div>
+                                <div class="event-item education">
+                                    <span class="event-icon">📚</span>
+                                    <span class="event-text">소방안전교육 (11/18 월 10:00)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 카드 3: 금일 피킹 유의 상품 (760px 폭으로 확대!) -->
+                <div class="gaugeItem ingWarning card5-wide" id="card5">
+                    <h2>⚠️ 금일 피킹 유의 상품</h2>
+                    <div class="inbound-content">
+                        <!-- 메트릭 -->
+                        <div class="picking-metrics">
+                            <div class="picking-metric-box total">
+                                <div class="picking-metric-label">총 개수</div>
+                                <div class="picking-metric-value" id="pickingTotal">12<span class="metric-unit" style="font-size:14px;">건</span></div>
+                            </div>
+                            <div class="picking-metric-box urgent">
+                                <div class="picking-metric-label">긴급</div>
+                                <div class="picking-metric-value" id="pickingUrgent">5<span class="metric-unit" style="font-size:14px;">건</span></div>
+                            </div>
+                            <div class="picking-metric-box warning">
+                                <div class="picking-metric-label">주의</div>
+                                <div class="picking-metric-value" id="pickingWarning">7<span class="metric-unit" style="font-size:14px;">건</span></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 유의상품 리스트 -->
+                        <div class="risky-section">
+                            <div class="section-header">
+                                <div class="section-title">🚨 유효비 20% 이하</div>
+                                <div class="section-count" id="pickingRiskyCount">12건</div>
+                            </div>
+                            <div class="risky-list" id="pickingRiskyList">
+                                <div class="risky-item">
+                                    <div class="item-header">
+                                        <span class="item-icon">🔴</span>
+                                        <span class="item-location">K031601</span>
+                                        <span class="item-name">(갓잇)치즈소스</span>
+                                    </div>
+                                    <div class="item-details">
+                                        PK.(2kg)<span class="separator">|</span><span class="date">11-08</span><span class="separator">|</span><span class="ratio">8%</span>
+                                    </div>
+                                </div>
+                                <div class="risky-item">
+                                    <div class="item-header">
+                                        <span class="item-icon">🔴</span>
+                                        <span class="item-location">K011101</span>
+                                        <span class="item-name">(갓잇)불닭렌치소스</span>
+                                    </div>
+                                    <div class="item-details">
+                                        PK.(3kg)<span class="separator">|</span><span class="date">11-07</span><span class="separator">|</span><span class="ratio">10%</span>
+                                    </div>
+                                </div>
+                                <div class="risky-item">
+                                    <div class="item-header">
+                                        <span class="item-icon">🟡</span>
+                                        <span class="item-location">K042402</span>
+                                        <span class="item-name">그라나파다노치즈</span>
+                                    </div>
+                                    <div class="item-details">
+                                        PK.(1kg)<span class="separator">|</span><span class="date">11-07</span><span class="separator">|</span><span class="ratio">20%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <!-- 우측 알림 로그 영역 (그대로 유지) -->
+        <div class="rightSection">
+            <div class="notificationCard">
+                <h2>알림 로그</h2>
+                <div class="notificationList" id="notificationList">
+                    
+                    <div class="notificationItem error">
+                        <div class="time">2025-11-09 14:45:23</div>
+                        <div class="message">⚠️ 피킹 유의 상품 12건 발생</div>
+                    </div>
+                    
+                    <div class="notificationItem warning">
+                        <div class="time">2025-11-09 14:30:15</div>
+                        <div class="message">🏢 자사 출고 14건 진행 중</div>
+                    </div>
+                    
+                    <div class="notificationItem">
+                        <div class="time">2025-11-09 14:15:42</div>
+                        <div class="message">📦 입고 18건 완료</div>
+                    </div>
+                    
+                    <div class="notificationItem">
+                        <div class="time">2025-11-09 13:00:00</div>
+                        <div class="message">시스템 정상 가동 중</div>
+                    </div>
+                    
+                    <div class="notificationItem">
+                        <div class="time">2025-11-09 12:30:25</div>
+                        <div class="message">🚚 지방 출고 75건 완료</div>
+                    </div>
+                    
+                    <div class="notificationItem warning">
+                        <div class="time">2025-11-09 11:15:10</div>
+                        <div class="message">🌡️ 냉장창고 도어1 온도 확인 필요</div>
+                    </div>
+                    
+                    <div class="notificationItem">
+                        <div class="time">2025-11-09 10:45:18</div>
+                        <div class="message">일일 점검 완료</div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- v10.html 작성 완료! -->
+    <!-- 다음 단계: 브라우저 확인 -->
+    
+    <script>
+        // ========================================
+        // 시계
+        // ========================================
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateStr = now.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                weekday: 'short'
+            });
+            document.getElementById('currentTime').textContent = `${dateStr} ${timeStr}`;
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // ========================================
+        // 카드2: 입고현황 업데이트
+        // ========================================
+        function updateCard1(data) {
+            // 총 건수
+            document.getElementById('totalCount').textContent = data.totalCount;
+            
+            // 진척률
+            document.getElementById('progressRate').textContent = data.progressRate;
+            document.getElementById('progressBar').style.width = data.progressRate + '%';
+            
+            // 유의상품 건수
+            document.getElementById('inboundRiskyCount').textContent = data.inboundRiskyCount + '건';
+            
+            // 유의상품 리스트
+            const listContainer = document.getElementById('inboundRiskyList');
+            listContainer.innerHTML = '';
+            
+            if (data.inboundRiskyCount === 0) {
+                listContainer.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: #60CB2E; font-size: 18px;">
+                        ✅ 입고 유의상품 없음
+                    </div>
+                `;
+            } else {
+                data.riskyItems.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'risky-item';
+                    
+                    const formatDate = (dateStr) => {
+                        if (!dateStr || dateStr.length !== 8) return dateStr;
+                        return dateStr.substring(2,4) + '.' + dateStr.substring(4,6) + '.' + dateStr.substring(6,8);
+                    };
+                    
+                    itemDiv.innerHTML = `
+                        <div class="item-header">
+                            <span class="item-icon">🔴</span>
+                            <span class="item-name">${item.productName}</span>
+                        </div>
+                        <div class="item-details">
+                            ${item.unit}<span class="separator">|</span>입고분 : <span style="color: #EF4444; font-weight: 600;">${formatDate(item.inboundExpiry)}</span><span class="separator">|</span>기존 : <span style="color: #3B82F6; font-weight: 600;">${formatDate(item.stockExpiry)}</span>
+                        </div>
+                    `;
+                    listContainer.appendChild(itemDiv);
+                });
+            }
+        }
+        
+        // ========================================
+        // 카드3: 재고현황 업데이트
+        // ========================================
+        function updateCard5(data) {
+            // 총 개수
+            document.getElementById('pickingTotal').innerHTML = data.totalCount + '<span class="metric-unit" style="font-size:14px;">건</span>';
+            
+            // 긴급
+            document.getElementById('pickingUrgent').innerHTML = data.urgentCount + '<span class="metric-unit" style="font-size:14px;">건</span>';
+            
+            // 주의
+            document.getElementById('pickingWarning').innerHTML = data.warningCount + '<span class="metric-unit" style="font-size:14px;">건</span>';
+            
+            // 유의상품 건수
+            document.getElementById('pickingRiskyCount').textContent = data.totalCount + '건';
+            
+            // 유의상품 리스트
+            const listContainer = document.getElementById('pickingRiskyList');
+            listContainer.innerHTML = '';
+            
+            if (data.totalCount === 0) {
+                listContainer.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: #60CB2E; font-size: 18px;">
+                        ✅ 피킹 유의상품 없음
+                    </div>
+                `;
+            } else {
+                data.riskyItems.slice(0, 10).forEach(item => {
+                    const icon = item.validityRatio <= 10 ? '🔴' : '🟡';
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'risky-item';
+                    itemDiv.innerHTML = `
+                        <div class="item-header">
+                            <span class="item-icon">${icon}</span>
+                            <span class="item-location">${item.location}</span>
+                            <span class="item-name">${item.productName}</span>
+                        </div>
+                        <div class="item-details">
+                            상품코드: ${item.productCode}<span class="separator">|</span><span class="date">${item.expiryDate}</span><span class="separator">|</span><span class="ratio">${item.validityRatio}%</span>
+                        </div>
+                    `;
+                    listContainer.appendChild(itemDiv);
+                });
+            }
+        }
+        
+        // ========================================
+        // 카드5: 자사 출고 업데이트
+        // ========================================
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+        
+        function updateCard2(data) {
+            // 출하금액
+            document.getElementById('card2AmountValue').textContent = formatNumber(data.amount) + ' 원';
+            
+            // 전일 대비
+            const compareEl = document.getElementById('card2AmountCompare');
+            const compareValue = document.getElementById('card2CompareValue');
+            const compareIcon = document.getElementById('card2CompareIcon');
+            
+            compareValue.textContent = data.compare + '%';
+            
+            if (data.compare > 0) {
+                compareEl.className = 'amount-compare positive';
+                compareIcon.textContent = '🔺';
+            } else if (data.compare < 0) {
+                compareEl.className = 'amount-compare negative';
+                compareIcon.textContent = '🔻';
+            } else {
+                compareEl.className = 'amount-compare';
+                compareIcon.textContent = '➖';
+            }
+            
+            // 총 라벨 건수
+            document.getElementById('card2TotalLabel').textContent = formatNumber(data.totalLabel) + ' 건';
+            
+            // 미발행 라벨 건수
+            const unprintedEl = document.getElementById('card2UnprintedLabel');
+            if (data.unprintedLabel === 0) {
+                unprintedEl.className = 'label-value success';
+                unprintedEl.textContent = '0 건 ✅';
+            } else {
+                unprintedEl.className = 'label-value danger';
+                unprintedEl.textContent = formatNumber(data.unprintedLabel) + ' 건 ⚠️';
+            }
+            
+            // 비정형 라벨 건수
+            document.getElementById('card2IrregularTotal').textContent = formatNumber(data.irregularTotal) + ' 건';
+            
+            const irregularUnprintedEl = document.getElementById('card2IrregularUnprinted');
+            if (data.irregularUnprinted === 0) {
+                irregularUnprintedEl.className = 'irregular-unprinted success';
+                irregularUnprintedEl.textContent = '(미출력 0 건) ✅';
+            } else {
+                irregularUnprintedEl.className = 'irregular-unprinted warning';
+                irregularUnprintedEl.textContent = '(미출력 ' + data.irregularUnprinted + ' 건) ⚠️';
+            }
+        }
+        
+        // ========================================
+        // 카드6: 지방 출고 업데이트
+        // ========================================
+        function updateCard3(data) {
+            // 출하금액
+            document.getElementById('card3AmountValue').textContent = formatNumber(data.amount) + ' 원';
+            
+            // 전일 대비
+            const compareEl = document.getElementById('card3AmountCompare');
+            const compareValue = document.getElementById('card3CompareValue');
+            const compareIcon = document.getElementById('card3CompareIcon');
+            
+            compareValue.textContent = data.compare + '%';
+            
+            if (data.compare > 0) {
+                compareEl.className = 'amount-compare positive';
+                compareIcon.textContent = '🔺';
+            } else if (data.compare < 0) {
+                compareEl.className = 'amount-compare negative';
+                compareIcon.textContent = '🔻';
+            } else {
+                compareEl.className = 'amount-compare';
+                compareIcon.textContent = '➖';
+            }
+            
+            // 미발행 피킹리스트
+            const pickingEl = document.getElementById('card3PickingValue');
+            if (data.unprintedPicking === 0) {
+                pickingEl.className = 'picking-value success';
+                pickingEl.textContent = '0 건 ✅';
+            } else {
+                pickingEl.className = 'picking-value danger';
+                pickingEl.textContent = formatNumber(data.unprintedPicking) + ' 건 ⚠️';
+            }
+            
+            // 배송처별 수량
+            document.getElementById('dest-jeju').textContent = formatNumber(data.destinations.jeju);
+            document.getElementById('dest-jecheon').textContent = formatNumber(data.destinations.jecheon);
+            document.getElementById('dest-honam').textContent = formatNumber(data.destinations.honam);
+            document.getElementById('dest-gumi').textContent = formatNumber(data.destinations.gumi);
+            document.getElementById('dest-gyeryong').textContent = formatNumber(data.destinations.gyeryong);
+            document.getElementById('dest-eumseong').textContent = formatNumber(data.destinations.eumseong);
+            document.getElementById('dest-yongin2').textContent = formatNumber(data.destinations.yongin2);
+            document.getElementById('dest-yongin3').textContent = formatNumber(data.destinations.yongin3);
+            document.getElementById('dest-ansan').textContent = formatNumber(data.destinations.ansan);
+            document.getElementById('dest-yangsan').textContent = formatNumber(data.destinations.yangsan);
+            document.getElementById('dest-yangsan2').textContent = formatNumber(data.destinations.yangsan2);
+            document.getElementById('dest-hanex').textContent = data.destinations.hanex + ', ' + data.destinations.kids;
+        }
+        
+        // ========================================
+        // 데이터 설정 및 초기화 (2025-11-23 실제 데이터)
+        // ========================================
+        const dashboardData = {
+            "date": "20251124",
+            "card1": {
+                "totalCount": 48,
+                "progressRate": 6.2,
+                "inboundRiskyCount": 1,
+                "riskyItems": [
+                    {
+                        "productCode": "8809257827703",
+                        "productName": "아워홈 순쌀떡국떡(1kg)",
+                        "inboundExpiry": "20260202",
+                        "stockExpiry": "20260209",
+                        "location": "K050202",
+                        "unit": "EA(개당1kg)"
+                    }
+                ],
+                "testMode": false
+            },
+            "card5": {
+                "totalCount": 11,
+                "urgentCount": 2,
+                "warningCount": 9,
+                "riskyItems": [
+                    {
+                        "location": "K040901",
+                        "productCode": "27576687",
+                        "productName": "(갓잇)블랙페퍼마요",
+                        "expiryDate": "20251204",
+                        "stockQty": 41,
+                        "validityRatio": 8.0
+                    },
+                    {
+                        "location": "K041101",
+                        "productCode": "27576700",
+                        "productName": "★(갓잇)치폴레소스",
+                        "expiryDate": "20251204",
+                        "stockQty": 6,
+                        "validityRatio": 8.0
+                    },
+                    {
+                        "location": "K060201",
+                        "productCode": "41059982",
+                        "productName": "사천짜볶이(NB)",
+                        "expiryDate": "20251207",
+                        "stockQty": 47,
+                        "validityRatio": 14.0
+                    },
+                    {
+                        "location": "K011303",
+                        "productCode": "27286876",
+                        "productName": "(순대실록) 고추장소스",
+                        "expiryDate": "20251223",
+                        "stockQty": 48,
+                        "validityRatio": 16.0
+                    },
+                    {
+                        "location": "K050801",
+                        "productCode": "41126073",
+                        "productName": "쫄면사리",
+                        "expiryDate": "20251223",
+                        "stockQty": 18,
+                        "validityRatio": 16.0
+                    },
+                    {
+                        "location": "L050902",
+                        "productCode": "25961898",
+                        "productName": "[Careplus] 돈까스소스 행복한맛남",
+                        "expiryDate": "20251209",
+                        "stockQty": 26,
+                        "validityRatio": 16.0
+                    },
+                    {
+                        "location": "L060903",
+                        "productCode": "41127612",
+                        "productName": "[케어플러스]라구소스",
+                        "expiryDate": "20251210",
+                        "stockQty": 11,
+                        "validityRatio": 17.0
+                    },
+                    {
+                        "location": "K060201",
+                        "productCode": "41059982",
+                        "productName": "사천짜볶이(NB)",
+                        "expiryDate": "20251207",
+                        "stockQty": 2,
+                        "validityRatio": 17.0
+                    },
+                    {
+                        "location": "K080501",
+                        "productCode": "25661521",
+                        "productName": "메추리알장조림(약270개) 행복한맛남",
+                        "expiryDate": "20251202",
+                        "stockQty": 23,
+                        "validityRatio": 18.0
+                    },
+                    {
+                        "location": "K011403",
+                        "productCode": "27558034",
+                        "productName": "[그남파] 그남자의 치킨칠라프소스",
+                        "expiryDate": "20251229",
+                        "stockQty": 15,
+                        "validityRatio": 19.0
+                    }
+                ]
+            },
+            "card2": {
+                "amount": 30652251,
+                "compare": -64.3,
+                "totalLabel": 2687,
+                "unprintedLabel": 1777,
+                "irregularTotal": 5,
+                "irregularUnprinted": 5
+            },
+            "card3": {
+                "amount": 12287126,
+                "compare": -0.2,
+                "unprintedPicking": 105,
+                "destinations": {
+                    "jeju": 439,
+                    "jecheon": 3,
+                    "honam": 2,
+                    "gumi": 29,
+                    "gyeryong": 884,
+                    "eumseong": 0,
+                    "yongin2": 1162,
+                    "yongin3": 0,
+                    "ansan": 147,
+                    "yangsan": 0,
+                    "yangsan2": 239,
+                    "hanex": 1,
+                    "kids": 0
+                }
+            }
+        };
+        
+        // 페이지 로드 시 데이터 적용
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('v10 페이지 로드 완료. 데이터 적용 시작...');
+            
+            updateCard1(dashboardData.card1);
+            updateCard5(dashboardData.card5);
+            updateCard2(dashboardData.card2);
+            updateCard3(dashboardData.card3);
+            
+            console.log('모든 카드 업데이트 완료! (2025-11-24 실제 데이터)');
+        });
+    </script>
+    
+</body>
+</html>

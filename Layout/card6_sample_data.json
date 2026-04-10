@@ -1,0 +1,149 @@
+{
+  "generated_at": "2025-11-25T13:56:09.041247",
+  "source_files": [
+    "outbound_all_20251116.csv",
+    "outbound_all_20251119.csv"
+  ],
+  "sections": {
+    "section1_fifo_violation": [
+      {
+        "location": "A-01-01-01",
+        "product": "닭가슴살채",
+        "expiry": "2025-12-05"
+      },
+      {
+        "location": "B-02-03-02",
+        "product": "보쌈수소스",
+        "expiry": "2025-12-03"
+      },
+      {
+        "location": "C-03-02-01",
+        "product": "간장소스우불고기",
+        "expiry": "2025-12-08"
+      }
+    ],
+    "section2_total_inventory": {
+      "total_value": 17680000
+    },
+    "section3_storage_rate": {
+      "rate": 45.2
+    },
+    "section4_special_delivery": [
+      {
+        "name": "(EE)이랜드_CJ이천(과세)",
+        "count": 778
+      },
+      {
+        "name": "프레시_쿠팡(곤지암1)직매입",
+        "count": 2
+      },
+      {
+        "name": "프레시_쿠팡(YAN4)직매입",
+        "count": 2
+      }
+    ],
+    "section5_delete_status": {
+      "ansan": [
+        {
+          "name": "닭가슴살채",
+          "unit": "EA",
+          "count": 2
+        },
+        {
+          "name": "보쌈수소스",
+          "unit": "PK",
+          "count": 3
+        },
+        {
+          "name": "간장소스우불고기",
+          "unit": "EA",
+          "count": 1
+        }
+      ],
+      "eumseong": [
+        {
+          "name": "프레시쿠팡용",
+          "unit": "BOX",
+          "count": 5
+        },
+        {
+          "name": "이랜드용",
+          "unit": "EA",
+          "count": 2
+        }
+      ]
+    },
+    "section6_partial_shipment": [
+      {
+        "delivery_group": "4331",
+        "delivery_name": "용인2",
+        "product_name": "(캘리)참깨소스(2kg) 캘리스코",
+        "qty_before": 4,
+        "qty_after": 2
+      },
+      {
+        "delivery_group": "1114",
+        "delivery_name": "사보텐건대스타시티점",
+        "product_name": "(캘리)우동소스 캘리스코",
+        "qty_before": 2,
+        "qty_after": 1
+      },
+      {
+        "delivery_group": "2209",
+        "delivery_name": "사보텐교대역점",
+        "product_name": "(캘리)우동소스 캘리스코",
+        "qty_before": 2,
+        "qty_after": 1
+      },
+      {
+        "delivery_group": "2201",
+        "delivery_name": "히바린 IFC몰",
+        "product_name": "(캘리)돈카츠소스(2kg) 캘리스코",
+        "qty_before": 3,
+        "qty_after": 2
+      },
+      {
+        "delivery_group": "2201",
+        "delivery_name": "히바린 IFC몰",
+        "product_name": "(캘리)참깨소스(2kg) 캘리스코",
+        "qty_before": 3,
+        "qty_after": 2
+      },
+      {
+        "delivery_group": "2203",
+        "delivery_name": "히바린 타임스퀘어점",
+        "product_name": "(캘리)돈카츠소스(2kg) 캘리스코",
+        "qty_before": 3,
+        "qty_after": 2
+      },
+      {
+        "delivery_group": "2211",
+        "delivery_name": "사보텐이마트남양주점",
+        "product_name": "(캘리)돈카츠소스(2kg) 캘리스코",
+        "qty_before": 2,
+        "qty_after": 1
+      },
+      {
+        "delivery_group": "4407",
+        "delivery_name": "더사보텐스타필드애비뉴점",
+        "product_name": "(캘리)돈카츠소스(2kg) 캘리스코",
+        "qty_before": 5,
+        "qty_after": 2
+      },
+      {
+        "delivery_group": "4407",
+        "delivery_name": "더사보텐스타필드애비뉴점",
+        "product_name": "(캘리)참깨소스(2kg) 캘리스코",
+        "qty_before": 3,
+        "qty_after": 1
+      },
+      {
+        "delivery_group": "3322",
+        "delivery_name": "엘엑스세미콘강남점",
+        "product_name": "우동소스Ⅱ(R) 행복한맛남",
+        "qty_before": 2,
+        "qty_after": 1
+      }
+    ]
+  }
+}

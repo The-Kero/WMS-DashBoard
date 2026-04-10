@@ -48,6 +48,7 @@ from api.inventory import bp as inventory_bp
 from api.delete import bp as delete_bp
 from api.irregular import bp as irregular_bp
 from api.dashboard import bp as dashboard_bp
+from api.schedule import bp as schedule_bp
 
 app.register_blueprint(inbound_bp)
 app.register_blueprint(outbound_bp)
@@ -55,6 +56,7 @@ app.register_blueprint(inventory_bp)
 app.register_blueprint(delete_bp)
 app.register_blueprint(irregular_bp)
 app.register_blueprint(dashboard_bp)
+app.register_blueprint(schedule_bp)
 
 
 # ============================================================
@@ -68,6 +70,13 @@ def index():
     return render_template('dashboard.html')
 
 
+@app.route('/admin/schedule')
+def schedule_admin():
+    """스케줄 관리 페이지"""
+    logger.info("스케줄 관리 페이지 접근")
+    return render_template('schedule_admin.html')
+
+
 @app.route('/api/health')
 def health_check():
     """헬스 체크 API"""
@@ -76,6 +85,20 @@ def health_check():
         'timestamp': datetime.now().isoformat(),
         'message': 'Flask 서버 정상 작동 중'
     })
+
+
+@app.route('/sound_test')
+def sound_test():
+    """긴급알림 소리 샘플 테스트 페이지"""
+    logger.info("소리 테스트 페이지 접근")
+    return render_template('sound_test.html')
+
+
+@app.route('/sample')
+def sample_report():
+    """샘플 보고서 페이지 (상부 보고용)"""
+    logger.info("샘플 보고서 페이지 접근")
+    return render_template('sample_report.html')
 
 
 # ============================================================

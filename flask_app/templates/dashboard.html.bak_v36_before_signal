@@ -1,0 +1,2826 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS 동서울물류센터 냉장파트</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background: #E8EAED;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+        }
+        
+        /* ========================================
+           헤더
+           ======================================== */
+        .header {
+            background: #3B4458;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        
+        .header .leftSection {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+        
+        .header .logoContainer {
+            background: #3B4458;
+            padding: 5px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header .logo {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            color: #FFFFFF;
+            font-weight: bold;
+        }
+        
+        .header .updateInfo {
+            font-size: 16px;
+            color: #B0B8C4;
+            margin-left: auto;
+        }
+        
+        .header .centerSection {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .header .time {
+            font-size: 20px;
+            color: #FFFFFF;
+            font-weight: bold;
+        }
+        
+        /* ========================================
+           메인 컨테이너
+           ======================================== */
+        .mainList {
+            padding: 20px;
+            height: calc(1080px - 60px);
+            display: flex;
+            gap: 20px;
+        }
+        
+        /* 좌측 카드 영역 (3x2 그리드) */
+        .cardsSection {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .cardRow {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        /* 우측 알림 로그 영역 */
+        .rightSection {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* ========================================
+           카드 기본 스타일
+           ======================================== */
+        .gaugeItem {
+            background: #FFFFFF;
+            border: 2px solid #D1D5DB;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            width: 360px;
+            height: 480px;
+        }
+        
+        /* 카드6 전용 스타일 (우측 큰 카드) */
+        #card6 {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        #card6 h2 {
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+        
+        .card6-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 경고 상태 */
+        .gaugeItem.ingWarning {
+            background: #FFF5F5;
+            border: 4px solid #F05E5E;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(240, 94, 94, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(240, 94, 94, 0);
+            }
+        }
+        
+        /* 제목 */
+        .gaugeItem h2 {
+            font-size: 18px;
+            color: #4B5563;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .gaugeItem.ingWarning h2 {
+            color: #F05E5E;
+        }
+        
+        /* 18시 이전 안내 문구 */
+        #card6 .before-18-notice {
+            background: #F3F4F6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            color: #9CA3AF;
+            font-size: 16px;
+        }
+        
+        #card6 .before-18-notice .notice-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        /* ========================================
+           카드 2: 입고 현황
+           ======================================== */
+        .inbound-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .metrics-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #E8EAED;
+        }
+        
+        .metric-box {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .metric-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3B4458;
+        }
+        
+        .metric-unit {
+            font-size: 18px;
+            color: #999;
+            margin-left: 6px;
+        }
+        
+        .progress-bar-container {
+            margin-top: 8px;
+            width: 100%;
+            height: 6px;
+            background: #E8EAED;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #60CB2E 0%, #7DD956 50%, #60CB2E 100%);
+            background-size: 200% 100%;
+            transition: width 0.8s ease-out;
+            animation: shimmer 2s infinite linear;
+            border-radius: 3px;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* 진척률별 프로그레스바 색상 */
+        .progress-bar.level-danger {
+            background: linear-gradient(90deg, #DC2626 0%, #EF4444 50%, #DC2626 100%);
+            background-size: 200% 100%;
+        }
+        
+        .progress-bar.level-warning {
+            background: linear-gradient(90deg, #F97316 0%, #FB923C 50%, #F97316 100%);
+            background-size: 200% 100%;
+        }
+        
+        .progress-bar.level-caution {
+            background: linear-gradient(90deg, #EAB308 0%, #FACC15 50%, #EAB308 100%);
+            background-size: 200% 100%;
+        }
+        
+        .progress-bar.level-good {
+            background: linear-gradient(90deg, #60CB2E 0%, #7DD956 50%, #60CB2E 100%);
+            background-size: 200% 100%;
+        }
+        
+        /* 입고 유의상품 영역 */
+        .risky-section {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #F05E5E;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #F05E5E;
+        }
+        
+        .section-count {
+            font-size: 13px;
+            background: #FEE2E2;
+            color: #F05E5E;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .risky-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 210px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 5px;
+        }
+        
+        /* 스크롤바 스타일 */
+        .risky-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .risky-list::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 3px;
+        }
+        
+        .risky-list::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+        
+        .risky-list::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        .risky-item {
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #FFFBFB 0%, #FEF2F2 100%);
+            border-left: 3px solid #F87171;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .risky-item:hover {
+            background: #FEF2F2;
+            border-left-color: #DC2626;
+            transform: translateX(3px);
+        }
+        
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        
+        .item-icon {
+            font-size: 16px;
+        }
+        
+        .item-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1F2937;
+        }
+        
+        .item-details {
+            font-size: 12px;
+            color: #6B7280;
+            padding-left: 24px;
+        }
+        
+        .item-details .separator {
+            margin: 0 6px;
+            color: #D1D5DB;
+        }
+        
+        .item-details .date {
+            color: #DC2626;
+            font-weight: 600;
+        }
+        
+        /* ========================================
+           카드 5: 피킹 유의 상품 (740px 폭 확대!)
+           ======================================== */
+        .gaugeItem.card5-wide {
+            width: 740px; /* 360px → 740px */
+            grid-column: span 2; /* 2칸 차지 */
+        }
+        
+        .picking-metrics {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #E8EAED;
+        }
+        
+        .picking-metric-box {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #FCA5A5;
+        }
+        
+        .picking-metric-box.total {
+            background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+        }
+        
+        .picking-metric-box.urgent {
+            background: linear-gradient(135deg, #FEE2E2 0%, #FEF2F2 100%);
+        }
+        
+        .picking-metric-box.warning {
+            background: linear-gradient(135deg, #FEF9C3 0%, #FEF3C7 100%);
+            border-color: #FCD34D;
+        }
+        
+        .picking-metric-label {
+            font-size: 11px;
+            color: #991B1B;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        
+        .picking-metric-box.warning .picking-metric-label {
+            color: #78350F;
+        }
+        
+        .picking-metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #DC2626;
+        }
+        
+        .picking-metric-box.warning .picking-metric-value {
+            color: #CA8A04;
+        }
+        
+        /* 카드5 전용: 피킹 유의상품 리스트 (2열 그리드) */
+        #card5 .risky-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            max-height: 400px;
+        }
+        
+        #card5 .risky-item {
+            padding: 8px 10px;
+            background: linear-gradient(135deg, #FFFBFB 0%, #FEF2F2 100%);
+            border-left: 3px solid #F87171;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        #card5 .risky-item:hover {
+            background: #FEF2F2;
+            border-left-color: #DC2626;
+        }
+        
+        #card5 .picking-row1 {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        #card5 .picking-row2 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-left: 22px;
+        }
+        
+        #card5 .picking-badge {
+            min-width: 38px;
+            height: 24px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        #card5 .picking-badge.urgent {
+            background: #DC2626;
+        }
+        
+        #card5 .picking-badge.warning {
+            background: #F59E0B;
+        }
+        
+        #card5 .picking-expiry-date {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6B7280;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        
+        #card5 .picking-location {
+            font-size: 13px;
+            font-weight: 700;
+            color: #7C3AED;
+            background: #F5F3FF;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        #card5 .picking-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1F2937;
+        }
+        
+        #card5 .picking-expiry {
+            font-size: 14px;
+            font-weight: 700;
+            color: #DC2626;
+        }
+        
+        #card5 .picking-ratio {
+            font-size: 13px;
+            font-weight: 700;
+            color: #DC2626;
+            background: #FEE2E2;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        .item-location {
+            font-size: 13px;
+            font-weight: 700;
+            color: #7C3AED;
+            background: #F5F3FF;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .item-details .ratio {
+            font-weight: 600;
+            color: #DC2626;
+            background: #FEE2E2;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        /* ========================================
+           카드 4: 스케줄
+           ======================================== */
+        .schedule-content-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        
+        .schedule-group {
+            margin-bottom: 12px;
+        }
+        
+        .group-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+        }
+        
+        .group-title-text {
+            flex: 1;
+        }
+        
+        .group-count {
+            font-size: 11px;
+            background: #E8EAED;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: #666;
+            font-weight: normal;
+        }
+        
+        /* 오늘 그룹 - 강조 */
+        .schedule-group.today {
+            background: linear-gradient(135deg, #FFFACD 0%, #FFF9E6 100%);
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #FFD700;
+        }
+        
+        .schedule-group.today .group-title {
+            font-size: 16px;
+            color: #FF8C00;
+            border-bottom: 2px solid #FFD700;
+        }
+        
+        .schedule-group.today .group-count {
+            background: #FFD700;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        /* 내일 그룹 */
+        .schedule-group.tomorrow {
+            background: linear-gradient(135deg, #E6F3FF 0%, #F0F8FF 100%);
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #B0D4FF;
+        }
+        
+        .schedule-group.tomorrow .group-title {
+            font-size: 14px;
+            color: #1E90FF;
+            border-bottom: 1px solid #B0D4FF;
+        }
+        
+        .schedule-group.tomorrow .group-count {
+            background: #B0D4FF;
+            color: #333;
+        }
+        
+        /* 이번 주 그룹 */
+        .schedule-group.this-week {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #E8EAED;
+        }
+        
+        .schedule-group.this-week .group-title {
+            font-size: 13px;
+            color: #3B4458;
+            border-bottom: 1px solid #E8EAED;
+        }
+        
+        /* 이벤트 리스트 */
+        .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        
+        .event-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 8px;
+            font-size: 13px;
+            line-height: 1.4;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .event-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(3px);
+        }
+        
+        .event-icon {
+            font-size: 18px;
+            margin-right: 10px;
+            min-width: 24px;
+            flex-shrink: 0;
+            text-align: center;
+        }
+        
+        .event-text {
+            color: #333;
+            flex: 1;
+        }
+        
+        /* 유형별 색상 */
+        .event-item.birthday .event-icon { color: #FF69B4; }
+        .event-item.leave .event-icon { color: #87CEEB; }
+        .event-item.education .event-icon { color: #FFA500; }
+        .event-item.vacation .event-icon { color: #90EE90; }
+        .event-item.other .event-icon { color: #C0C0C0; }
+        
+        .schedule-content-main::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .schedule-content-main::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 3px;
+        }
+        
+        .schedule-content-main::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+        
+        .schedule-content-main::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        /* ========================================
+           카드 5 & 6: 출고 현황
+           ======================================== */
+        .outbound-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 출하금액 영역 */
+        .amount-section {
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #E8EAED;
+            margin-bottom: 15px;
+        }
+        
+        .amount-section.card3-amount {
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .amount-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .amount-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3B4458;
+            margin-bottom: 12px;
+        }
+        
+        /* 라벨 건수 영역 (카드5) */
+        .label-section-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .label-section {
+            text-align: center;
+            padding: 2px 0 16px 0;
+            border-bottom: 2px solid #E8EAED;
+        }
+        
+        .label-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .label-text {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .label-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3B4458;
+        }
+        
+        .label-value.success {
+            color: #60CB2E;
+        }
+        
+        .label-value.danger {
+            color: #F05E5E;
+        }
+        
+        .label-value .danger {
+            color: #F05E5E;
+        }
+        
+        /* 미발행 피킹리스트 영역 (카드3) */
+        .picking-section-card3 {
+            text-align: center;
+            padding: 0px 0 16px 0;
+            border-bottom: 2px solid #E8EAED;
+            margin-bottom: 10px;
+        }
+        
+        .picking-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .picking-text {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .picking-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .picking-value.success {
+            color: #60CB2E;
+        }
+        
+        .picking-value.danger {
+            color: #F05E5E;
+        }
+        
+        /* 카드3 긴급알림 스타일 */
+        .urgent-border {
+            border: 4px solid #F05E5E !important;
+            background: #FFE5E5 !important;
+            animation: pulse-border 0.8s infinite;
+            box-shadow: 0 0 20px rgba(240, 94, 94, 0.6);
+        }
+        
+        @keyframes pulse-border {
+            0%, 100% { 
+                border-color: #F05E5E; 
+                background: #FFE5E5;
+                box-shadow: 0 0 20px rgba(240, 94, 94, 0.6);
+            }
+            50% { 
+                border-color: #FF3333; 
+                background: #FFCCCC;
+                box-shadow: 0 0 40px rgba(255, 51, 51, 0.9);
+            }
+        }
+        
+        .unprinted-qty {
+            color: #F05E5E;
+            font-weight: bold;
+        }
+        
+        /* 긴급알림 팝업 */
+        .urgent-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .urgent-popup-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 3px solid #F05E5E;
+            border-radius: 20px;
+            padding: 40px 60px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(240, 94, 94, 0.5);
+            animation: popup-appear 0.3s ease-out;
+        }
+        
+        @keyframes popup-appear {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .urgent-popup-title {
+            font-size: 48px;
+            color: #F05E5E;
+            margin-bottom: 20px;
+        }
+        
+        .urgent-popup-message {
+            font-size: 32px;
+            color: #FFFFFF;
+            margin-bottom: 15px;
+        }
+        
+        .urgent-popup-dest {
+            font-size: 40px;
+            color: #FFD700;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        
+        .urgent-popup-close {
+            font-size: 20px;
+            color: #9CA3AF;
+            cursor: pointer;
+        }
+        
+        .urgent-popup-close:hover {
+            color: #FFFFFF;
+        }
+
+        /* 배송처별 수량 영역 (카드6) */
+        .destination-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3px 12px;
+            font-size: 13px;
+        }
+        
+        .destination-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2px 0;
+        }
+        
+        .destination-name {
+            color: #4B5563;
+        }
+        
+        .destination-value {
+            font-weight: bold;
+            color: #3B4458;
+            font-size: 18px;
+        }
+        
+        /* 한익스,키즈 - 작은 글씨 */
+        .destination-item.small .destination-name {
+            font-size: 11px;
+        }
+        
+        .destination-item.small .destination-value {
+            font-size: 15px;
+        }
+        
+        /* ========================================
+           알림 로그 카드
+           ======================================== */
+        .notificationCard {
+            background: #FFFFFF;
+            border: 2px solid #D1D5DB;
+            border-radius: 12px;
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .notificationCard h2 {
+            font-size: 22px;
+            color: #4B5563;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notificationCard h2::before {
+            content: "📋";
+            font-size: 24px;
+        }
+        
+        /* 알림 리스트 */
+        .notificationList {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .notificationList::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .notificationList::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 4px;
+        }
+        
+        .notificationList::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 4px;
+        }
+        
+        .notificationList::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        /* 알림 아이템 */
+        .notificationItem {
+            background: #F9FAFB;
+            border-left: 4px solid #60CB2E;
+            padding: 12px 15px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .notificationItem:hover {
+            background: #F3F4F6;
+            transform: translateX(2px);
+        }
+        
+        .notificationItem.warning {
+            border-left-color: #F59E0B;
+            background: #FFFBEB;
+        }
+        
+        .notificationItem.error {
+            border-left-color: #F05E5E;
+            background: #FFF5F5;
+        }
+        
+        .notificationItem .time {
+            font-size: 13px;
+            color: #9CA3AF;
+            margin-bottom: 5px;
+        }
+        
+        .notificationItem .message {
+            font-size: 15px;
+            color: #4B5563;
+            line-height: 1.4;
+        }
+        
+        .notificationItem.warning .message {
+            color: #92400E;
+        }
+        
+        .notificationItem.error .message {
+            color: #991B1B;
+        }
+        
+        /* ========================================
+           팝업 레이어
+           ======================================== */
+        .pageLayer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+        }
+        
+        .pageLayer.active {
+            display: block;
+        }
+        
+        .pageMask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        .pageInner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            min-width: 500px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .pageInner.typeWarning {
+            border: 3px solid #F05E5E;
+        }
+        
+        .topBox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .topBox img {
+            width: 48px;
+            height: 48px;
+            margin-right: 15px;
+        }
+        
+        .topBox h2 {
+            font-size: 32px;
+            color: #F05E5E;
+            font-weight: bold;
+        }
+        
+        .middleBox {
+            font-size: 24px;
+            color: #2C365C;
+            line-height: 1.6;
+        }
+        
+        /* ========================================
+           스크롤바
+           ======================================== */
+        .risky-section::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .risky-section::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 3px;
+        }
+        
+        .risky-section::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+        
+        .risky-section::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        /* ========================================
+           카드6: 금일 재고 현황 (card6_kero 이식)
+           ======================================== */
+        
+        /* 섹션 공통 스타일 */
+        #card6 .section {
+            border-radius: 0;
+            background: transparent;
+            border-bottom: 3px solid #E5E7EB;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        #card6 .section:last-child {
+            border-bottom: none;
+        }
+        
+        #card6 .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #4B5563;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        #card6 .section-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1F2937;
+        }
+
+        /* 섹션1: 총재고 + 적치율 */
+        #card6 .section-top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 10px;
+            border-bottom: 3px solid #E5E7EB;
+            background: #F8FAFC;
+        }
+        
+        #card6 .section-top-row .top-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        #card6 .section-top-row .top-item-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3B4458;
+        }
+        
+        #card6 .section-top-row .top-item-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #2563EB;
+        }
+        
+        #card6 .section-top-row .divider {
+            width: 2px;
+            height: 30px;
+            background: #D1D5DB;
+        }
+        
+        /* 선입선출 위반 */
+        #card6 .section-fifo {
+            background: #FEE2E2;
+            border: 3px solid #EF4444;
+            border-radius: 8px;
+            animation: pulse-fifo 2s infinite;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        
+        #card6 .section-fifo .section-title {
+            color: #DC2626;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        #card6 .section-fifo-normal {
+            background: #D1FAE5;
+            border: 2px solid #10B981;
+            border-radius: 8px;
+            margin: 10px 0;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        @keyframes pulse-fifo {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+
+        #card6 .fifo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        #card6 .fifo-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        #card6 .fifo-item .product-name {
+            width: 200px;
+            font-weight: 700;
+            color: #DC2626;
+            padding-right: 10px;
+            border-right: 1px solid #F87171;
+        }
+        
+        #card6 .fifo-item .left-section {
+            width: 180px;
+            padding-left: 10px;
+            color: #374151;
+            text-align: left;
+        }
+        
+        #card6 .fifo-item .arrow {
+            width: 40px;
+            text-align: center;
+            color: #DC2626;
+            font-weight: 700;
+            margin-left: 10px;
+            margin-right: 20px;
+        }
+        
+        #card6 .fifo-item .right-section {
+            width: 180px;
+            color: #374151;
+            text-align: left;
+        }
+        
+        /* 미출/부분출고 테이블 */
+        #card6 .partial-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            border: 1px solid #D1D5DB;
+        }
+        
+        #card6 .partial-table th {
+            background: #F3F4F6;
+            color: #4B5563;
+            font-weight: 600;
+            padding: 6px 4px;
+            border: 1px solid #D1D5DB;
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        #card6 .partial-table td {
+            padding: 5px 4px;
+            border: 1px solid #E5E7EB;
+            color: #374151;
+            text-align: center;
+        }
+        
+        #card6 .partial-table td.left {
+            text-align: left;
+        }
+        
+        #card6 .partial-table td.right {
+            text-align: right;
+        }
+        
+        #card6 .partial-table .shortage {
+            color: #DC2626;
+            font-weight: 700;
+        }
+        
+        #card6 .partial-table .partial {
+            color: #F59E0B;
+            font-weight: 700;
+        }
+
+        /* 삭제 현황 */
+        #card6 .delete-container {
+            display: flex;
+            gap: 15px;
+        }
+        
+        #card6 .delete-group {
+            flex: 1;
+        }
+        
+        #card6 .delete-group-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        #card6 .delete-group-title.ansan {
+            color: #2563EB;
+        }
+        
+        #card6 .delete-group-title.eumseong {
+            color: #059669;
+        }
+        
+        #card6 .delete-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            border: 1px solid #D1D5DB;
+        }
+        
+        #card6 .delete-table th {
+            background: #F3F4F6;
+            color: #4B5563;
+            font-weight: 600;
+            padding: 6px 4px;
+            border: 1px solid #D1D5DB;
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        #card6 .delete-table td {
+            padding: 5px 4px;
+            border: 1px solid #E5E7EB;
+            color: #374151;
+            text-align: center;
+        }
+        
+        #card6 .delete-table td.left {
+            text-align: left;
+        }
+        
+        #card6 .delete-table td.right {
+            text-align: right;
+        }
+        
+        /* 미할당 입고현황 */
+        #card6 .unallocated-section {
+            flex-grow: 1;
+            padding: 10px;
+            border-top: 3px solid #E5E7EB;
+        }
+        
+        #card6 .unallocated-tables {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #card6 .unallocated-tables .table-col {
+            flex: 1;
+        }
+        
+        #card6 .unallocated-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        
+        #card6 .unallocated-table th,
+        #card6 .unallocated-table td {
+            text-align: center;
+        }
+        
+        #card6 .unallocated-table th {
+            background: #F3F4F6;
+            padding: 4px 3px;
+            border: 1px solid #D1D5DB;
+            font-weight: 600;
+            color: #4B5563;
+            white-space: nowrap;
+        }
+        
+        #card6 .unallocated-table td {
+            padding: 3px;
+            border: 1px solid #E5E7EB;
+            color: #374151;
+        }
+        
+        #card6 .unallocated-table th:nth-child(1),
+        #card6 .unallocated-table td:nth-child(1) { width: auto; }
+        
+        #card6 .unallocated-table th:nth-child(2),
+        #card6 .unallocated-table td:nth-child(2) { width: 60px; }
+        
+        #card6 .unallocated-table th:nth-child(3),
+        #card6 .unallocated-table td:nth-child(3) { width: 35px; }
+        
+        #card6 .unallocated-table th:nth-child(4),
+        #card6 .unallocated-table td:nth-child(4) { width: 40px; }
+        
+        #card6 .unallocated-table .qty {
+            text-align: right;
+            font-weight: 700;
+            color: #DC2626;
+        }
+        
+        /* 9개 센터 색상 */
+        #card6 .unallocated-table .center-ansan { color: #2563EB; font-weight: 600; }
+        #card6 .unallocated-table .center-eumseong { color: #059669; font-weight: 600; }
+        #card6 .unallocated-table .center-jeju { color: #EA580C; font-weight: 600; }
+        #card6 .unallocated-table .center-jecheon { color: #7C3AED; font-weight: 600; }
+        #card6 .unallocated-table .center-honam { color: #DB2777; font-weight: 600; }
+        #card6 .unallocated-table .center-gumi { color: #0891B2; font-weight: 600; }
+        #card6 .unallocated-table .center-gyeryong { color: #B45309; font-weight: 600; }
+        #card6 .unallocated-table .center-yongin { color: #4338CA; font-weight: 600; }
+        #card6 .unallocated-table .center-yangsan { color: #65A30D; font-weight: 600; }
+        #card6 .unallocated-table .supplier { color: #6B7280; font-weight: 500; }
+        #card6 .unallocated-table .waiting { color: #F59E0B; font-style: italic; }
+        
+        /* ========================================
+           카드5: 미할당 입고현황 전용 스타일
+           ======================================== */
+        .card5-unallocated-section {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .card5-unallocated-table-wrapper {
+            overflow-y: auto;
+        }
+        
+        .card5-unallocated-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11.5px;
+        }
+        
+        .card5-unallocated-table th {
+            background: #F3F4F6;
+            padding: 8px 6px;
+            font-weight: 600;
+            color: #374151;
+            border: 1px solid #D1D5DB;
+            text-align: center;
+        }
+        
+        .card5-unallocated-table td {
+            padding: 6px;
+            border: 1px solid #E5E7EB;
+            vertical-align: middle;
+            text-align: center;
+        }
+        
+        .card5-unallocated-table td.left { text-align: left; }
+        .card5-unallocated-table td.right { text-align: right; font-weight: 600; }
+        
+        /* 2열 레이아웃 */
+        .card5-two-column {
+            display: flex;
+            gap: 15px;
+            flex: 1;
+        }
+        .card5-two-column .card5-unallocated-table {
+            flex: 1;
+            width: 50%;
+        }
+        
+        /* 3열 레이아웃 */
+        .card5-three-column {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .card5-three-column .card5-unallocated-table {
+            flex: 1;
+            width: 33.33%;
+        }
+        
+        /* 컬럼 너비: 상품명(넓게), 입고예정(좁게) */
+        .card5-unallocated-table th:nth-child(1),
+        .card5-unallocated-table td:nth-child(1) { width: 70%; }
+        .card5-unallocated-table th:nth-child(2),
+        .card5-unallocated-table td:nth-child(2) { width: 30%; }
+        
+        .card5-unallocated-table tr:hover {
+            background: #F9FAFB;
+        }
+        
+        /* 카드5 미할당용 센터 색상 */
+        #card5 .center-ansan { color: #DC2626; font-weight: 600; }
+        #card5 .center-eumseong { color: #2563EB; font-weight: 600; }
+        #card5 .center-jeju { color: #F97316; font-weight: 600; }
+        #card5 .center-jecheon { color: #8B5CF6; font-weight: 600; }
+        #card5 .center-honam { color: #10B981; font-weight: 600; }
+        #card5 .center-gumi { color: #EC4899; font-weight: 600; }
+        #card5 .center-gyeryong { color: #14B8A6; font-weight: 600; }
+        #card5 .center-yongin { color: #4338CA; font-weight: 600; }
+        #card5 .center-yangsan { color: #65A30D; font-weight: 600; }
+        #card5 .supplier { color: #6B7280; font-weight: 500; }
+        
+        /* 카드5 스크롤바 스타일 */
+        .card5-unallocated-table-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+        .card5-unallocated-table-wrapper::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 3px;
+        }
+        .card5-unallocated-table-wrapper::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 운영 시간 외 오버레이 -->
+    <div id="offTimeOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); z-index:9999; justify-content:center; align-items:center;">
+        <div style="text-align:center; color:white;">
+            <div style="font-size:120px; margin-bottom:40px;">🌙</div>
+            <div id="offTimeText" style="font-size:72px; font-weight:bold; margin-bottom:20px;">업무 시작 전</div>
+            <div id="offTimeSubText" style="font-size:36px; color:#888;">운영 시간: 09:00 ~ 24:00</div>
+        </div>
+    </div>
+
+    <!-- 헤더 -->
+    <div class="header">
+        <div class="leftSection">
+            <div class="logoContainer">
+                <img src="/static/images/ourhome_ci.png" alt="아워홈 로고" class="logo">
+            </div>
+            <h1>WMS 동서울물류센터 냉장파트</h1>
+            <div class="updateInfo">마지막 업데이트 : <span id="lastUpdate">-</span></div>
+        </div>
+        <div class="centerSection">
+            <div class="time" id="currentTime"></div>
+        </div>
+    </div>
+    
+    <!-- 메인 -->
+    <div class="mainList">
+        
+        <!-- 좌측 카드 영역 (3x2 그리드) -->
+        <div class="cardsSection">
+            
+            <!-- 상단 3개: 카드2(입고), 카드5(자사), 카드6(지방) -->
+            <div class="cardRow">
+                
+                <!-- 카드 2: 금일 입고 사항 (원래 1행 2열 → 1행 1열로 이동) -->
+                <div class="gaugeItem" id="card1">
+                    <h2>📦 금일 입고 사항</h2>
+                    <div class="inbound-content">
+                        <!-- 메트릭 -->
+                        <div class="metrics-section">
+                            <div class="metric-box">
+                                <div class="metric-label">총 건수</div>
+                                <div class="metric-value"><span id="totalCount">24</span><span class="metric-unit">건</span></div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">진행률</div>
+                                <div class="metric-value"><span id="progressRate">75</span><span class="metric-unit">%</span></div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" id="progressBar" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 입고 유의상품 -->
+                        <div class="risky-section">
+                            <div class="section-header">
+                                <div class="section-title">🚨 입고 유의상품</div>
+                                <div class="section-count" id="inboundRiskyCount">3건</div>
+                            </div>
+                            <div class="risky-list" id="inboundRiskyList">
+                                <div class="risky-item">
+                                    <div class="item-header">
+                                        <span class="item-icon">🔴</span>
+                                        <span class="item-name">케찹통</span>
+                                    </div>
+                                    <div class="item-details">
+                                        EA(450ml)<span class="separator">|</span><span class="date">2025-11-30</span>
+                                    </div>
+                                </div>
+                                <div class="risky-item">
+                                    <div class="item-header">
+                                        <span class="item-icon">🔴</span>
+                                        <span class="item-name">떡볶이양념장</span>
+                                    </div>
+                                    <div class="item-details">
+                                        PK(2kg)<span class="separator">|</span><span class="date">2025-11-15</span>
+                                    </div>
+                                </div>
+                                <div class="risky-item">
+                                    <div class="item-header">
+                                        <span class="item-icon">🟠</span>
+                                        <span class="item-name">삼각유부</span>
+                                    </div>
+                                    <div class="item-details">
+                                        EA(500g)<span class="separator">|</span><span class="date">2025-12-01</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 카드 5: 금일 자사 출고 사항 (원래 2행 2열 → 1행 2열로 이동) -->
+                <div class="gaugeItem" id="card2">
+                    <h2>🚚 금일 자사 출고 사항</h2>
+                    <div class="outbound-content">
+                        <!-- 출하금액 영역 -->
+                        <div class="amount-section">
+                            <div class="amount-label">현시각 출하 금액 :</div>
+                            <div class="amount-value" id="card2AmountValue">63,591,852 원</div>
+                        </div>
+                        
+                        <!-- 라벨 건수 영역 -->
+                        <div class="label-section-wrapper">
+                            <div class="label-section">
+                                <div class="label-row">
+                                    <span class="label-text">총 라벨 :</span>
+                                    <span class="label-value" id="card2LabelDisplay">6,672 건 ✅</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 카드 3: 금일 지방 출고 사항 (원래 2행 3열 → 1행 3열로 이동) -->
+                <div class="gaugeItem" id="card3">
+                    <h2>🚛 금일 지방 출고 사항</h2>
+                    <div class="outbound-content">
+                        <!-- 출하금액 영역 -->
+                        <div class="amount-section card3-amount">
+                            <div class="amount-label">현시각 출하 금액 :</div>
+                            <div class="amount-value" id="card3AmountValue">16,948,585 원</div>
+                        </div>
+                        
+                        <!-- 미발행 피킹리스트 -->
+                        <div class="picking-section-card3">
+                            <div class="picking-row">
+                                <span class="picking-text">미발행 피킹리스트 :</span>
+                                <span class="picking-value danger" id="card3PickingValue">11 건 ⚠️</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 배송처별 수량 (12개) -->
+                        <div class="destination-section" id="card3DestinationList">
+                            <!-- 좌측 6개 -->
+                            <div class="destination-item">
+                                <span class="destination-name">제주:</span>
+                                <span class="destination-value" id="dest-jeju">64</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">제천:</span>
+                                <span class="destination-value" id="dest-jecheon">153</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">호남:</span>
+                                <span class="destination-value" id="dest-honam">116</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">구미:</span>
+                                <span class="destination-value" id="dest-gumi">28</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">계룡:</span>
+                                <span class="destination-value" id="dest-gyeryong">1,230</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">음성:</span>
+                                <span class="destination-value" id="dest-eumseong">1</span>
+                            </div>
+                            
+                            <!-- 우측 6개 -->
+                            <div class="destination-item">
+                                <span class="destination-name">용인2:</span>
+                                <span class="destination-value" id="dest-yongin2">743</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">용인3:</span>
+                                <span class="destination-value" id="dest-yongin3">13</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">안산:</span>
+                                <span class="destination-value" id="dest-ansan">396</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">양산:</span>
+                                <span class="destination-value" id="dest-yangsan">37</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">양산2:</span>
+                                <span class="destination-value" id="dest-yangsan2">114</span>
+                            </div>
+                            <div class="destination-item small">
+                                <span class="destination-name">한익스,키즈:</span>
+                                <span class="destination-value" id="dest-hanex">3, 4</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- 하단 2개: 카드4(스케줄), 카드3(재고 - 760px 폭!) -->
+            <div class="cardRow">
+                
+                <!-- 카드 4: 냉장파트 스케줄 -->
+                <div class="gaugeItem" id="card4">
+                    <h2>📅 냉장파트 스케줄</h2>
+                    <div class="schedule-content-main">
+                        <!-- updateCard4()가 동적으로 채움 -->
+                    </div>
+                </div>
+                
+                <!-- 카드 3: 금일 피킹 유의 상품 (760px 폭으로 확대!) -->
+                <div class="gaugeItem ingWarning card5-wide" id="card5">
+                    <h2>⚠️ 금일 피킹 유의 상품</h2>
+                    <div class="inbound-content">
+                        <!-- 유의상품 리스트 (메트릭 삭제됨) -->
+                        <div class="risky-section">
+                            <div class="section-header">
+                                <div class="section-title">🚨 유효비 20% 이하</div>
+                                <div class="section-count" id="pickingRiskyCount">12건</div>
+                            </div>
+                            <div class="risky-list" id="pickingRiskyList">
+                                <div class="risky-item">
+                                    <div class="item-header">
+                                        <span class="item-icon">🔴</span>
+                                        <span class="item-location">K031601</span>
+                                        <span class="item-name">(갓잇)치즈소스</span>
+                                    </div>
+                                    <div class="item-details">
+                                        PK.(2kg)<span class="separator">|</span><span class="date">11-08</span><span class="separator">|</span><span class="ratio">8%</span>
+                                    </div>
+                                </div>
+                                <div class="risky-item">
+                                    <div class="item-header">
+                                        <span class="item-icon">🔴</span>
+                                        <span class="item-location">K011101</span>
+                                        <span class="item-name">(갓잇)불닭렌치소스</span>
+                                    </div>
+                                    <div class="item-details">
+                                        PK.(3kg)<span class="separator">|</span><span class="date">11-07</span><span class="separator">|</span><span class="ratio">10%</span>
+                                    </div>
+                                </div>
+                                <div class="risky-item">
+                                    <div class="item-header">
+                                        <span class="item-icon">🟡</span>
+                                        <span class="item-location">K042402</span>
+                                        <span class="item-name">그라나파다노치즈</span>
+                                    </div>
+                                    <div class="item-details">
+                                        PK.(1kg)<span class="separator">|</span><span class="date">11-07</span><span class="separator">|</span><span class="ratio">20%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <!-- 우측 카드6 영역: 금일 재고 현황 -->
+        <div class="rightSection">
+            <div class="gaugeItem" id="card6" style="height: 100%; width: 100%;">
+                <h2>📦 금일 재고 현황</h2>
+                <div class="card6-content" id="card6Content">
+                    <!-- JS에서 동적 렌더링 -->
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- v10.html 작성 완료! -->
+    <!-- 다음 단계: 브라우저 확인 -->
+    
+    <script>
+        // ========================================
+        // 전역 변수 (스크립트 최상단)
+        // ========================================
+        let lastRefreshTime = null;  // 마지막 갱신 시각 (경과 시간 표시용)
+        
+        // ========================================
+        // 시계
+        // ========================================
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateStr = now.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                weekday: 'short'
+            });
+            document.getElementById('currentTime').textContent = `${dateStr} ${timeStr}`;
+            
+            // 마지막 갱신 경과 시간 표시
+            const lastUpdateEl = document.getElementById('lastUpdate');
+            if (lastRefreshTime && lastUpdateEl) {
+                const elapsed = Math.floor((now - lastRefreshTime) / 1000);
+                let text;
+                if (elapsed < 60) {
+                    text = '방금';
+                } else {
+                    const minutes = Math.floor(elapsed / 60);
+                    text = `${minutes}분 전`;
+                }
+                lastUpdateEl.textContent = text;
+            }
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // ========================================
+        // 카드2: 입고현황 업데이트
+        // ========================================
+        function updateCard1(data) {
+            // 총 건수 (숫자만 - HTML에 단위 있음)
+            document.getElementById('totalCount').textContent = data.totalCount;
+            
+            // 진척률 (숫자만 - HTML에 % 있음)
+            document.getElementById('progressRate').textContent = data.progressRate;
+            
+            // 프로그레스바 (폭 + 색상)
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = data.progressRate + '%';
+            
+            // 진척률별 색상 클래스 적용 (빨강→주황→노랑→초록)
+            progressBar.classList.remove('level-danger', 'level-warning', 'level-caution', 'level-good');
+            if (data.progressRate < 25) {
+                progressBar.classList.add('level-danger');      // 빨강
+            } else if (data.progressRate < 50) {
+                progressBar.classList.add('level-warning');     // 주황
+            } else if (data.progressRate < 75) {
+                progressBar.classList.add('level-caution');     // 노랑
+            } else {
+                progressBar.classList.add('level-good');        // 초록
+            }
+            
+            // 유의상품 건수
+            document.getElementById('inboundRiskyCount').textContent = data.inboundRiskyCount + '건';
+            
+            // 유의상품 리스트
+            const listContainer = document.getElementById('inboundRiskyList');
+            listContainer.innerHTML = '';
+            
+            if (data.inboundRiskyCount === 0) {
+                listContainer.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: #60CB2E; font-size: 18px;">
+                        ✅ 입고 유의상품 없음
+                    </div>
+                `;
+            } else {
+                data.riskyItems.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'risky-item';
+                    
+                    const formatDate = (dateStr) => {
+                        if (!dateStr || dateStr.length !== 8) return dateStr;
+                        return dateStr.substring(2,4) + '.' + dateStr.substring(4,6) + '.' + dateStr.substring(6,8);
+                    };
+                    
+                    itemDiv.innerHTML = `
+                        <div class="item-header">
+                            <span class="item-icon">🔴</span>
+                            <span class="item-name">${item.productName}</span>
+                        </div>
+                        <div class="item-details">
+                            입고분 : <span style="color: #EF4444; font-weight: 600;">${formatDate(item.inboundExpiry)}</span><span class="separator">|</span>기존 : <span style="color: #3B82F6; font-weight: 600;">${formatDate(item.stockExpiry)}</span>
+                        </div>
+                    `;
+                    listContainer.appendChild(itemDiv);
+                });
+            }
+        }
+        
+        // ========================================
+        // 카드4: 스케줄 업데이트 (날짜 그룹핑 + 순서 스타일)
+        // ========================================
+        function updateCard4(data) {
+            const container = document.querySelector('#card4 .schedule-content-main');
+            if (!container) return;
+            
+            const typeIcons = {
+                birthday: '🎂',
+                leave: '🏖️',
+                education: '📚',
+                event: '📌'
+            };
+            
+            const typeNames = {
+                birthday: '생일',
+                leave: '월차',
+                education: '교육',
+                event: '행사'
+            };
+            
+            const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+            
+            // 날짜 포맷 함수 (M/DD 요일)
+            function formatDate(dateStr) {
+                const d = new Date(dateStr + 'T00:00:00');
+                const month = d.getMonth() + 1;
+                const day = d.getDate();
+                const dayName = dayNames[d.getDay()];
+                return `${month}/${String(day).padStart(2,'0')} (${dayName})`;
+            }
+            
+            const schedules = data.schedules || [];
+            
+            if (schedules.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #A0AEC0; font-size: 16px;">
+                        📅 예정된 일정이 없습니다
+                    </div>
+                `;
+                return;
+            }
+            
+            // 날짜별로 그룹핑
+            const dateGroups = {};
+            schedules.forEach(item => {
+                if (!dateGroups[item.date]) {
+                    dateGroups[item.date] = [];
+                }
+                dateGroups[item.date].push(item);
+            });
+            
+            // 날짜순 정렬
+            const sortedDates = Object.keys(dateGroups).sort();
+            
+            // 타입별로 이름 합치는 함수
+            function groupByType(items) {
+                const typeGroups = {};
+                items.forEach(item => {
+                    const type = item.type || 'event';
+                    if (!typeGroups[type]) {
+                        typeGroups[type] = [];
+                    }
+                    typeGroups[type].push(item.content);
+                });
+                return typeGroups;
+            }
+            
+            // 타입별 그룹을 HTML로 변환하는 함수
+            function renderTypeGroups(typeGroups, suffix = '') {
+                return Object.keys(typeGroups).map(type => {
+                    const names = typeGroups[type].join(', ');
+                    const icon = typeIcons[type] || '📌';
+                    const typeName = typeNames[type] || '';
+                    return `
+                        <div class="event-item ${type}">
+                            <span class="event-icon">${icon}</span>
+                            <span class="event-text">${names} ${typeName}${suffix}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            let html = '';
+            
+            sortedDates.forEach((date, dateIndex) => {
+                const items = dateGroups[date];
+                const dateText = formatDate(date);
+                const typeGroups = groupByType(items);
+                
+                // 첫번째 날짜=노란색, 두번째 날짜=파란색, 나머지=추후일정으로 모음
+                if (dateIndex === 0) {
+                    // 첫번째 날짜 - 노란색
+                    html += `
+                        <div class="schedule-group today">
+                            <div class="group-title">
+                                <span class="group-title-text">${dateText}</span>
+                                <span class="group-count">${items.length}건</span>
+                            </div>
+                            <div class="event-list">
+                                ${renderTypeGroups(typeGroups)}
+                            </div>
+                        </div>
+                    `;
+                } else if (dateIndex === 1) {
+                    // 두번째 날짜 - 파란색
+                    html += `
+                        <div class="schedule-group tomorrow">
+                            <div class="group-title">
+                                <span class="group-title-text">${dateText}</span>
+                                <span class="group-count">${items.length}건</span>
+                            </div>
+                            <div class="event-list">
+                                ${renderTypeGroups(typeGroups)}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            // 추후일정 (3번째 날짜 이후)
+            const laterDates = sortedDates.slice(2);
+            if (laterDates.length > 0) {
+                let totalLaterCount = 0;
+                let laterHtml = '';
+                
+                laterDates.forEach(date => {
+                    const items = dateGroups[date];
+                    totalLaterCount += items.length;
+                    const dateText = formatDate(date);
+                    const typeGroups = {};
+                    
+                    items.forEach(item => {
+                        const type = item.type || 'event';
+                        if (!typeGroups[type]) {
+                            typeGroups[type] = [];
+                        }
+                        // 이름에서 요일 패턴 제거
+                        const cleanContent = item.content.replace(/\([일월화수목금토]\)/, '');
+                        typeGroups[type].push(cleanContent);
+                    });
+                    
+                    // 각 타입별로 날짜 태그 붙여서 렌더링
+                    Object.keys(typeGroups).forEach(type => {
+                        const names = typeGroups[type].join(', ');
+                        const icon = typeIcons[type] || '📌';
+                        const typeName = typeNames[type] || '';
+                        laterHtml += `
+                            <div class="event-item ${type}">
+                                <span class="event-icon">${icon}</span>
+                                <span class="event-text">${names} ${typeName} [ ${dateText} ]</span>
+                            </div>
+                        `;
+                    });
+                });
+                
+                html += `
+                    <div class="schedule-group this-week">
+                        <div class="group-title">
+                            <span class="group-title-text">추후일정</span>
+                            <span class="group-count">${totalLaterCount}건</span>
+                        </div>
+                        <div class="event-list">
+                            ${laterHtml}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // ========================================
+        // 카드5: 피킹유의 / 미할당 입고현황 (18:30 기준 전환)
+        // ========================================
+        
+        // 센터명 → 클래스명 매핑 (카드5 미할당용)
+        const card5CenterClassMap = {
+            '안산': 'ansan', '음성': 'eumseong', '제주': 'jeju', '제천': 'jecheon',
+            '호남': 'honam', '구미': 'gumi', '계룡': 'gyeryong', '용인': 'yongin', '양산': 'yangsan'
+        };
+        
+        function updateCard5(data) {
+            const card5El = document.getElementById('card5');
+            const card5Title = card5El.querySelector('h2');
+            const contentContainer = card5El.querySelector('.inbound-content');
+            
+            if (data.isAfter1830) {
+                // ========================================
+                // 18:30 이후: 미할당 입고현황 표시
+                // ========================================
+                
+                // 스타일 변경 (빨간 테두리 제거)
+                card5El.classList.remove('ingWarning');
+                
+                // 제목 변경
+                card5Title.textContent = '📥 금일 미할당 상품 입고 센터 현황';
+                
+                // 내용 렌더링
+                const items = data.unallocatedItems || [];
+                
+                if (items.length === 0) {
+                    contentContainer.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #10B981; font-size: 20px;">
+                            ✅ 미할당 상품 없음
+                        </div>
+                    `;
+                } else {
+                    // 3열 레이아웃: 인덱스 % 3으로 분리
+                    const leftItems = items.filter((_, i) => i % 3 === 0);
+                    const midItems = items.filter((_, i) => i % 3 === 1);
+                    const rightItems = items.filter((_, i) => i % 3 === 2);
+                    
+                    const leftRows = leftItems.map(item => {
+                        const inboundInfo = formatCard5InboundInfo(item.inbound_info);
+                        return `<tr><td class="left">${item.product_name}</td><td class="left">${inboundInfo}</td></tr>`;
+                    }).join('');
+                    
+                    const midRows = midItems.map(item => {
+                        const inboundInfo = formatCard5InboundInfo(item.inbound_info);
+                        return `<tr><td class="left">${item.product_name}</td><td class="left">${inboundInfo}</td></tr>`;
+                    }).join('');
+                    
+                    const rightRows = rightItems.map(item => {
+                        const inboundInfo = formatCard5InboundInfo(item.inbound_info);
+                        return `<tr><td class="left">${item.product_name}</td><td class="left">${inboundInfo}</td></tr>`;
+                    }).join('');
+                    
+                    contentContainer.innerHTML = `
+                        <div class="card5-unallocated-section">
+                            <div class="section-header" style="border-bottom-color: #3B82F6;">
+                                <div class="section-title" style="color: #3B82F6;">📦 미할당 ${items.length}건</div>
+                            </div>
+                            <div class="card5-three-column">
+                                <table class="card5-unallocated-table">
+                                    <thead><tr><th>상품명</th><th>입고센터</th></tr></thead>
+                                    <tbody>${leftRows}</tbody>
+                                </table>
+                                <table class="card5-unallocated-table">
+                                    <thead><tr><th>상품명</th><th>입고센터</th></tr></thead>
+                                    <tbody>${midRows}</tbody>
+                                </table>
+                                <table class="card5-unallocated-table">
+                                    <thead><tr><th>상품명</th><th>입고센터</th></tr></thead>
+                                    <tbody>${rightRows}</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                // ========================================
+                // 18:30 이전: 피킹 유의상품 표시 (기존 로직)
+                // ========================================
+                
+                // 스타일 복원 (빨간 테두리)
+                card5El.classList.add('ingWarning');
+                
+                // 제목 복원
+                card5Title.textContent = '⚠️ 금일 피킹 유의 상품';
+                
+                // 기존 피킹 유의상품 렌더링
+                contentContainer.innerHTML = `
+                    <div class="risky-section">
+                        <div class="section-header">
+                            <div class="section-title">🚨 유효비 20% 이하</div>
+                            <div class="section-count" id="pickingRiskyCount">${data.totalCount}건</div>
+                        </div>
+                        <div class="risky-list" id="pickingRiskyList"></div>
+                    </div>
+                `;
+                
+                const listContainer = document.getElementById('pickingRiskyList');
+                
+                if (data.totalCount === 0) {
+                    listContainer.innerHTML = `
+                        <div style="text-align: center; padding: 30px; color: #60CB2E; font-size: 18px; grid-column: span 2;">
+                            ✅ 피킹 유의상품 없음
+                        </div>
+                    `;
+                } else {
+                    data.riskyItems.slice(0, 12).forEach(item => {
+                        const badgeClass = item.validityRatio <= 10 ? 'urgent' : 'warning';
+                        const ratioText = item.validityRatio + '%';
+                        
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'risky-item';
+                        itemDiv.innerHTML = `
+                            <span class="picking-badge ${badgeClass}">${ratioText}</span>
+                            <span class="picking-location">${item.location}</span>
+                            <span class="picking-name">${item.productName}</span>
+                            <span class="picking-expiry-date">${item.expiryDate}</span>
+                        `;
+                        listContainer.appendChild(itemDiv);
+                    });
+                }
+            }
+        }
+        
+        // 카드5용 입고예정 정보 포맷팅 (센터명만 표시)
+        function formatCard5InboundInfo(infoStr) {
+            if (!infoStr || infoStr === '⏳입고정보 대기중') {
+                return '<span style="color: #9CA3AF;">⏳대기중</span>';
+            }
+            
+            // "제주(300)|18:15, 양산(100)|19:00" → "제주, 양산"
+            const parts = infoStr.split(', ');
+            const centers = parts.map(part => {
+                // 센터명만 추출 (숫자, 시간 제거)
+                const match = part.match(/^([가-힣]+)/);
+                return match ? match[1] : null;
+            }).filter(Boolean);
+            
+            // 중복 제거 후 색상 적용
+            const uniqueCenters = [...new Set(centers)];
+            return uniqueCenters.map(center => {
+                const cssClass = card5CenterClassMap[center] ? `center-${card5CenterClassMap[center]}` : 'supplier';
+                return `<span class="${cssClass}">${center}</span>`;
+            }).join(', ');
+        }
+        
+        // ========================================
+        // 카드3 긴급알림 관련 변수
+        // ========================================
+        let prevCard3UnprintedCount = 0;  // 이전 미발행 건수 (팝업 트리거용)
+        let lastAlertTime = 0;  // 마지막 알림 시간 (10분 반복용)
+        
+        // 긴급알림 소리 재생 (1번: 붕— 붕— 붕— 붕— 붕—)
+        function playAlertSound() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            for (let i = 0; i < 5; i++) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime + i * 1.0);
+                gain.gain.setValueAtTime(0, audioCtx.currentTime + i * 1.0);
+                gain.gain.linearRampToValueAtTime(0.45, audioCtx.currentTime + i * 1.0 + 0.06);
+                gain.gain.setValueAtTime(0.4, audioCtx.currentTime + i * 1.0 + 0.42);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + i * 1.0 + 0.6);
+                osc.start(audioCtx.currentTime + i * 1.0);
+                osc.stop(audioCtx.currentTime + i * 1.0 + 0.65);
+            }
+        }
+
+        // 긴급알림 팝업 표시
+        function showUrgentAlert(destinations) {
+            const popup = document.getElementById('urgentAlertPopup');
+            const destList = document.getElementById('urgentAlertDestList');
+            destList.textContent = destinations.join(', ');
+            popup.style.display = 'flex';
+            
+            // 알림 소리 재생
+            playAlertSound();
+            
+            // 10초 후 자동 닫힘
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 10000);
+        }
+        
+        // 팝업 닫기
+        function closeUrgentAlert() {
+            document.getElementById('urgentAlertPopup').style.display = 'none';
+        }
+        
+        // ========================================
+        // 카드5: 자사 출고 업데이트
+        // ========================================
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+        
+        function updateCard2(data) {
+            // 출하금액
+            document.getElementById('card2AmountValue').textContent = formatNumber(data.amount) + ' 원';
+            
+            // 라벨 건수 (총 라벨 + 미발행)
+            const labelDisplay = document.getElementById('card2LabelDisplay');
+            if (data.unprintedLabel === 0) {
+                labelDisplay.className = 'label-value success';
+                labelDisplay.textContent = formatNumber(data.totalLabel) + ' ✅';
+            } else {
+                labelDisplay.className = 'label-value';
+                labelDisplay.innerHTML = formatNumber(data.totalLabel) + ' + <span class="danger">' + formatNumber(data.unprintedLabel) + '</span>';
+            }
+            
+        }
+        
+        // ========================================
+        // 카드6: 지방 출고 업데이트
+        // ========================================
+        function updateCard3(data) {
+            // 출하금액
+            document.getElementById('card3AmountValue').textContent = formatNumber(data.amount) + ' 원';
+            
+            // 미발행 피킹리스트
+            const pickingEl = document.getElementById('card3PickingValue');
+            if (data.unprintedPicking === 0) {
+                pickingEl.className = 'picking-value success';
+                pickingEl.textContent = '0 건 ✅';
+            } else {
+                pickingEl.className = 'picking-value danger';
+                pickingEl.textContent = formatNumber(data.unprintedPicking) + ' 건 ⚠️';
+            }
+            
+            // 배송처별 수량 (printedQty + unprintedQty 형태)
+            const destKeys = ['jeju', 'jecheon', 'honam', 'gumi', 'gyeryong', 'eumseong', 
+                              'yongin2', 'yongin3', 'ansan', 'yangsan', 'yangsan2'];
+            
+            let totalUnprintedCount = 0;  // 전체 미발행 건수 합계
+            
+            destKeys.forEach(key => {
+                const el = document.getElementById('dest-' + key);
+                const dest = data.destinations[key];
+                const printed = dest.printedQty || 0;
+                const unprinted = dest.unprintedQty || 0;
+                
+                totalUnprintedCount += (dest.unprintedCount || 0);
+                
+                if (unprinted > 0) {
+                    el.innerHTML = formatNumber(printed) + ' + <span class="unprinted-qty">' + formatNumber(unprinted) + '</span>';
+                } else {
+                    el.textContent = formatNumber(printed + unprinted);
+                }
+            });
+            
+            // 한익스/키즈 (합산 표시)
+            const hanexEl = document.getElementById('dest-hanex');
+            const hanex = data.destinations.hanex;
+            const kids = data.destinations.kids;
+            const hanexPrinted = (hanex.printedQty || 0) + (kids.printedQty || 0);
+            const hanexUnprinted = (hanex.unprintedQty || 0) + (kids.unprintedQty || 0);
+            
+            totalUnprintedCount += (hanex.unprintedCount || 0) + (kids.unprintedCount || 0);
+            
+            if (hanexUnprinted > 0) {
+                hanexEl.innerHTML = formatNumber(hanexPrinted) + ' + <span class="unprinted-qty">' + formatNumber(hanexUnprinted) + '</span>';
+            } else {
+                hanexEl.textContent = formatNumber(hanexPrinted + hanexUnprinted);
+            }
+            
+            // 카드3 테두리 (미발행 있으면 빨간 테두리)
+            const card3El = document.getElementById('card3');
+            if (data.urgentAlert) {
+                card3El.classList.add('urgent-border');
+            } else {
+                card3El.classList.remove('urgent-border');
+            }
+            
+            // 팝업 트리거 (건수 증가 또는 10분 경과 시)
+            if (data.urgentAlert && data.urgentDestinations.length > 0) {
+                const now = Date.now();
+                const tenMinutes = 10 * 60 * 1000;  // 10분 = 600,000ms
+                
+                // 건수 증가 시 → 즉시 울림
+                if (totalUnprintedCount > prevCard3UnprintedCount) {
+                    showUrgentAlert(data.urgentDestinations);
+                    lastAlertTime = now;
+                }
+                // 건수 유지 & 10분 경과 시 → 반복 울림
+                else if (totalUnprintedCount > 0 && (now - lastAlertTime) >= tenMinutes) {
+                    showUrgentAlert(data.urgentDestinations);
+                    lastAlertTime = now;
+                }
+            } else {
+                // 긴급알림 해소 시 타이머 리셋
+                lastAlertTime = 0;
+            }
+            prevCard3UnprintedCount = totalUnprintedCount;
+        }
+        
+        // ========================================
+        // 카드6: 금일 재고 현황 (card6_kero 이식)
+        // ========================================
+        
+        // 센터명 → 클래스명 매핑
+        const centerClassMap = {
+            '안산': 'ansan', '음성': 'eumseong', '제주': 'jeju', '제천': 'jecheon',
+            '호남': 'honam', '구미': 'gumi', '계룡': 'gyeryong', '용인': 'yongin', '양산': 'yangsan'
+        };
+        
+        function updateCard6(data) {
+            const container = document.getElementById('card6Content');
+            const now = new Date();
+            const isAfter1830 = (now.getHours() > 18) || (now.getHours() === 18 && now.getMinutes() >= 30);
+            
+            container.innerHTML = '';
+            container.innerHTML += renderTopRow(data);
+            container.innerHTML += renderFifoSection(data);
+            
+            // 18:30 이전/이후 분기
+            if (isAfter1830) {
+                container.innerHTML += renderPartialShipment(data);
+                container.innerHTML += renderDeleteStatus(data);
+            } else {
+                container.innerHTML += renderBefore1830Notice('미출/부분출고 내역');
+                container.innerHTML += renderBefore1830Notice('금일 삭제 현황');
+            }
+        }
+        
+        // 18:30 이전 안내 문구 렌더링
+        function renderBefore1830Notice(sectionName) {
+            return `
+                <div class="section">
+                    <div class="section-title">${sectionName}</div>
+                    <div class="before-18-notice">
+                        <div class="notice-icon">🕕</div>
+                        <div>18시 30분 이후 표시됩니다</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 1. 최상단: 총재고 + 적치율
+        function renderTopRow(data) {
+            const formatted = data.inventory.total_value.toLocaleString('ko-KR');
+            return `
+                <div class="section-top-row">
+                    <div class="top-item">
+                        <span class="top-item-title">💰 총 재고</span>
+                        <span class="top-item-value">${formatted} 원</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="top-item">
+                        <span class="top-item-title">📊 상단 적치율</span>
+                        <span class="top-item-value">${data.storageRate.rate}%</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 2. 선입선출 위반
+        function renderFifoSection(data) {
+            const items = data.fifo || [];
+            if (items.length === 0) {
+                return `
+                    <div class="section-fifo-normal">
+                        <div class="section-title">⚠️ 선입선출 위반 상품</div>
+                        <div class="section-value" style="color: #10B981;">✅ 정상 진행중</div>
+                    </div>
+                `;
+            }
+            const rows = items.map(item => `
+                <div class="fifo-item">
+                    <span class="product-name">🔴 ${item.lower.product}</span>
+                    <span class="left-section">[하단] ${item.lower.location} (${item.lower.expiry})</span>
+                    <span class="arrow">→</span>
+                    <span class="right-section">[상단] ${item.upper.location} (${item.upper.expiry})</span>
+                </div>
+            `).join('');
+            return `
+                <div class="section-fifo">
+                    <div class="section-title">⚠️ 선입선출 위반 상품 (${items.length}건)</div>
+                    <div class="fifo-list">${rows}</div>
+                </div>
+            `;
+        }
+
+        // 3. 미출/부분출고
+        function renderPartialShipment(data) {
+            const items = data.partial || [];
+            if (items.length === 0) {
+                return `
+                    <div class="section">
+                        <div class="section-title">🔔 미출/부분출고 내역</div>
+                        <div class="section-value" style="color: #6B7280; font-size: 16px;">내역 없음</div>
+                    </div>
+                `;
+            }
+            const rows = items.map(item => {
+                const remark = item.order_qty >= 1 ? '부분출고' : '미출';
+                const remarkClass = item.order_qty >= 1 ? 'partial' : 'shortage';
+                return `<tr><td>${item.delivery_group}</td><td class="left">${item.delivery_name}</td><td class="left">${item.product_name}</td><td>${item.unit}</td><td class="right">${item.original_qty}</td><td class="right">${item.order_qty}</td><td class="${remarkClass}">${remark}</td></tr>`;
+            }).join('');
+            return `
+                <div class="section">
+                    <div class="section-title">🔔 미출/부분출고 (${items.length}건)</div>
+                    <table class="partial-table">
+                        <thead><tr><th>배송군</th><th>배송처명</th><th>상품명</th><th>단위</th><th>원주문</th><th>오더</th><th>비고</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // 4. 삭제 현황
+        function renderDeleteStatus(data) {
+            const ansan = data.deleteAnsan || [];
+            const eumseong = data.deleteEumseong || [];
+            const totalCount = ansan.length + eumseong.length;
+            
+            if (totalCount === 0) {
+                return `
+                    <div class="section">
+                        <div class="section-title">🗑️ 금일 삭제 현황</div>
+                        <div class="section-value" style="color: #6B7280; font-size: 16px;">내역 없음</div>
+                    </div>
+                `;
+            }
+            
+            const ansanRows = ansan.length > 0 ? ansan.map(item => `<tr><td class="left">${item.product_name}</td><td>${item.unit}</td><td class="right">${item.qty}</td></tr>`).join('') : '<tr><td colspan="3" style="color:#9CA3AF;">내역 없음</td></tr>';
+            const eumseongRows = eumseong.length > 0 ? eumseong.map(item => `<tr><td class="left">${item.product_name}</td><td>${item.unit}</td><td class="right">${item.qty}</td></tr>`).join('') : '<tr><td colspan="3" style="color:#9CA3AF;">내역 없음</td></tr>';
+            
+            return `
+                <div class="section">
+                    <div class="section-title">🗑️ 금일 삭제 현황 (${totalCount}건)</div>
+                    <div class="delete-container">
+                        <div class="delete-group">
+                            <div class="delete-group-title ansan">📍 안산 (${ansan.length}건)</div>
+                            <table class="delete-table"><thead><tr><th>상품명</th><th>단위</th><th>수량</th></tr></thead><tbody>${ansanRows}</tbody></table>
+                        </div>
+                        <div class="delete-group">
+                            <div class="delete-group-title eumseong">📍 음성 (${eumseong.length}건)</div>
+                            <table class="delete-table"><thead><tr><th>상품명</th><th>단위</th><th>수량</th></tr></thead><tbody>${eumseongRows}</tbody></table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========================================
+        // 자동 갱신 시스템 (1분 간격, 운영시간 체크)
+        // ========================================
+        
+        // 상수 정의
+        const REFRESH_INTERVAL = 1 * 60 * 1000;  // 1분 (60,000ms)
+        const REFRESH_OFFSET = 2;                 // X분 2초에 갱신
+        const OPERATING_START_HOUR = 9;           // 09시 시작
+        const OPERATING_END_HOUR = 24;            // 24시 종료
+        const OFF_DAY = 6;                        // 토요일 (0=일, 6=토)
+        
+        // 전역 변수
+        let refreshTimer = null;
+        let lastData = null;  // API 실패 시 이전 데이터 유지용
+        // lastRefreshTime은 스크립트 최상단에 선언됨
+        
+        // ========================================
+        // 유틸리티 함수
+        // ========================================
+        
+        // 운영 시간 체크
+        function isOperatingTime() {
+            const now = new Date();
+            const hour = now.getHours();
+            const day = now.getDay();  // 0=일, 6=토
+            
+            // 토요일은 휴무
+            if (day === OFF_DAY) {
+                return { operating: false, reason: 'holiday' };
+            }
+            
+            // 09시 ~ 24시 운영
+            if (hour >= OPERATING_START_HOUR && hour < OPERATING_END_HOUR) {
+                return { operating: true, reason: null };
+            }
+            
+            return { operating: false, reason: 'before_start' };
+        }
+        
+        // 다음 갱신 시간 계산 (X분 2초)
+        function getNextRefreshTime() {
+            const now = new Date();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            
+            // 다음 5분 단위 + 2초 계산
+            // 예: 현재 09:03:45 → 다음은 09:07:02
+            const currentSlot = Math.floor(minutes / 5) * 5;
+            let nextSlot = currentSlot + 5;
+            
+            // 이미 X분 2초를 지났으면 다음 슬롯
+            if (minutes % 5 > REFRESH_OFFSET || (minutes % 5 === REFRESH_OFFSET && seconds >= 2)) {
+                nextSlot += 5;
+            }
+            
+            const nextTime = new Date(now);
+            if (nextSlot >= 60) {
+                nextTime.setHours(now.getHours() + 1);
+                nextSlot = nextSlot - 60;
+            }
+            nextTime.setMinutes(nextSlot + REFRESH_OFFSET);
+            nextTime.setSeconds(2);
+            nextTime.setMilliseconds(0);
+            
+            return nextTime;
+        }
+        
+        // 09:02까지 남은 시간 계산
+        function getMsUntilOperatingStart() {
+            const now = new Date();
+            const target = new Date(now);
+            target.setHours(OPERATING_START_HOUR);
+            target.setMinutes(REFRESH_OFFSET);
+            target.setSeconds(2);
+            target.setMilliseconds(0);
+            
+            // 이미 지났으면 내일
+            if (target <= now) {
+                target.setDate(target.getDate() + 1);
+            }
+            
+            return target.getTime() - now.getTime();
+        }
+        
+        // 자정까지 남은 시간 계산
+        function getMsUntilMidnight() {
+            const now = new Date();
+            const midnight = new Date(now);
+            midnight.setHours(24, 0, 0, 0);
+            return midnight.getTime() - now.getTime();
+        }
+        
+        // ========================================
+        // UI 표시 함수
+        // ========================================
+        
+        // 운영 시간 외 메시지 표시
+        function showOffTimeMessage(reason) {
+            const overlay = document.getElementById('offTimeOverlay');
+            const textEl = document.getElementById('offTimeText');
+            const subTextEl = document.getElementById('offTimeSubText');
+            
+            if (reason === 'holiday') {
+                textEl.textContent = '휴무일';
+                subTextEl.textContent = '토요일은 운영하지 않습니다';
+            } else {
+                textEl.textContent = '업무 시작 전';
+                subTextEl.textContent = '운영 시간: 09:00 ~ 24:00';
+            }
+            
+            overlay.style.display = 'flex';
+            console.log(`[OFF] ${reason === 'holiday' ? '휴무일' : '업무 시작 전'} 메시지 표시`);
+        }
+        
+        // 운영 시간 외 메시지 숨김
+        function hideOffTimeMessage() {
+            const overlay = document.getElementById('offTimeOverlay');
+            overlay.style.display = 'none';
+            console.log('[ON] 운영 시간 시작 - 대시보드 표시');
+        }
+        
+        // ========================================
+        // API 호출 함수
+        // ========================================
+        
+        async function fetchDashboardData() {
+            const now = new Date();
+            const timeStr = now.toTimeString().slice(0, 8);
+            console.log(`[${timeStr}] API 호출 시작...`);
+            
+            try {
+                // URL 파라미터 전달 (test_alert 등)
+                const urlParams = window.location.search;
+                const response = await fetch('/api/dashboard' + urlParams);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'API 실패');
+                }
+                
+                // 데이터 저장 (실패 시 복구용)
+                lastData = data;
+                
+                // 카드 업데이트
+                updateCard1(data.card1);
+                updateCard2(data.card2);
+                updateCard3(data.card3);
+                updateCard4(data.card4);
+                updateCard5(data.card5);
+                updateCard6(data.card6);
+                
+                // 마지막 갱신 시각 저장
+                lastRefreshTime = new Date();
+                
+                console.log(`[${timeStr}] ✅ 대시보드 갱신 완료`);
+                
+            } catch (error) {
+                console.error(`[${timeStr}] ❌ API 호출 실패:`, error.message);
+                
+                // 이전 데이터가 있으면 유지 (화면 빈칸 방지)
+                if (lastData) {
+                    console.log(`[${timeStr}] 이전 데이터 유지`);
+                }
+            }
+        }
+        
+        // ========================================
+        // 자동 갱신 제어
+        // ========================================
+        
+        function startAutoRefresh() {
+            // 기존 타이머 정리
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+            }
+            
+            // 5분마다 갱신
+            refreshTimer = setInterval(() => {
+                // 운영 시간 재확인 (혹시 모를 상황 대비)
+                const status = isOperatingTime();
+                if (status.operating) {
+                    fetchDashboardData();
+                } else {
+                    console.log('[SKIP] 운영 시간 외 - 갱신 건너뜀');
+                }
+            }, REFRESH_INTERVAL);
+            
+            console.log('[AUTO] 5분 간격 자동 갱신 시작');
+        }
+        
+        function stopAutoRefresh() {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+                console.log('[AUTO] 자동 갱신 중지');
+            }
+        }
+        
+        // ========================================
+        // 스케줄링 함수
+        // ========================================
+        
+        // 다음 갱신 시간에 맞춰 시작
+        function scheduleNextRefresh() {
+            const nextTime = getNextRefreshTime();
+            const msUntil = nextTime.getTime() - Date.now();
+            const nextTimeStr = nextTime.toTimeString().slice(0, 8);
+            
+            console.log(`[SCHEDULE] 다음 갱신: ${nextTimeStr} (${Math.round(msUntil/1000)}초 후)`);
+            
+            setTimeout(() => {
+                fetchDashboardData();
+                startAutoRefresh();
+            }, msUntil);
+        }
+        
+        // 운영 시간 시작까지 대기
+        function scheduleOperatingStart() {
+            const msUntil = getMsUntilOperatingStart();
+            const hours = Math.floor(msUntil / 1000 / 60 / 60);
+            const minutes = Math.floor((msUntil / 1000 / 60) % 60);
+            
+            console.log(`[WAIT] 운영 시작까지 ${hours}시간 ${minutes}분 대기`);
+            
+            setTimeout(() => {
+                hideOffTimeMessage();
+                fetchDashboardData();
+                startAutoRefresh();
+            }, msUntil);
+        }
+        
+        // 자정 새로고침 예약
+        function scheduleMidnightReload() {
+            const msUntil = getMsUntilMidnight();
+            const hours = Math.floor(msUntil / 1000 / 60 / 60);
+            const minutes = Math.floor((msUntil / 1000 / 60) % 60);
+            
+            console.log(`[MIDNIGHT] 자정 새로고침 예약 (${hours}시간 ${minutes}분 후)`);
+            
+            setTimeout(() => {
+                console.log('[MIDNIGHT] 자정 새로고침 실행!');
+                location.reload();
+            }, msUntil);
+        }
+        
+        // ========================================
+        // 초기화
+        // ========================================
+        
+        function init() {
+            console.log('========================================');
+            console.log('WMS 대시보드 초기화');
+            console.log('========================================');
+            
+            // 1. 자정 새로고침 예약 (항상)
+            scheduleMidnightReload();
+            
+            // 2. 운영 시간 체크
+            const status = isOperatingTime();
+            
+            if (!status.operating) {
+                // 운영 시간 외
+                showOffTimeMessage(status.reason);
+                
+                if (status.reason === 'holiday') {
+                    // 토요일: 자정 새로고침까지 대기 (이미 예약됨)
+                    console.log('[HOLIDAY] 토요일 - 자정까지 대기');
+                } else {
+                    // 09시 전: 09:02까지 대기
+                    scheduleOperatingStart();
+                }
+            } else {
+                // 운영 시간 중
+                console.log('[OPERATING] 운영 시간 중 - 즉시 시작');
+                
+                // 오버레이 숨기기
+                hideOffTimeMessage();
+                
+                // 즉시 첫 데이터 로드
+                fetchDashboardData();
+                
+                // 다음 X분 2초에 맞춰 스케줄링
+                scheduleNextRefresh();
+            }
+        }
+        
+        // 페이지 로드 시 초기화
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+    
+    <!-- 긴급알림 팝업 -->
+    <div id="urgentAlertPopup" class="urgent-popup" onclick="closeUrgentAlert()">
+        <div class="urgent-popup-content" onclick="event.stopPropagation()">
+            <div class="urgent-popup-title">🚨 지방출고 긴급알림</div>
+            <div class="urgent-popup-message">미발행 피킹리스트 발생!</div>
+            <div class="urgent-popup-dest" id="urgentAlertDestList"></div>
+            <div class="urgent-popup-close" onclick="closeUrgentAlert()">클릭하여 닫기 (10초 후 자동 닫힘)</div>
+        </div>
+    </div>
+    
+</body>
+</html>

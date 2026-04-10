@@ -1,0 +1,109 @@
+﻿{
+  "card1": {
+    "inboundRiskyCount": 0,
+    "progressRate": 100.0,
+    "riskyItems": [],
+    "totalCount": 67
+  },
+  "card2": {
+    "amount": 78722867,
+    "compare": 29.9,
+    "irregularTotal": 11,
+    "irregularUnprinted": 5,
+    "totalLabel": 5803,
+    "unprintedLabel": 0
+  },
+  "card3": {
+    "amount": 15053322,
+    "compare": -46.9,
+    "destinations": {
+      "ansan": 0,
+      "eumseong": 0,
+      "gumi": 0,
+      "gyeryong": 0,
+      "hanex": 1,
+      "honam": 0,
+      "jecheon": 0,
+      "jeju": 0,
+      "kids": 0,
+      "yangsan": 304,
+      "yangsan2": 0,
+      "yongin2": 3,
+      "yongin3": 0
+    },
+    "unprintedPicking": 0
+  },
+  "card5": {
+    "riskyItems": [
+      {
+        "expiryDate": "20251204",
+        "location": "K040901",
+        "productCode": "27576687",
+        "productName": "(\uac13\uc787)\ube14\ub799\ud398\ud37c\ub9c8\uc694",
+        "validityRatio": 6.0
+      },
+      {
+        "expiryDate": "20251223",
+        "location": "K011303",
+        "productCode": "27286876",
+        "productName": "(\uc21c\ub300\uc2e4\ub85d) \uace0\ucd94\uc7a5\uc18c\uc2a4",
+        "validityRatio": 15.0
+      },
+      {
+        "expiryDate": "20251210",
+        "location": "L060903",
+        "productCode": "41127612",
+        "productName": "[\ucf00\uc5b4\ud50c\ub7ec\uc2a4]\ub77c\uad6c\uc18c\uc2a4",
+        "validityRatio": 15.0
+      },
+      {
+        "expiryDate": "20251205",
+        "location": "K042402",
+        "productCode": "27392768",
+        "productName": "(\ud54f\uc81c\ub9ac\uc544\uc624) \uadf8\ub77c\ub098\ud30c\ub2e4\ub178\uadf8\ub808\uc774\ud2f0\ub4dc",
+        "validityRatio": 17.0
+      },
+      {
+        "expiryDate": "20251229",
+        "location": "K011403",
+        "productCode": "27558034",
+        "productName": "[\uadf8\ub0a8\ud30c] \uadf8\ub0a8\uc790\uc758 \uce58\ud0a8\uce60\ub77c\ud504\uc18c\uc2a4",
+        "validityRatio": 18.0
+      },
+      {
+        "expiryDate": "20251229",
+        "location": "K011301",
+        "productCode": "27558027",
+        "productName": "[\uadf8\ub0a8\ud30c] \uadf8\ub0a8\uc790\uc758 \uc0c1\ud558\uc774\uc18c\uc2a4",
+        "validityRatio": 18.0
+      }
+    ],
+    "totalCount": 6,
+    "urgentCount": 1,
+    "warningCount": 5
+  },
+  "card6": {
+    "deleteAnsan": [],
+    "deleteEumseong": [],
+    "fifo": [],
+    "inventory": {
+      "total_value": 866242825
+    },
+    "partial": [],
+    "storageRate": {
+      "rate": 38.0
+    },
+    "unallocated": []
+  },
+  "data_counts": {
+    "delete": 0,
+    "inbound": 67,
+    "inventory": 900,
+    "irregular": 11,
+    "outbound": 6125
+  },
+  "date": "20251126",
+  "success": true,
+  "timestamp": "2025-11-26T22:12:12.819410"
+}
+

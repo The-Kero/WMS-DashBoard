@@ -1,0 +1,1433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ╔═══════════════════════════════════════════════════════════════════════════╗
+  ║                    V10 레이아웃 설계서 (Layout Specification)               ║
+  ║                                                                           ║
+  ║  목적: 다음 대화의 Claude가 이 문서만 보고 v10.html 구조를 100% 이해하고    ║
+  ║        Flask 템플릿화 작업을 바로 시작할 수 있도록 함                       ║
+  ║                                                                           ║
+  ║  생성일: 2025-11-26                                                        ║
+  ║  원본: C:\Projects\WMS-DashBoard\Layout\v10.html (2,312줄)                 ║
+  ║  기반 문서:                                                                ║
+  ║    - v10_최종_통합_요약본_v2.xml (1,517줄)                                  ║
+  ║    - v9_데이터적용_요약가이드.md (1,249줄)                                  ║
+  ╚═══════════════════════════════════════════════════════════════════════════╝
+-->
+
+<v10_layout_specification version="1.0">
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- PART 1. 문서 메타정보 및 사용 가이드                                      -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <part1_metadata>
+    
+    <document_info>
+      <title>V10 레이아웃 설계서</title>
+      <version>1.0</version>
+      <created_date>2025-11-26</created_date>
+      <author>Claude (17차 대화 기반)</author>
+      <status>PRODUCTION</status>
+    </document_info>
+    
+    <source_files>
+      <primary_file>
+        <path>C:\Projects\WMS-DashBoard\Layout\v10.html</path>
+        <lines>2312</lines>
+        <size>88KB</size>
+        <description>V10 레이아웃 최종 완성본 (프로덕션 배포 상태)</description>
+      </primary_file>
+      <backup_file>
+        <path>C:\Projects\WMS-DashBoard\Layout\v10_backup_20251125_card6이식전.html</path>
+        <lines>1786</lines>
+        <description>카드6 이식 전 백업</description>
+      </backup_file>
+      <card6_dev_file>
+        <path>C:\Projects\WMS-DashBoard\Layout\card6_kero_layout.html</path>
+        <lines>953</lines>
+        <description>카드6 개발/테스트용 독립 파일</description>
+      </card6_dev_file>
+    </source_files>
+    
+    <deployment>
+      <docker_container>wms-dashboard-v6</docker_container>
+      <url>http://10.60.27.130:8080/</url>
+      <tab_title>WMS 동서울물류센터 냉장파트</tab_title>
+    </deployment>
+    
+    <how_to_use_this_document>
+      <step seq="1">전체 구조 파악: PART 2 (레이아웃 개요) 먼저 읽기</step>
+      <step seq="2">카드6 이해: PART 4 (카드6 상세) 집중 학습</step>
+      <step seq="3">데이터 연동: PART 7 (데이터 구조) 참조</step>
+      <step seq="4">Flask 작업: PART 9 (Phase 2 연동) 따라하기</step>
+      <step seq="5">스타일 수정: PART 5 (CSS 시스템) 참조</step>
+    </how_to_use_this_document>
+    
+  </part1_metadata>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- PART 2. 전체 레이아웃 구조                                                -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <part2_layout_overview>
+    
+    <display_spec>
+      <resolution width="1920" height="1080">Full HD</resolution>
+      <target_device>100인치 TV (LG 상업용 디스플레이)</target_device>
+      <viewing_distance>약 10미터</viewing_distance>
+      <interaction>없음 (정보 표시 전용, 터치/키보드 불가)</interaction>
+      <location>동서울물류센터 냉장파트 사무실</location>
+      <auto_refresh>30초마다 (Phase 2에서 구현)</auto_refresh>
+    </display_spec>
+    
+    <page_structure>
+      <header height="60px" background="#3B4458">
+        <left_section>로고 + 타이틀 + 업데이트 시간</left_section>
+        <center_section>현재 시간 (실시간 업데이트)</center_section>
+      </header>
+      <main_content height="1020px" padding="20px" gap="20px">
+        <left_area width="1120px">카드 1~5 (3x2 그리드)</left_area>
+        <right_area width="740px">카드6 (금일 재고 현황)</right_area>
+      </main_content>
+    </page_structure>
+    
+    <grid_system>
+      <total_width>1920px</total_width>
+      <total_height>1080px</total_height>
+      <header_height>60px</header_height>
+      <content_padding>20px (상하좌우)</content_padding>
+      <card_gap>20px</card_gap>
+      <content_area width="1880px" height="1000px"/>
+    </grid_system>
+    
+    <!-- 6개 카드 배치도 (ASCII) -->
+    <card_layout_diagram>
+      <!--
+      ┌─────────────────────────────────────────────────────────────────────────┐
+      │ 헤더 (60px) - 로고, 타이틀, 시간                                          │
+      ├───────────────┬───────────────┬───────────────┬─────────────────────────┤
+      │               │               │               │                         │
+      │   카드1       │    카드2      │    카드3      │                         │
+      │   입고현황    │   자사출고    │   지방출고    │       카드6             │
+      │  360×480     │   360×480     │   360×480     │    금일 재고 현황        │
+      │               │               │               │      740×980           │
+      ├───────────────┼───────────────┴───────────────┤                         │
+      │               │                               │                         │
+      │   카드4       │         카드5                 │                         │
+      │   스케줄      │      피킹유의상품             │                         │
+      │  360×480     │        740×480                │                         │
+      │               │                               │                         │
+      └───────────────┴───────────────────────────────┴─────────────────────────┘
+      -->
+    </card_layout_diagram>
+    
+    <!-- 6개 카드 좌표 및 크기 상세 -->
+    <card_coordinates>
+      
+      <card id="1" name="입고현황" html_id="card1">
+        <position row="1" col="1">좌상단</position>
+        <size width="360px" height="480px"/>
+        <css_class>gaugeItem</css_class>
+        <title>📦 금일 입고 사항</title>
+      </card>
+      
+      <card id="2" name="자사출고" html_id="card2">
+        <position row="1" col="2">중상단</position>
+        <size width="360px" height="480px"/>
+        <css_class>gaugeItem</css_class>
+        <title>🚚 금일 자사 출고 사항</title>
+      </card>
+      
+      <card id="3" name="지방출고" html_id="card3">
+        <position row="1" col="3">우상단</position>
+        <size width="360px" height="480px"/>
+        <css_class>gaugeItem</css_class>
+        <title>🚛 금일 지방 출고 사항</title>
+      </card>
+      
+      <card id="4" name="스케줄" html_id="card4">
+        <position row="2" col="1">좌하단</position>
+        <size width="360px" height="480px"/>
+        <css_class>gaugeItem</css_class>
+        <title>📅 냉장파트 스케줄</title>
+      </card>
+      
+      <card id="5" name="피킹유의" html_id="card5">
+        <position row="2" col="2-3">중하단 (2칸)</position>
+        <size width="740px" height="480px"/>
+        <css_class>gaugeItem ingWarning card5-wide</css_class>
+        <title>⚠️ 금일 피킹 유의 상품</title>
+        <note>grid-column: span 2 로 2칸 차지</note>
+      </card>
+      
+      <card id="6" name="재고현황" html_id="card6">
+        <position>우측 전체 (2행 차지)</position>
+        <size width="740px" height="980px"/>
+        <css_class>gaugeItem</css_class>
+        <title>📦 금일 재고 현황</title>
+        <sections count="5">
+          <section seq="1">총재고 + 적치율</section>
+          <section seq="2">선입선출 위반</section>
+          <section seq="3">미출/부분출고</section>
+          <section seq="4">삭제현황</section>
+          <section seq="5">미할당 입고현황</section>
+        </sections>
+      </card>
+      
+    </card_coordinates>
+    
+  </part2_layout_overview>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- PART 3. 카드 1~5 상세 스펙                                                -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <part3_cards_1_to_5>
+    
+    <!-- 카드1: 입고현황 -->
+    <card1_inbound>
+      <html_id>card1</html_id>
+      <js_function>updateCard1(data)</js_function>
+      <data_key>dashboardData.card1</data_key>
+      
+      <structure>
+        <section name="metrics">
+          <element id="totalCount">총 건수 (숫자만, HTML에 "건" 있음)</element>
+          <element id="progressRate">진척률 (숫자만, HTML에 "%" 있음)</element>
+          <element id="progressBar">프로그레스바 (width % + 색상 클래스)</element>
+        </section>
+        <section name="risky">
+          <element id="inboundRiskyCount">입고 유의상품 건수</element>
+          <element id="inboundRiskyList">입고 유의상품 리스트 (동적 생성)</element>
+        </section>
+      </structure>
+      
+      <progress_color_rules>
+        <rule condition="progressRate &lt; 25" class="level-danger" color="#DC2626">빨강</rule>
+        <rule condition="progressRate &lt; 50" class="level-warning" color="#F97316">주황</rule>
+        <rule condition="progressRate &lt; 75" class="level-caution" color="#EAB308">노랑</rule>
+        <rule condition="progressRate >= 75" class="level-good" color="#60CB2E">초록</rule>
+      </progress_color_rules>
+      
+      <data_structure>
+        <field name="totalCount" type="number" example="57"/>
+        <field name="progressRate" type="number" example="71.9"/>
+        <field name="inboundRiskyCount" type="number" example="1"/>
+        <field name="riskyItems" type="array">
+          <item_fields>
+            <field name="productName" type="string"/>
+            <field name="inboundExpiry" type="string" format="YYYYMMDD"/>
+            <field name="stockExpiry" type="string" format="YYYYMMDD"/>
+          </item_fields>
+        </field>
+      </data_structure>
+    </card1_inbound>
+    
+    <!-- 카드2: 자사출고 -->
+    <card2_outbound_company>
+      <html_id>card2</html_id>
+      <js_function>updateCard2(data)</js_function>
+      <data_key>dashboardData.card2</data_key>
+      
+      <structure>
+        <section name="amount">
+          <element id="card2AmountValue">출하금액 (formatNumber + " 원")</element>
+          <element id="card2AmountCompare">전일대비 컨테이너</element>
+          <element id="card2CompareValue">전일대비 퍼센트</element>
+          <element id="card2CompareIcon">🔺/🔻/➖ 아이콘</element>
+        </section>
+        <section name="label">
+          <element id="card2TotalLabel">총 라벨 건수</element>
+          <element id="card2UnprintedLabel">미발행 라벨 건수 (0이면 초록 ✅)</element>
+        </section>
+        <section name="irregular">
+          <element id="card2IrregularTotal">비정형 라벨 건수</element>
+          <element id="card2IrregularUnprinted">비정형 미출력 건수</element>
+        </section>
+      </structure>
+      
+      <compare_color_rules>
+        <rule condition="compare > 0" class="positive" color="#60CB2E" icon="🔺"/>
+        <rule condition="compare &lt; 0" class="negative" color="#F05E5E" icon="🔻"/>
+        <rule condition="compare == 0" class="" icon="➖"/>
+      </compare_color_rules>
+      
+      <data_structure>
+        <field name="amount" type="number" example="60609461"/>
+        <field name="compare" type="number" example="-29.4"/>
+        <field name="totalLabel" type="number" example="5412"/>
+        <field name="unprintedLabel" type="number" example="0"/>
+        <field name="irregularTotal" type="number" example="14"/>
+        <field name="irregularUnprinted" type="number" example="9"/>
+      </data_structure>
+    </card2_outbound_company>
+    
+    <!-- 카드3: 지방출고 -->
+    <card3_outbound_region>
+      <html_id>card3</html_id>
+      <js_function>updateCard3(data)</js_function>
+      <data_key>dashboardData.card3</data_key>
+      
+      <structure>
+        <section name="amount">
+          <element id="card3AmountValue">출하금액</element>
+          <element id="card3CompareValue">전일대비</element>
+          <element id="card3CompareIcon">아이콘</element>
+        </section>
+        <section name="picking">
+          <element id="card3PickingValue">미발행 피킹리스트 (0이면 초록 ✅)</element>
+        </section>
+        <section name="destinations">
+          <element id="dest-jeju">제주</element>
+          <element id="dest-jecheon">제천</element>
+          <element id="dest-honam">호남</element>
+          <element id="dest-gumi">구미</element>
+          <element id="dest-gyeryong">계룡</element>
+          <element id="dest-eumseong">음성</element>
+          <element id="dest-yongin2">용인2</element>
+          <element id="dest-yongin3">용인3</element>
+          <element id="dest-ansan">안산</element>
+          <element id="dest-yangsan">양산</element>
+          <element id="dest-yangsan2">양산2</element>
+          <element id="dest-hanex">한익스,키즈 (합쳐서 표시)</element>
+        </section>
+      </structure>
+      
+      <data_structure>
+        <field name="amount" type="number" example="28358148"/>
+        <field name="compare" type="number" example="130.4"/>
+        <field name="unprintedPicking" type="number" example="0"/>
+        <field name="destinations" type="object">
+          <field name="jeju" type="number"/>
+          <field name="jecheon" type="number"/>
+          <field name="honam" type="number"/>
+          <field name="gumi" type="number"/>
+          <field name="gyeryong" type="number"/>
+          <field name="eumseong" type="number"/>
+          <field name="yongin2" type="number"/>
+          <field name="yongin3" type="number"/>
+          <field name="ansan" type="number"/>
+          <field name="yangsan" type="number"/>
+          <field name="yangsan2" type="number"/>
+          <field name="hanex" type="number"/>
+          <field name="kids" type="number"/>
+        </field>
+      </data_structure>
+    </card3_outbound_region>
+    
+    <!-- 카드4: 스케줄 -->
+    <card4_schedule>
+      <html_id>card4</html_id>
+      <js_function>없음 (정적 HTML)</js_function>
+      <data_key>없음</data_key>
+      
+      <structure>
+        <group name="today" class="schedule-group today">오늘 일정</group>
+        <group name="tomorrow" class="schedule-group tomorrow">내일 일정</group>
+        <group name="this-week" class="schedule-group this-week">이번 주 일정</group>
+      </structure>
+      
+      <event_types>
+        <type class="birthday" icon="🎂">생일</type>
+        <type class="leave" icon="🏖️">월차</type>
+        <type class="education" icon="📚">교육</type>
+        <type class="vacation" icon="✈️">휴가</type>
+        <type class="other" icon="📌">기타</type>
+      </event_types>
+      
+      <note>Phase 2에서 API 연동 또는 정적 유지 결정 필요</note>
+    </card4_schedule>
+    
+    <!-- 카드5: 피킹유의 -->
+    <card5_picking_risky>
+      <html_id>card5</html_id>
+      <js_function>updateCard5(data)</js_function>
+      <data_key>dashboardData.card5</data_key>
+      
+      <special_style>
+        <width>740px (2칸 차지)</width>
+        <class>card5-wide</class>
+        <warning_class>ingWarning (빨간 테두리 + pulse 애니메이션)</warning_class>
+      </special_style>
+      
+      <structure>
+        <section name="header">
+          <element id="pickingRiskyCount">유효비 20% 이하 건수</element>
+        </section>
+        <section name="list">
+          <element id="pickingRiskyList">2열 그리드 리스트 (동적 생성)</element>
+        </section>
+      </structure>
+      
+      <list_item_structure>
+        <element class="picking-badge">유효비% (urgent: 빨강 ≤10%, warning: 주황 11~20%)</element>
+        <element class="picking-location">로케이션 (보라색 배경)</element>
+        <element class="picking-name">상품명</element>
+        <element class="picking-expiry-date">소비기한 (MM.DD 형식)</element>
+      </list_item_structure>
+      
+      <data_structure>
+        <field name="totalCount" type="number" example="10"/>
+        <field name="urgentCount" type="number" example="2"/>
+        <field name="warningCount" type="number" example="8"/>
+        <field name="riskyItems" type="array">
+          <item_fields>
+            <field name="location" type="string" example="K040901"/>
+            <field name="productName" type="string"/>
+            <field name="expiryDate" type="string" format="YYYYMMDD or YYYY-MM-DD"/>
+            <field name="validityRatio" type="number" example="8.0"/>
+          </item_fields>
+        </field>
+      </data_structure>
+    </card5_picking_risky>
+    
+  </part3_cards_1_to_5>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- PART 4. 카드6 상세 설계 (핵심!)                                           -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <part4_card6_detail>
+    
+    <card6_overview>
+      <html_id>card6</html_id>
+      <container_id>card6Content</container_id>
+      <size width="740px" height="980px"/>
+      <title>📦 금일 재고 현황</title>
+      <js_function>updateCard6(data)</js_function>
+      <data_key>dashboardData.card6</data_key>
+      <sections_count>5</sections_count>
+      <rendering_method>JavaScript 동적 렌더링 (innerHTML)</rendering_method>
+      <css_scope_rule>모든 CSS는 #card6 접두사 적용 (충돌 방지)</css_scope_rule>
+    </card6_overview>
+    
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- 섹션 1: 최상단 (총재고 + 적치율) -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section1_top_row>
+      <title>💰 총 재고 / 📊 상단 적치율</title>
+      <css_class>.section-top-row</css_class>
+      <render_function>renderTopRow(data)</render_function>
+      <layout>가로 1줄, 세로 구분선으로 2분할</layout>
+      
+      <left_part>
+        <label>💰 총 재고</label>
+        <value_example>17,680,000 원</value_example>
+        <data_path>data.inventory.total_value</data_path>
+        <format>toLocaleString('ko-KR') + " 원"</format>
+      </left_part>
+      
+      <right_part>
+        <label>📊 상단 적치율</label>
+        <value_example>45.2%</value_example>
+        <data_path>data.storageRate.rate</data_path>
+        <format>숫자 + "%"</format>
+        <note>524개 상단 로케이션 중 재고 있는 비율</note>
+      </right_part>
+      
+      <html_output><![CDATA[
+<div class="section-top-row">
+    <div class="top-item">
+        <span class="top-item-title">💰 총 재고</span>
+        <span class="top-item-value">${formatted} 원</span>
+    </div>
+    <div class="divider"></div>
+    <div class="top-item">
+        <span class="top-item-title">📊 상단 적치율</span>
+        <span class="top-item-value">${data.storageRate.rate}%</span>
+    </div>
+</div>
+      ]]></html_output>
+      
+      <css_rules>
+        <rule selector="#card6 .section-top-row">
+          display: flex; align-items: center; justify-content: space-around;
+          padding: 10px; border-bottom: 3px solid #E5E7EB; background: #F8FAFC;
+        </rule>
+        <rule selector="#card6 .top-item-title">font-size: 24px; font-weight: 700; color: #3B4458;</rule>
+        <rule selector="#card6 .top-item-value">font-size: 20px; font-weight: 800; color: #2563EB;</rule>
+        <rule selector="#card6 .divider">width: 2px; height: 30px; background: #D1D5DB;</rule>
+      </css_rules>
+    </section1_top_row>
+    
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- 섹션 2: 선입선출 위반 -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section2_fifo>
+      <title>⚠️ 선입선출 위반 상품 (N건)</title>
+      <priority>최우선 (중요도 1위)</priority>
+      <css_class_violation>.section-fifo</css_class_violation>
+      <css_class_normal>.section-fifo-normal</css_class_normal>
+      <render_function>renderFifoSection(data)</render_function>
+      <data_path>data.fifo</data_path>
+      
+      <warehouse_structure>
+        <upper_location>상단 로케이션 = 보관용 (정상 위치)</upper_location>
+        <lower_location>하단 로케이션 = 출고용 (피킹 위치)</lower_location>
+        <violation_condition>
+          소비기한이 빠른 상품이 상단(보관)에 있고,
+          소비기한이 늦은 상품이 하단(출고)에 있으면 위반
+          → 늦은 상품이 먼저 출고되므로 선입선출 위반
+        </violation_condition>
+      </warehouse_structure>
+      
+      <display_format>
+        <structure>1줄 배치: 🔴 상품명 | [하단] 로케이션 (소비기한) → [상단] 로케이션 (소비기한)</structure>
+        <location_format>A010101 (7자리, 하이픈 없음)</location_format>
+        <expiry_format>YY.MM.DD (예: 25.12.05)</expiry_format>
+        <arrow>→ (단방향 화살표, 빨간색)</arrow>
+      </display_format>
+      
+      <when_violation_exists count="1+">
+        <background>#FEE2E2 (분홍색)</background>
+        <border>3px solid #EF4444 (빨간색)</border>
+        <animation>pulse-fifo 2s infinite (깜빡임)</animation>
+        <title_color>#DC2626</title_color>
+      </when_violation_exists>
+      
+      <when_normal count="0">
+        <display>✅ 정상 진행중</display>
+        <background>#D1FAE5 (연한 초록)</background>
+        <border>2px solid #10B981</border>
+        <text_color>#10B981</text_color>
+      </when_normal>
+      
+      <data_structure>
+        <item>
+          <lower>
+            <product type="string">상품명</product>
+            <location type="string">하단 로케이션</location>
+            <expiry type="string">소비기한 (YY.MM.DD)</expiry>
+          </lower>
+          <upper>
+            <location type="string">상단 로케이션</location>
+            <expiry type="string">소비기한 (YY.MM.DD)</expiry>
+          </upper>
+        </item>
+      </data_structure>
+      
+      <html_output_violation><![CDATA[
+<div class="section-fifo">
+    <div class="section-title">⚠️ 선입선출 위반 상품 (${items.length}건)</div>
+    <div class="fifo-list">
+        <div class="fifo-item">
+            <span class="product-name">🔴 ${item.lower.product}</span>
+            <span class="left-section">[하단] ${item.lower.location} (${item.lower.expiry})</span>
+            <span class="arrow">→</span>
+            <span class="right-section">[상단] ${item.upper.location} (${item.upper.expiry})</span>
+        </div>
+    </div>
+</div>
+      ]]></html_output_violation>
+      
+      <html_output_normal><![CDATA[
+<div class="section-fifo-normal">
+    <div class="section-title">⚠️ 선입선출 위반 상품</div>
+    <div class="section-value" style="color: #10B981;">✅ 정상 진행중</div>
+</div>
+      ]]></html_output_normal>
+      
+      <css_rules>
+        <rule selector="#card6 .section-fifo">
+          background: #FEE2E2; border: 3px solid #EF4444; border-radius: 8px;
+          animation: pulse-fifo 2s infinite; margin: 10px 0; padding: 10px;
+        </rule>
+        <rule selector="#card6 .section-fifo-normal">
+          background: #D1FAE5; border: 2px solid #10B981; border-radius: 8px;
+          margin: 10px 0; padding: 15px; text-align: center;
+        </rule>
+        <rule selector="#card6 .fifo-item .product-name">
+          width: 200px; font-weight: 700; color: #DC2626;
+          padding-right: 10px; border-right: 1px solid #F87171;
+        </rule>
+        <rule selector="#card6 .fifo-item .arrow">
+          width: 40px; text-align: center; color: #DC2626; font-weight: 700;
+        </rule>
+      </css_rules>
+      
+      <animation_keyframes name="pulse-fifo">
+        @keyframes pulse-fifo {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+          50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+      </animation_keyframes>
+    </section2_fifo>
+    
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- 섹션 3: 미출/부분출고 -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section3_partial_shipment>
+      <title>🔔 미출/부분출고 내역 (N건)</title>
+      <css_class>.partial-table</css_class>
+      <render_function>renderPartialShipment(data)</render_function>
+      <data_path>data.partial</data_path>
+      <monitoring_time>18시 이후 감시 시작</monitoring_time>
+      
+      <detection_logic>
+        현재 CSV vs 가장 최근 백업 CSV 비교
+        → 오더수량이 감소한 건 감지
+      </detection_logic>
+      
+      <table_structure>
+        <column seq="1" name="배송군" width="auto" align="center"/>
+        <column seq="2" name="배송처명" width="auto" align="left"/>
+        <column seq="3" name="상품명" width="auto" align="left"/>
+        <column seq="4" name="단위" width="auto" align="center"/>
+        <column seq="5" name="원주문" width="auto" align="right"/>
+        <column seq="6" name="오더" width="auto" align="right"/>
+        <column seq="7" name="비고" width="auto" align="center"/>
+      </table_structure>
+      
+      <remark_logic>
+        <when condition="order_qty == 0">
+          <text>미출</text>
+          <class>shortage</class>
+          <color>#DC2626 (빨강)</color>
+        </when>
+        <when condition="order_qty >= 1">
+          <text>부분출고</text>
+          <class>partial</class>
+          <color>#F59E0B (주황)</color>
+        </when>
+      </remark_logic>
+      
+      <data_structure>
+        <field name="delivery_group" type="string" example="4331"/>
+        <field name="delivery_name" type="string" example="용인2"/>
+        <field name="product_name" type="string" example="(캘리)참깨소스(2kg)"/>
+        <field name="unit" type="string" example="EA(2kg)"/>
+        <field name="original_qty" type="number" example="4"/>
+        <field name="order_qty" type="number" example="2"/>
+      </data_structure>
+      
+      <html_output><![CDATA[
+<div class="section">
+    <div class="section-title">🔔 미출/부분출고 (${items.length}건)</div>
+    <table class="partial-table">
+        <thead>
+            <tr><th>배송군</th><th>배송처명</th><th>상품명</th><th>단위</th><th>원주문</th><th>오더</th><th>비고</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>${item.delivery_group}</td>
+                <td class="left">${item.delivery_name}</td>
+                <td class="left">${item.product_name}</td>
+                <td>${item.unit}</td>
+                <td class="right">${item.original_qty}</td>
+                <td class="right">${item.order_qty}</td>
+                <td class="${remarkClass}">${remark}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+      ]]></html_output>
+    </section3_partial_shipment>
+
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- 섹션 4: 삭제현황 -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section4_delete_status>
+      <title>🗑️ 삭제 현황</title>
+      <css_class>.delete-container</css_class>
+      <render_function>renderDeleteStatus(data)</render_function>
+      <data_path>data.deleteAnsan, data.deleteEumseong</data_path>
+      <monitoring_time>18시 이후 표시</monitoring_time>
+      
+      <layout>
+        <structure>좌우 분할 (50%:50%)</structure>
+        <left_side title="안산 삭제" color="#2563EB">파란색 타이틀</left_side>
+        <right_side title="음성 삭제" color="#059669">초록색 타이틀</right_side>
+      </layout>
+      
+      <table_structure>
+        <column seq="1" name="상품명" align="left"/>
+        <column seq="2" name="단위" align="center"/>
+        <column seq="3" name="수량" align="right"/>
+      </table_structure>
+      
+      <expected_count>
+        <ansan min="0" max="12">평균 3~5건</ansan>
+        <eumseong min="0" max="21">평균 5~10건</eumseong>
+      </expected_count>
+      
+      <data_structure>
+        <deleteAnsan type="array">
+          <field name="product_name" type="string"/>
+          <field name="unit" type="string"/>
+          <field name="qty" type="number"/>
+        </deleteAnsan>
+        <deleteEumseong type="array">
+          <field name="product_name" type="string"/>
+          <field name="unit" type="string"/>
+          <field name="qty" type="number"/>
+        </deleteEumseong>
+      </data_structure>
+      
+      <html_output><![CDATA[
+<div class="section">
+    <div class="section-title">🗑️ 삭제 현황</div>
+    <div class="delete-container">
+        <div class="delete-column">
+            <div class="delete-title" style="color: #2563EB;">안산 삭제 (${ansan.length}건)</div>
+            <table class="delete-table">
+                <thead><tr><th>상품명</th><th>단위</th><th>수량</th></tr></thead>
+                <tbody>
+                    <tr><td class="left">${item.product_name}</td><td>${item.unit}</td><td class="right">${item.qty}</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="delete-column">
+            <div class="delete-title" style="color: #059669;">음성 삭제 (${eumseong.length}건)</div>
+            <table class="delete-table">...</table>
+        </div>
+    </div>
+</div>
+      ]]></html_output>
+      
+      <css_rules>
+        <rule selector="#card6 .delete-container">display: flex; gap: 15px;</rule>
+        <rule selector="#card6 .delete-column">flex: 1;</rule>
+        <rule selector="#card6 .delete-title">font-size: 14px; font-weight: 700; margin-bottom: 5px;</rule>
+        <rule selector="#card6 .delete-table">width: 100%; border-collapse: collapse; font-size: 11px;</rule>
+        <rule selector="#card6 .delete-table th">background: #F1F5F9; padding: 4px; border: 1px solid #E5E7EB;</rule>
+        <rule selector="#card6 .delete-table td">padding: 3px 4px; border: 1px solid #E5E7EB;</rule>
+      </css_rules>
+    </section4_delete_status>
+    
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- 섹션 5: 미할당 입고현황 -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section5_unallocated>
+      <title>📥 미할당 입고현황 (N건)</title>
+      <css_class>.unallocated-section</css_class>
+      <render_function>renderUnallocatedTable(data)</render_function>
+      <data_path>data.unallocated</data_path>
+      
+      <layout>
+        <structure>2열 테이블 (좌우 50%:50%)</structure>
+        <data_split>데이터 2등분하여 좌우 배치</data_split>
+      </layout>
+      
+      <table_structure>
+        <column seq="1" name="상품명" align="left"/>
+        <column seq="2" name="단위" align="center"/>
+        <column seq="3" name="수량" align="right"/>
+        <column seq="4" name="센터" align="center">색상 배지</column>
+      </table_structure>
+      
+      <center_color_system count="9">
+        <center name="안산" class="center-ansan" color="#2563EB">파랑</center>
+        <center name="음성" class="center-eumseong" color="#059669">초록</center>
+        <center name="제주" class="center-jeju" color="#EA580C">주황</center>
+        <center name="제천" class="center-jecheon" color="#7C3AED">보라</center>
+        <center name="호남" class="center-honam" color="#DB2777">핑크</center>
+        <center name="구미" class="center-gumi" color="#0891B2">청록</center>
+        <center name="계룡" class="center-gyeryong" color="#B45309">갈색</center>
+        <center name="용인" class="center-yongin" color="#4338CA">남색</center>
+        <center name="양산" class="center-yangsan" color="#65A30D">올리브</center>
+      </center_color_system>
+      
+      <center_class_map><![CDATA[
+const centerClassMap = {
+    "안산": "center-ansan",
+    "음성": "center-eumseong",
+    "제주": "center-jeju",
+    "제천": "center-jecheon",
+    "호남": "center-honam",
+    "구미": "center-gumi",
+    "계룡": "center-gyeryong",
+    "용인": "center-yongin",
+    "양산": "center-yangsan"
+};
+      ]]></center_class_map>
+      
+      <expected_count min="0" max="21">평균 5~10건</expected_count>
+      
+      <data_structure>
+        <unallocated type="array">
+          <field name="product_name" type="string"/>
+          <field name="unit" type="string"/>
+          <field name="qty" type="number"/>
+          <field name="center" type="string" example="안산"/>
+        </unallocated>
+      </data_structure>
+      
+      <html_output><![CDATA[
+<div class="section">
+    <div class="section-title">📥 미할당 입고현황 (${items.length}건)</div>
+    <div class="unallocated-tables">
+        <table class="unallocated-table">
+            <thead><tr><th>상품명</th><th>단위</th><th>수량</th><th>센터</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td class="left">${item.product_name}</td>
+                    <td>${item.unit}</td>
+                    <td class="right">${item.qty}</td>
+                    <td><span class="center-badge ${centerClass}">${item.center}</span></td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- 우측 테이블 동일 구조 -->
+    </div>
+</div>
+      ]]></html_output>
+      
+      <css_rules>
+        <rule selector="#card6 .unallocated-tables">display: flex; gap: 15px;</rule>
+        <rule selector="#card6 .unallocated-table">flex: 1; border-collapse: collapse; font-size: 11px;</rule>
+        <rule selector="#card6 .center-badge">padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; color: white;</rule>
+        <rule selector="#card6 .center-ansan">background: #2563EB;</rule>
+        <rule selector="#card6 .center-eumseong">background: #059669;</rule>
+        <rule selector="#card6 .center-jeju">background: #EA580C;</rule>
+        <rule selector="#card6 .center-jecheon">background: #7C3AED;</rule>
+        <rule selector="#card6 .center-honam">background: #DB2777;</rule>
+        <rule selector="#card6 .center-gumi">background: #0891B2;</rule>
+        <rule selector="#card6 .center-gyeryong">background: #B45309;</rule>
+        <rule selector="#card6 .center-yongin">background: #4338CA;</rule>
+        <rule selector="#card6 .center-yangsan">background: #65A30D;</rule>
+      </css_rules>
+    </section5_unallocated>
+    
+  </part4_card6_detail>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- PART 5. CSS 시스템                                                       -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <part5_css_system>
+    
+    <scope_rule>
+      <principle>모든 카드6 전용 CSS는 #card6 접두사 적용</principle>
+      <reason>기존 v10 CSS와 충돌 방지</reason>
+      <example_correct>#card6 .section-title { ... }</example_correct>
+      <example_wrong>.section-title { ... } ← 다른 카드에 영향 줄 수 있음</example_wrong>
+    </scope_rule>
+    
+    <color_palette>
+      <category name="배경">
+        <color name="페이지 배경" hex="#E8EAED" usage="body"/>
+        <color name="카드 배경" hex="#FFFFFF" usage=".gaugeItem"/>
+        <color name="섹션 배경" hex="#F8FAFC" usage=".section-top-row"/>
+        <color name="테이블 헤더" hex="#F1F5F9" usage="th"/>
+      </category>
+      <category name="텍스트">
+        <color name="주 텍스트" hex="#1F2937" usage="기본 텍스트"/>
+        <color name="보조 텍스트" hex="#6B7280" usage="라벨, 설명"/>
+        <color name="헤더 네이비" hex="#3B4458" usage="카드 타이틀"/>
+      </category>
+      <category name="시맨틱">
+        <color name="성공/정상" hex="#60CB2E" usage="정상 상태, 증가"/>
+        <color name="경고/위험" hex="#F05E5E" usage="경고 상태, 감소"/>
+        <color name="주의" hex="#F59E0B" usage="부분출고, 주의"/>
+        <color name="정보" hex="#2563EB" usage="총재고, 안산"/>
+        <color name="음성센터" hex="#059669" usage="음성 관련"/>
+      </category>
+      <category name="테두리">
+        <color name="기본 테두리" hex="#E5E7EB" usage="테이블, 구분선"/>
+        <color name="강조 테두리" hex="#D1D5DB" usage="divider"/>
+      </category>
+    </color_palette>
+    
+    <font_rules>
+      <rule name="대형 숫자" size="72px+" weight="800" usage="카드2,3 출하금액"/>
+      <rule name="카드 타이틀" size="28px" weight="700" usage=".gaugeItem .headText"/>
+      <rule name="섹션 타이틀" size="20px" weight="700" usage="#card6 .section-title"/>
+      <rule name="본문 텍스트" size="16px" weight="400" usage="일반 텍스트"/>
+      <rule name="테이블 텍스트" size="11-13px" weight="400" usage="카드6 테이블"/>
+      <rule name="배지 텍스트" size="10px" weight="600" usage="센터 배지"/>
+    </font_rules>
+    
+    <animations>
+      <animation name="shimmer">
+        <target>카드1 프로그레스바</target>
+        <duration>2s infinite</duration>
+        <keyframes><![CDATA[
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+        ]]></keyframes>
+      </animation>
+      <animation name="pulse-fifo">
+        <target>카드6 선입선출 위반 섹션</target>
+        <duration>2s infinite</duration>
+        <keyframes><![CDATA[
+@keyframes pulse-fifo {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+}
+        ]]></keyframes>
+      </animation>
+      <animation name="pulse">
+        <target>카드5 경고 테두리</target>
+        <duration>2s infinite</duration>
+        <keyframes><![CDATA[
+@keyframes pulse {
+    0%, 100% { border-color: #F05E5E; }
+    50% { border-color: #FCA5A5; }
+}
+        ]]></keyframes>
+      </animation>
+    </animations>
+    
+    <progress_bar_colors>
+      <level name="danger" range="0-24%" gradient="linear-gradient(90deg, #DC2626, #EF4444)"/>
+      <level name="warning" range="25-49%" gradient="linear-gradient(90deg, #F97316, #FB923C)"/>
+      <level name="caution" range="50-74%" gradient="linear-gradient(90deg, #EAB308, #FACC15)"/>
+      <level name="good" range="75-100%" gradient="linear-gradient(90deg, #60CB2E, #84D65A)"/>
+    </progress_bar_colors>
+    
+    <card_common_styles><![CDATA[
+.gaugeItem {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.gaugeItem .headText {
+    font-size: 28px;
+    font-weight: 700;
+    color: #3B4458;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #E5E7EB;
+}
+
+.gaugeItem.ingWarning {
+    background: #FFF5F5;
+    border: 4px solid #F05E5E;
+    animation: pulse 2s infinite;
+}
+    ]]></card_common_styles>
+    
+  </part5_css_system>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- PART 6. JavaScript 시스템                                                -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <part6_javascript_system>
+    
+    <function_overview>
+      <total_functions>11개</total_functions>
+      <card1_to_5_functions>5개</card1_to_5_functions>
+      <card6_functions>5개</card6_functions>
+      <utility_functions>1개 (formatNumber)</utility_functions>
+    </function_overview>
+    
+    <function_list>
+      
+      <function name="updateTime">
+        <purpose>헤더 현재 시간 업데이트</purpose>
+        <trigger>setInterval(1000) - 1초마다</trigger>
+        <target>#current-time</target>
+        <format>HH:MM:SS</format>
+      </function>
+      
+      <function name="formatNumber">
+        <purpose>천 단위 콤마 포맷팅</purpose>
+        <input type="number">숫자</input>
+        <output type="string">콤마 포함 문자열</output>
+        <implementation>num.toLocaleString('ko-KR')</implementation>
+      </function>
+      
+      <function name="updateCard1">
+        <purpose>입고현황 카드 업데이트</purpose>
+        <data_key>dashboardData.card1</data_key>
+        <updates>
+          <element id="totalCount">총 건수</element>
+          <element id="progressRate">진척률 %</element>
+          <element id="progressBar">프로그레스바 width + 색상 클래스</element>
+          <element id="inboundRiskyCount">유의상품 건수</element>
+          <element id="inboundRiskyList">유의상품 리스트 (동적 innerHTML)</element>
+        </updates>
+        <color_logic>
+          rate &lt; 25 → level-danger
+          rate &lt; 50 → level-warning
+          rate &lt; 75 → level-caution
+          rate >= 75 → level-good
+        </color_logic>
+      </function>
+      
+      <function name="updateCard2">
+        <purpose>자사출고 카드 업데이트</purpose>
+        <data_key>dashboardData.card2</data_key>
+        <updates>
+          <element id="card2AmountValue">출하금액 (formatNumber + " 원")</element>
+          <element id="card2CompareValue">전일대비 %</element>
+          <element id="card2CompareIcon">🔺/🔻/➖</element>
+          <element id="card2TotalLabel">총 라벨</element>
+          <element id="card2UnprintedLabel">미발행 라벨 (0이면 "✅ 0")</element>
+          <element id="card2IrregularTotal">비정형 건수</element>
+          <element id="card2IrregularUnprinted">비정형 미출력</element>
+        </updates>
+      </function>
+      
+      <function name="updateCard3">
+        <purpose>지방출고 카드 업데이트</purpose>
+        <data_key>dashboardData.card3</data_key>
+        <updates>
+          <element id="card3AmountValue">출하금액</element>
+          <element id="card3CompareValue">전일대비</element>
+          <element id="card3PickingValue">미발행 피킹 (0이면 "✅ 0")</element>
+          <element id="dest-*">13개 배송처 (jeju, jecheon 등)</element>
+        </updates>
+        <special>hanex + kids 합산하여 표시</special>
+      </function>
+      
+      <function name="updateCard5">
+        <purpose>피킹유의 카드 업데이트</purpose>
+        <data_key>dashboardData.card5</data_key>
+        <updates>
+          <element id="pickingRiskyCount">유의상품 총 건수</element>
+          <element id="pickingRiskyList">2열 그리드 리스트 (동적 innerHTML)</element>
+        </updates>
+        <badge_logic>
+          validityRatio &lt;= 10 → urgent (빨강)
+          validityRatio > 10 → warning (주황)
+        </badge_logic>
+        <expiry_format>YYYYMMDD → MM.DD 변환</expiry_format>
+      </function>
+      
+      <function name="updateCard6">
+        <purpose>재고현황 카드 메인 업데이트</purpose>
+        <data_key>dashboardData.card6</data_key>
+        <target>#card6Content</target>
+        <calls>
+          <call seq="1">renderTopRow(data)</call>
+          <call seq="2">renderFifoSection(data.fifo)</call>
+          <call seq="3">renderPartialShipment(data.partial)</call>
+          <call seq="4">renderDeleteStatus(data.deleteAnsan, data.deleteEumseong)</call>
+          <call seq="5">renderUnallocatedTable(data.unallocated)</call>
+        </calls>
+        <rendering_method>innerHTML 전체 교체</rendering_method>
+      </function>
+      
+      <function name="renderTopRow">
+        <purpose>총재고 + 적치율 섹션 렌더링</purpose>
+        <input>data (inventory, storageRate 포함)</input>
+        <output>HTML 문자열</output>
+      </function>
+      
+      <function name="renderFifoSection">
+        <purpose>선입선출 위반 섹션 렌더링</purpose>
+        <input>fifo 배열</input>
+        <output>HTML 문자열</output>
+        <logic>length==0 → 정상(초록), else → 위반(분홍+애니메이션)</logic>
+      </function>
+      
+      <function name="renderPartialShipment">
+        <purpose>미출/부분출고 테이블 렌더링</purpose>
+        <input>partial 배열</input>
+        <output>HTML 문자열</output>
+        <remark_logic>order_qty==0 → "미출", else → "부분출고"</remark_logic>
+      </function>
+      
+      <function name="renderDeleteStatus">
+        <purpose>삭제현황 좌우 분할 렌더링</purpose>
+        <input>deleteAnsan 배열, deleteEumseong 배열</input>
+        <output>HTML 문자열</output>
+      </function>
+      
+      <function name="renderUnallocatedTable">
+        <purpose>미할당 2열 테이블 렌더링</purpose>
+        <input>unallocated 배열</input>
+        <output>HTML 문자열</output>
+        <data_split>Math.ceil(length/2)로 좌우 분할</data_split>
+        <center_class>centerClassMap 객체로 색상 클래스 매핑</center_class>
+      </function>
+      
+    </function_list>
+    
+    <initialization_flow><![CDATA[
+// 페이지 로드 시 실행 순서
+document.addEventListener('DOMContentLoaded', function() {
+    updateTime();
+    setInterval(updateTime, 1000);
+    
+    // 카드 업데이트
+    updateCard1(dashboardData.card1);
+    updateCard2(dashboardData.card2);
+    updateCard3(dashboardData.card3);
+    updateCard5(dashboardData.card5);
+    updateCard6(dashboardData.card6);
+});
+    ]]></initialization_flow>
+    
+  </part6_javascript_system>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- PART 7. 데이터 구조 (dashboardData)                                       -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <part7_data_structure>
+    
+    <overview>
+      <variable_name>dashboardData</variable_name>
+      <location_in_html>라인 1946 근처, const dashboardData = { ... };</location_in_html>
+      <source>C:/OSIS_AUTO/scripts/v9_dashboard_data_{today}.json</source>
+      <update_method>Phase 2에서 API 호출로 대체 예정</update_method>
+    </overview>
+    
+    <full_schema><![CDATA[
+const dashboardData = {
+    // 메타 정보
+    "date": "20251124",  // YYYYMMDD 형식
+    
+    // 카드1: 입고현황
+    "card1": {
+        "totalCount": 57,           // number: 총 입고 건수
+        "progressRate": 71.9,       // number: 진척률 (0~100)
+        "inboundRiskyCount": 1,     // number: 유의상품 건수
+        "riskyItems": [             // array: 유의상품 목록
+            {
+                "productName": "상품명",
+                "inboundExpiry": "20251210",  // 입고분 소비기한
+                "stockExpiry": "20251215"     // 기존 재고 소비기한
+            }
+        ]
+    },
+    
+    // 카드2: 자사출고
+    "card2": {
+        "amount": 60609461,         // number: 출하금액 (원)
+        "compare": -29.4,           // number: 전일대비 (%)
+        "totalLabel": 5412,         // number: 총 라벨 건수
+        "unprintedLabel": 0,        // number: 미발행 라벨
+        "irregularTotal": 14,       // number: 비정형 총 건수
+        "irregularUnprinted": 9     // number: 비정형 미출력
+    },
+    
+    // 카드3: 지방출고
+    "card3": {
+        "amount": 28358148,         // number: 출하금액 (원)
+        "compare": 130.4,           // number: 전일대비 (%)
+        "unprintedPicking": 0,      // number: 미발행 피킹리스트
+        "destinations": {           // object: 13개 배송처
+            "jeju": 5,
+            "jecheon": 3,
+            "honam": 8,
+            "gumi": 2,
+            "gyeryong": 4,
+            "eumseong": 12,
+            "yongin2": 6,
+            "yongin3": 3,
+            "ansan": 15,
+            "yangsan": 7,
+            "yangsan2": 2,
+            "hanex": 4,
+            "kids": 2
+        }
+    },
+    
+    // 카드5: 피킹유의
+    "card5": {
+        "totalCount": 10,           // number: 총 유의상품 건수
+        "urgentCount": 2,           // number: 긴급 (유효비 ≤10%)
+        "warningCount": 8,          // number: 주의 (유효비 11~20%)
+        "riskyItems": [             // array: 유의상품 목록
+            {
+                "location": "K040901",
+                "productName": "상품명",
+                "expiryDate": "20251205",   // 또는 "2025-12-05"
+                "validityRatio": 8.0        // 유효유통비 (%)
+            }
+        ]
+    },
+    
+    // 카드6: 재고현황 (5개 섹션)
+    "card6": {
+        // 섹션1: 총재고 + 적치율
+        "inventory": {
+            "total_value": 17680000  // number: SUM(가용수량 × 단가)
+        },
+        "storageRate": {
+            "rate": 45.2             // number: (재고있는 상단로케이션/524) × 100
+        },
+        
+        // 섹션2: 선입선출 위반
+        "fifo": [                    // array: 위반 목록 (0건이면 빈 배열)
+            {
+                "lower": {           // 하단 (출고용) - 소비기한 더 늦음
+                    "product": "닭가슴살채",
+                    "location": "A010101",
+                    "expiry": "25.12.05"
+                },
+                "upper": {           // 상단 (보관용) - 소비기한 더 빠름
+                    "location": "B020101",
+                    "expiry": "25.12.03"
+                }
+            }
+        ],
+        
+        // 섹션3: 미출/부분출고
+        "partial": [                 // array: 미출/부분출고 목록
+            {
+                "delivery_group": "4331",
+                "delivery_name": "용인2",
+                "product_name": "(캘리)참깨소스(2kg)",
+                "unit": "EA(2kg)",
+                "original_qty": 4,   // 원주문 수량
+                "order_qty": 2       // 현재 오더 수량 (0이면 미출)
+            }
+        ],
+        
+        // 섹션4: 삭제현황
+        "deleteAnsan": [             // array: 안산 삭제 목록
+            {
+                "product_name": "상품명",
+                "unit": "EA",
+                "qty": 5
+            }
+        ],
+        "deleteEumseong": [          // array: 음성 삭제 목록
+            {
+                "product_name": "상품명",
+                "unit": "BOX",
+                "qty": 3
+            }
+        ],
+        
+        // 섹션5: 미할당 입고
+        "unallocated": [             // array: 미할당 입고 목록
+            {
+                "product_name": "상품명",
+                "unit": "EA",
+                "qty": 10,
+                "center": "안산"     // 9개 센터 중 하나
+            }
+        ]
+    }
+};
+    ]]></full_schema>
+    
+    <csv_to_card_mapping>
+      <mapping csv="inbound_status_YYYYMMDD.csv" cards="card1, card6.unallocated"/>
+      <mapping csv="outbound_all_YYYYMMDD.csv" cards="card2, card3, card6.partial"/>
+      <mapping csv="inventory_status_YYYYMMDD.csv" cards="card5, card6.inventory, card6.storageRate, card6.fifo"/>
+      <mapping csv="delete_status_YYYYMMDD.csv" cards="card6.deleteAnsan, card6.deleteEumseong"/>
+      <mapping csv="irregular_order_YYYYMMDD.csv" cards="card2.irregular*"/>
+    </csv_to_card_mapping>
+    
+  </part7_data_structure>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- PART 8. 100인치 TV 제약조건                                               -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <part8_tv_constraints>
+    
+    <display_environment>
+      <device>100인치 TV (LG 상업용 디스플레이)</device>
+      <resolution width="1920" height="1080">Full HD</resolution>
+      <viewing_distance>약 10미터</viewing_distance>
+      <interaction>없음 (터치/키보드/마우스 불가)</interaction>
+      <location>동서울물류센터 냉장파트 사무실</location>
+      <purpose>실시간 모니터링 (정보 표시 전용)</purpose>
+    </display_environment>
+    
+    <design_constraints>
+      
+      <constraint name="스크롤 금지">
+        <rule>모든 콘텐츠 한 화면에 표시</rule>
+        <css>overflow: hidden</css>
+        <reason>10m 거리에서 스크롤 조작 불가</reason>
+      </constraint>
+      
+      <constraint name="폰트 크기">
+        <rule type="대형숫자" min="72px">출하금액 등 핵심 수치</rule>
+        <rule type="헤더" min="48px">카드 타이틀</rule>
+        <rule type="본문" min="24px">일반 텍스트</rule>
+        <rule type="보조" min="18px">라벨, 작은 텍스트</rule>
+        <rule type="테이블" min="11px">카드6 테이블 (예외적 허용)</rule>
+        <reason>10m 거리에서 가독성 확보</reason>
+      </constraint>
+      
+      <constraint name="대비율">
+        <rule min="5:1">최소 대비율</rule>
+        <rule recommended="7:1">권장 대비율 (WCAG AAA)</rule>
+        <example>어두운 배경(#3B4458) + 밝은 텍스트(#FFFFFF)</example>
+      </constraint>
+      
+      <constraint name="카드 개수">
+        <rule max="12">최대 카드 수</rule>
+        <current>6개</current>
+        <reason>너무 많으면 정보 과부하</reason>
+      </constraint>
+      
+      <constraint name="색상 제한">
+        <rule>주요 색상 3~4개</rule>
+        <semantic>
+          <color meaning="정상/성공" hex="#60CB2E">초록</color>
+          <color meaning="경고/위험" hex="#F05E5E">빨강</color>
+          <color meaning="주의" hex="#F59E0B">주황</color>
+          <color meaning="정보" hex="#2563EB">파랑</color>
+        </semantic>
+      </constraint>
+      
+      <constraint name="애니메이션">
+        <allowed>깜빡임(pulse), 반짝임(shimmer)</allowed>
+        <duration min="2s">최소 2초 주기</duration>
+        <prohibited>빠른 움직임, 회전, 슬라이드</prohibited>
+        <reason>과도한 움직임은 주의 분산</reason>
+      </constraint>
+      
+      <constraint name="자동 새로고침">
+        <interval>30초</interval>
+        <method>Phase 2에서 API 폴링 또는 WebSocket</method>
+      </constraint>
+      
+    </design_constraints>
+    
+    <card6_specific_limits>
+      <limit section="선입선출" max="5">초과 시 "외 N건" 표시</limit>
+      <limit section="미출/부분출고" max="10">테이블 행 제한</limit>
+      <limit section="삭제(안산)" max="12">테이블 행 제한</limit>
+      <limit section="삭제(음성)" max="21">테이블 행 제한</limit>
+      <limit section="미할당" max="21">2열로 분산 배치</limit>
+    </card6_specific_limits>
+    
+    <test_checklist>
+      <item>□ 10m 거리에서 카드 타이틀 읽히는가?</item>
+      <item>□ 10m 거리에서 대형 숫자(출하금액) 읽히는가?</item>
+      <item>□ 카드6 테이블 내용이 식별 가능한가? (완독 불필요, 존재 인식)</item>
+      <item>□ 색상 구분이 명확한가? (빨강/초록/주황)</item>
+      <item>□ 애니메이션이 눈에 띄는가? (경고 깜빡임)</item>
+      <item>□ 스크롤 없이 모든 정보가 보이는가?</item>
+      <item>□ 30초 새로고침 시 깜빡임이 거슬리지 않는가?</item>
+    </test_checklist>
+    
+  </part8_tv_constraints>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- PART 9. Phase 2 연동 가이드                                               -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <part9_phase2_integration>
+    
+    <overview>
+      <current_state>v10.html - 정적 HTML + JavaScript (dashboardData 하드코딩)</current_state>
+      <target_state>Flask + Jinja2 템플릿 + REST API (동적 데이터)</target_state>
+      <auto_refresh>30초마다 API 호출하여 데이터 갱신</auto_refresh>
+    </overview>
+    
+    <flask_template_conversion>
+      
+      <step seq="1" name="파일 분리">
+        <from>v10.html (단일 파일)</from>
+        <to>
+          <file>templates/v10.html (Jinja2 템플릿)</file>
+          <file>static/css/v10.css (스타일)</file>
+          <file>static/js/v10.js (JavaScript)</file>
+        </to>
+      </step>
+      
+      <step seq="2" name="API 엔드포인트 생성">
+        <endpoint method="GET" path="/api/dashboard">/api/dashboard</endpoint>
+        <response>dashboardData JSON 전체 반환</response>
+        <example_code><![CDATA[
+@app.route('/api/dashboard')
+def get_dashboard():
+    data = load_dashboard_data()  # CSV 읽어서 계산
+    return jsonify(data)
+        ]]></example_code>
+      </step>
+      
+      <step seq="3" name="JavaScript 수정">
+        <change>dashboardData 하드코딩 → fetch() API 호출</change>
+        <auto_refresh>setInterval(fetchData, 30000)</auto_refresh>
+        <example_code><![CDATA[
+async function fetchDashboardData() {
+    try {
+        const response = await fetch('/api/dashboard');
+        const data = await response.json();
+        
+        updateCard1(data.card1);
+        updateCard2(data.card2);
+        updateCard3(data.card3);
+        updateCard5(data.card5);
+        updateCard6(data.card6);
+        
+        updateLastRefreshTime();
+    } catch (error) {
+        console.error('데이터 로드 실패:', error);
+    }
+}
+
+// 페이지 로드 시 + 30초마다
+fetchDashboardData();
+setInterval(fetchDashboardData, 30000);
+        ]]></example_code>
+      </step>
+      
+      <step seq="4" name="Jinja2 변환 (선택적)">
+        <note>클라이언트 렌더링(현재) vs 서버 렌더링(Jinja2) 선택</note>
+        <recommendation>현재 JavaScript 렌더링 유지 권장 (변경 최소화)</recommendation>
+        <jinja2_example><![CDATA[
+<!-- 서버 렌더링 시 예시 -->
+<span id="totalCount">{{ card1.totalCount }}</span>
+<span id="progressRate">{{ card1.progressRate }}</span>
+
+{% for item in card5.riskyItems %}
+<div class="risky-item">
+    <span class="picking-badge {{ 'urgent' if item.validityRatio <= 10 else 'warning' }}">
+        {{ item.validityRatio }}%
+    </span>
+    <span class="picking-name">{{ item.productName }}</span>
+</div>
+{% endfor %}
+        ]]></jinja2_example>
+      </step>
+      
+    </flask_template_conversion>
+    
+    <backend_integration>
+      <collector_path>C:\OSIS_AUTO\</collector_path>
+      <collectors>
+        <collector name="InboundCollector" file="inbound_status.py" output="inbound_status_YYYYMMDD.csv"/>
+        <collector name="OutboundCollector" file="collect_outbound_status.py" output="outbound_all_YYYYMMDD.csv"/>
+        <collector name="InventoryCollector" file="inventory_status.py" output="inventory_status_YYYYMMDD.csv"/>
+        <collector name="DeleteCollector" file="delete_status.py" output="delete_status_YYYYMMDD.csv"/>
+        <collector name="IrregularCollector" file="irregular_order_status.py" output="irregular_order_YYYYMMDD.csv"/>
+      </collectors>
+      <scheduler>Windows Task Scheduler 또는 NSSM 서비스</scheduler>
+      <interval>1~10분마다 실행</interval>
+    </backend_integration>
+    
+    <api_endpoints_plan>
+      <endpoint path="/api/dashboard" method="GET">전체 대시보드 데이터</endpoint>
+      <endpoint path="/api/card1" method="GET">입고현황만</endpoint>
+      <endpoint path="/api/card2" method="GET">자사출고만</endpoint>
+      <endpoint path="/api/card3" method="GET">지방출고만</endpoint>
+      <endpoint path="/api/card5" method="GET">피킹유의만</endpoint>
+      <endpoint path="/api/card6" method="GET">재고현황만</endpoint>
+      <endpoint path="/api/health" method="GET">서버 상태 체크</endpoint>
+    </api_endpoints_plan>
+    
+    <deployment_plan>
+      <step seq="1">Flask 앱 개발 (app.py)</step>
+      <step seq="2">로컬 테스트 (flask run)</step>
+      <step seq="3">Docker 컨테이너화 (Dockerfile, docker-compose.yml)</step>
+      <step seq="4">프로덕션 배포 (10.60.27.130:8080)</step>
+      <step seq="5">Windows 서비스 등록 (NSSM)</step>
+    </deployment_plan>
+    
+    <important_notes>
+      <note priority="1">
+        카드6 미발행 피킹리스트 계산 주의!
+        ❌ 잘못: len(data[data['피킹리스트']=='N'])
+        ✅ 올바름: len(data[(data['피킹리스트']=='N') &amp; (data['오더수량'] > 0)])
+      </note>
+      <note priority="2">
+        CSS 파일 분리 시 #card6 스코프 유지 필수
+      </note>
+      <note priority="3">
+        API 응답 시간 1초 이내 유지 (TV 새로고침 원활)
+      </note>
+    </important_notes>
+    
+  </part9_phase2_integration>
+
+</v10_layout_specification>

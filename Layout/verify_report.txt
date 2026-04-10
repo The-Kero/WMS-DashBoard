@@ -1,0 +1,86 @@
+================================================================================
+HTML ID Change Verification Report
+================================================================================
+
+[ 1. File Size Verification ]
+Backup file: 60,414 bytes
+New file: 60,414 bytes
+Difference: +0 bytes
+PASS: File size identical (only string length changed)
+
+[ 2. Card Container ID Verification ]
+--------------------------------------------------------------------------------
+Card       Backup          New             Status              
+--------------------------------------------------------------------------------
+card1     0               1               PASS
+card2     1               1               PASS
+card3     1               1               PASS
+card4     1               1               PASS
+card5     1               1               PASS
+card6     1               0               PASS
+
+[ 3. Element ID Change Verification ]
+
+3-1. card1 (Inbound) - originally card2
+  Found IDs: 1
+    - card1
+
+3-2. card2 (Company Outbound) - originally card5
+  Found IDs: 9
+    - card2
+    - card2AmountCompare
+    - card2AmountValue
+    - card2CompareIcon
+    - card2CompareValue
+    - card2IrregularTotal
+    - card2IrregularUnprinted
+    - card2TotalLabel
+    - card2UnprintedLabel
+
+3-3. card3 (Regional Outbound) - originally card6
+  Found IDs: 7
+    - card3
+    - card3AmountCompare
+    - card3AmountValue
+    - card3CompareIcon
+    - card3CompareValue
+    - card3DestinationList
+    - card3PickingValue
+
+3-4. card4 (Schedule) - kept
+  Found IDs: 1
+    - card4
+
+3-5. card5 (Caution Items) - originally card3
+  Found IDs: 1
+    - card5
+
+3-6. card6 (Deleted)
+  PASS: card6 completely removed
+
+[ 4. CSS Class Verification ]
+Backup: card3-wide = 2
+New: card3-wide = 0
+New: card5-wide = 2
+PASS: card3-wide -> card5-wide changed
+
+[ 5. Temporary Name Removal Verification ]
+PASS: 'TEMP' not found
+PASS: 'CARDTEMP' not found
+PASS: 'card2_NEW' not found
+PASS: 'card3_TEMP' not found
+
+================================================================================
+[ Final Verdict ]
+================================================================================
+PASS: card1 container: 1
+PASS: card2 IDs: 9 (container + 8 elements)
+PASS: card3 IDs: 7 (container + 6 elements)
+PASS: card4 container: 1
+PASS: card5 container: 1
+PASS: card6 completely removed
+PASS: CSS class changed
+PASS: Temp names removed
+
+SUCCESS! All verifications passed! HTML ID change complete!
+================================================================================

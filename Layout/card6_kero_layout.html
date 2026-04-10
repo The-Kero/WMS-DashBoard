@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카드6 케로님 레이아웃</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background: #E8EAED;
+            padding: 20px;
+        }
+        
+        /* 컨트롤 패널 */
+        .control-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .control-panel h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #3B4458;
+        }
+        
+        .control-panel p {
+            color: #6B7280;
+            margin-bottom: 10px;
+        }
+        
+        .time-toggle {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        
+        .time-btn {
+            padding: 6px 10px;
+            background: #E8EAED;
+            border: 2px solid #9CA3AF;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .time-btn:hover {
+            background: #D1D5DB;
+        }
+        
+        .time-btn.active {
+            background: #3B4458;
+            color: white;
+            border-color: #3B4458;
+        }
+        
+        .test-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .test-row-label {
+            width: 120px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4B5563;
+        }
+
+        /* 카드6 컨테이너 */
+        .card6-container {
+            width: 740px;
+            height: 980px;
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            margin: 0 auto;
+        }
+        
+        .card6-title {
+            font-size: 26px;
+            color: #3B4458;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .card6-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            height: calc(100% - 50px);
+        }
+        
+        /* 섹션 공통 스타일 (레이아웃7 기반) */
+        .section {
+            border-radius: 0;
+            background: transparent;
+            border-bottom: 3px solid #E5E7EB;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #4B5563;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1F2937;
+        }
+
+        /* 섹션1: 총재고 + 적치율 (최상단 한 줄) */
+        .section-top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 10px;
+            border-bottom: 3px solid #E5E7EB;
+            background: #F8FAFC;
+        }
+        
+        .section-top-row .top-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-top-row .top-item-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3B4458;
+        }
+        
+        .section-top-row .top-item-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #2563EB;
+        }
+        
+        .section-top-row .divider {
+            width: 2px;
+            height: 30px;
+            background: #D1D5DB;
+        }
+        
+        /* 선입선출 위반 강조 */
+        .section-fifo {
+            background: #FEE2E2;
+            border: 3px solid #EF4444;
+            border-radius: 8px;
+            animation: pulse-fifo 2s infinite;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        
+        .section-fifo .section-title {
+            color: #DC2626;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .section-fifo-normal {
+            background: #D1FAE5;
+            border: 2px solid #10B981;
+            border-radius: 8px;
+            margin: 10px 0;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        @keyframes pulse-fifo {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+
+        /* 선입선출 심플 리스트 */
+        .fifo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .fifo-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .fifo-item .product-name {
+            width: 200px;
+            font-weight: 700;
+            color: #DC2626;
+            padding-right: 10px;
+            border-right: 1px solid #F87171;
+        }
+        
+        .fifo-item .left-section {
+            width: 180px;
+            padding-left: 10px;
+            color: #374151;
+            text-align: left;
+        }
+        
+        .fifo-item .arrow {
+            width: 40px;
+            text-align: center;
+            color: #DC2626;
+            font-weight: 700;
+            margin-left: 10px;
+            margin-right: 20px;
+        }
+        
+        .fifo-item .right-section {
+            width: 180px;
+            color: #374151;
+            text-align: left;
+        }
+        
+        /* 18시 이전 안내 문구 */
+        .before-18-notice {
+            background: #F3F4F6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            color: #9CA3AF;
+            font-size: 16px;
+        }
+        
+        .before-18-notice .icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        /* 미출/부분출고 테이블 */
+        .partial-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            border: 1px solid #D1D5DB;
+        }
+        
+        .partial-table th {
+            background: #F3F4F6;
+            color: #4B5563;
+            font-weight: 600;
+            padding: 6px 4px;
+            border: 1px solid #D1D5DB;
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        .partial-table td {
+            padding: 5px 4px;
+            border: 1px solid #E5E7EB;
+            color: #374151;
+            text-align: center;
+        }
+        
+        .partial-table td.left {
+            text-align: left;
+        }
+        
+        .partial-table td.right {
+            text-align: right;
+        }
+        
+        .partial-table .shortage {
+            color: #DC2626;
+            font-weight: 700;
+        }
+        
+        .partial-table .partial {
+            color: #F59E0B;
+            font-weight: 700;
+        }
+
+        /* 삭제 현황 테이블 */
+        .delete-container {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .delete-group {
+            flex: 1;
+        }
+        
+        .delete-group-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        .delete-group-title.ansan {
+            color: #2563EB;
+        }
+        
+        .delete-group-title.eumseong {
+            color: #059669;
+        }
+        
+        .delete-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            border: 1px solid #D1D5DB;
+        }
+        
+        .delete-table th {
+            background: #F3F4F6;
+            color: #4B5563;
+            font-weight: 600;
+            padding: 6px 4px;
+            border: 1px solid #D1D5DB;
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        .delete-table td {
+            padding: 5px 4px;
+            border: 1px solid #E5E7EB;
+            color: #374151;
+            text-align: center;
+        }
+        
+        .delete-table td.left {
+            text-align: left;
+        }
+        
+        .delete-table td.right {
+            text-align: right;
+        }
+        
+        /* 미할당 입고현황 */
+        .unallocated-section {
+            flex-grow: 1;
+            padding: 10px;
+            border-top: 3px solid #E5E7EB;
+        }
+        
+        /* 방안2: 2열 테이블 */
+        .unallocated-tables {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .unallocated-tables .table-col {
+            flex: 1;
+        }
+        
+        .unallocated-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        
+        .unallocated-table th,
+        .unallocated-table td {
+            text-align: center;
+        }
+        
+        .unallocated-table th {
+            background: #F3F4F6;
+            padding: 4px 3px;
+            border: 1px solid #D1D5DB;
+            font-weight: 600;
+            color: #4B5563;
+            white-space: nowrap;
+        }
+        
+        .unallocated-table td {
+            padding: 3px;
+            border: 1px solid #E5E7EB;
+            color: #374151;
+        }
+        
+        /* 컬럼 폭 지정 */
+        .unallocated-table th:nth-child(1),
+        .unallocated-table td:nth-child(1) { width: auto; } /* 상품명 - 나머지 공간 */
+        
+        .unallocated-table th:nth-child(2),
+        .unallocated-table td:nth-child(2) { width: 60px; } /* 단위 */
+        
+        .unallocated-table th:nth-child(3),
+        .unallocated-table td:nth-child(3) { width: 35px; } /* 수량 */
+        
+        .unallocated-table th:nth-child(4),
+        .unallocated-table td:nth-child(4) { width: 40px; } /* 센터 */
+        
+        .unallocated-table .center-ansan {
+            color: #2563EB;
+            font-weight: 600;
+        }
+        
+        .unallocated-table .center-eumseong {
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        .unallocated-table .center-jeju {
+            color: #EA580C;
+            font-weight: 600;
+        }
+        
+        .unallocated-table .center-jecheon {
+            color: #7C3AED;
+            font-weight: 600;
+        }
+        
+        .unallocated-table .center-honam {
+            color: #DB2777;
+            font-weight: 600;
+        }
+        
+        .unallocated-table .center-gumi {
+            color: #0891B2;
+            font-weight: 600;
+        }
+        
+        .unallocated-table .center-gyeryong {
+            color: #B45309;
+            font-weight: 600;
+        }
+        
+        .unallocated-table .center-yongin {
+            color: #4338CA;
+            font-weight: 600;
+        }
+        
+        .unallocated-table .center-yangsan {
+            color: #65A30D;
+            font-weight: 600;
+        }
+        
+        .unallocated-table .qty {
+            text-align: right;
+            font-weight: 700;
+            color: #DC2626;
+        }
+        
+        /* 방안3: 초컴팩트 리스트 */
+        .unallocated-compact {
+            font-size: 12px;
+            line-height: 1.8;
+        }
+        
+        .unallocated-compact .compact-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px 15px;
+        }
+        
+        .unallocated-compact .compact-item {
+            white-space: nowrap;
+        }
+        
+        .unallocated-compact .compact-item .code {
+            color: #6B7280;
+        }
+        
+        .unallocated-compact .compact-item .name {
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .unallocated-compact .compact-item .qty {
+            color: #DC2626;
+            font-weight: 700;
+        }
+        
+        .unallocated-compact .compact-item .badge {
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .unallocated-compact .compact-item .badge.ansan {
+            background: #2563EB;
+        }
+        
+        .unallocated-compact .compact-item .badge.eumseong {
+            background: #059669;
+        }
+        
+        .unallocated-compact .compact-item .badge.jeju {
+            background: #EA580C;
+        }
+        
+        .unallocated-compact .compact-item .badge.jecheon {
+            background: #7C3AED;
+        }
+        
+        .unallocated-compact .compact-item .badge.honam {
+            background: #DB2777;
+        }
+        
+        .unallocated-compact .compact-item .badge.gumi {
+            background: #0891B2;
+        }
+        
+        .unallocated-compact .compact-item .badge.gyeryong {
+            background: #B45309;
+        }
+        
+        .unallocated-compact .compact-item .badge.yongin {
+            background: #4338CA;
+        }
+        
+        .unallocated-compact .compact-item .badge.yangsan {
+            background: #65A30D;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- 컨트롤 패널 -->
+    <div class="control-panel">
+        <h1>📦 카드6 테스트 패널</h1>
+        <p>각 섹션별 건수를 선택하여 레이아웃 테스트</p>
+        
+        <!-- 선입선출 -->
+        <div class="test-row" data-section="fifo">
+            <span class="test-row-label">⚠️ 선입선출:</span>
+            <div class="time-toggle">
+                <button class="time-btn active" onclick="setFifo(0)">0건</button>
+                <button class="time-btn" onclick="setFifo(1)">1건</button>
+                <button class="time-btn" onclick="setFifo(2)">2건</button>
+                <button class="time-btn" onclick="setFifo(3)">3건</button>
+                <button class="time-btn" onclick="setFifo(4)">4건</button>
+                <button class="time-btn" onclick="setFifo(5)">5건</button>
+            </div>
+        </div>
+        
+        <!-- 미출/부분출고 -->
+        <div class="test-row" data-section="partial">
+            <span class="test-row-label">🔔 미출/부분:</span>
+            <div class="time-toggle">
+                <button class="time-btn active" onclick="setPartial(0)">0건</button>
+                <button class="time-btn" onclick="setPartial(1)">1건</button>
+                <button class="time-btn" onclick="setPartial(2)">2건</button>
+                <button class="time-btn" onclick="setPartial(3)">3건</button>
+                <button class="time-btn" onclick="setPartial(4)">4건</button>
+                <button class="time-btn" onclick="setPartial(5)">5건</button>
+            </div>
+        </div>
+        
+        <!-- 삭제 안산 -->
+        <div class="test-row" data-section="deleteAnsan">
+            <span class="test-row-label">🗑️ 삭제(안산):</span>
+            <div class="time-toggle">
+                <button class="time-btn active" onclick="setDeleteAnsan(0)">0건</button>
+                <button class="time-btn" onclick="setDeleteAnsan(1)">1건</button>
+                <button class="time-btn" onclick="setDeleteAnsan(2)">2건</button>
+                <button class="time-btn" onclick="setDeleteAnsan(3)">3건</button>
+                <button class="time-btn" onclick="setDeleteAnsan(4)">4건</button>
+                <button class="time-btn" onclick="setDeleteAnsan(5)">5건</button>
+            </div>
+        </div>
+        
+        <!-- 삭제 음성 -->
+        <div class="test-row" data-section="deleteEumseong">
+            <span class="test-row-label">🗑️ 삭제(음성):</span>
+            <div class="time-toggle">
+                <button class="time-btn active" onclick="setDeleteEumseong(0)">0건</button>
+                <button class="time-btn" onclick="setDeleteEumseong(1)">1건</button>
+                <button class="time-btn" onclick="setDeleteEumseong(2)">2건</button>
+                <button class="time-btn" onclick="setDeleteEumseong(3)">3건</button>
+                <button class="time-btn" onclick="setDeleteEumseong(4)">4건</button>
+                <button class="time-btn" onclick="setDeleteEumseong(5)">5건</button>
+            </div>
+        </div>
+        
+        <!-- 미할당 입고 -->
+        <div class="test-row" data-section="unallocated">
+            <span class="test-row-label">📦 미할당:</span>
+            <div class="time-toggle">
+                <button class="time-btn active" onclick="setUnallocated(0)">0건</button>
+                <button class="time-btn" onclick="setUnallocated(2)">2건</button>
+                <button class="time-btn" onclick="setUnallocated(5)">5건</button>
+                <button class="time-btn" onclick="setUnallocated(10)">10건</button>
+                <button class="time-btn" onclick="setUnallocated(15)">15건</button>
+                <button class="time-btn" onclick="setUnallocated(21)">21건</button>
+            </div>
+        </div>
+        
+        <!-- 미할당 레이아웃 타입 -->
+        <div class="test-row" data-section="unallocatedType">
+            <span class="test-row-label">📐 미할당 타입:</span>
+            <div class="time-toggle">
+                <button class="time-btn active" onclick="setUnallocatedType('table')">2열 테이블</button>
+                <button class="time-btn" onclick="setUnallocatedType('compact')">컴팩트</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 카드6 컨테이너 -->
+    <div class="card6-container" id="card6">
+        <h2 class="card6-title">📦 금일 재고 현황</h2>
+        <div class="card6-content" id="card6Content">
+            <!-- JavaScript로 동적 생성 -->
+        </div>
+    </div>
+    
+    <script>
+        // 샘플 데이터 풀 (각 5건씩)
+        const dataPool = {
+            inventory: { total_value: 17680000 },
+            storageRate: { rate: 45.2 },
+            fifo: [
+                { lower: { location: "A010101", product: "닭가슴살채", expiry: "25.12.05" }, upper: { location: "B020101", expiry: "25.12.03" } },
+                { lower: { location: "C030201", product: "보쌈수소스", expiry: "25.12.08" }, upper: { location: "D040301", expiry: "25.12.01" } },
+                { lower: { location: "E050101", product: "간장소스", expiry: "25.12.10" }, upper: { location: "F060201", expiry: "25.12.02" } },
+                { lower: { location: "G070101", product: "돈카츠소스", expiry: "25.12.12" }, upper: { location: "H080201", expiry: "25.12.04" } },
+                { lower: { location: "I090101", product: "우동소스", expiry: "25.12.15" }, upper: { location: "J100201", expiry: "25.12.06" } }
+            ],
+            partial: [
+                { delivery_group: "4331", delivery_name: "용인2", product_name: "(캘리)참깨소스(2kg)", unit: "EA(2kg)", original_qty: 4, order_qty: 2 },
+                { delivery_group: "1114", delivery_name: "사보텐건대", product_name: "(캘리)우동소스", unit: "EA(2kg)", original_qty: 2, order_qty: 0 },
+                { delivery_group: "2209", delivery_name: "사보텐교대", product_name: "(캘리)우동소스", unit: "EA(2kg)", original_qty: 2, order_qty: 1 },
+                { delivery_group: "2201", delivery_name: "히바린IFC", product_name: "(캘리)돈카츠소스", unit: "EA(2kg)", original_qty: 3, order_qty: 0 },
+                { delivery_group: "2203", delivery_name: "히바린타임스퀘어", product_name: "(캘리)돈카츠소스", unit: "EA(2kg)", original_qty: 3, order_qty: 2 }
+            ],
+            deleteAnsan: [
+                { name: "닭가슴살채", unit: "EA", count: 2 },
+                { name: "보쌈수소스", unit: "PK", count: 3 },
+                { name: "간장소스우불고기", unit: "EA", count: 1 },
+                { name: "돈카츠소스", unit: "BOX", count: 4 },
+                { name: "참깨소스", unit: "EA", count: 2 }
+            ],
+            deleteEumseong: [
+                { name: "프레시쿠팡용", unit: "BOX", count: 5 },
+                { name: "이랜드용", unit: "EA", count: 2 },
+                { name: "군납용소스", unit: "PK", count: 3 },
+                { name: "특판전용", unit: "EA", count: 1 },
+                { name: "신규거래처용", unit: "BOX", count: 4 }
+            ],
+            unallocated: [
+                { code: "51003203", name: "(캘리)참깨소스", unit: "EA(2kg)", qty: 15, center: "안산" },
+                { code: "51003043", name: "(캘리)우동소스", unit: "EA(2kg)", qty: 8, center: "음성" },
+                { code: "51003111", name: "(캘리)돈카츠소스", unit: "EA(2kg)", qty: 12, center: "제주" },
+                { code: "51003055", name: "(캘리)간장소스", unit: "PK(1kg)", qty: 20, center: "제천" },
+                { code: "51003088", name: "보쌈수육소스", unit: "BOX(5kg)", qty: 5, center: "호남" },
+                { code: "51003101", name: "닭가슴살채", unit: "EA(500g)", qty: 30, center: "구미" },
+                { code: "51003122", name: "떡볶이소스", unit: "PK(2kg)", qty: 18, center: "계룡" },
+                { code: "51003133", name: "짜장소스", unit: "EA(3kg)", qty: 10, center: "용인" },
+                { code: "51003144", name: "카레소스", unit: "BOX(2kg)", qty: 25, center: "양산" },
+                { code: "51003155", name: "데미글라스", unit: "EA(1kg)", qty: 7, center: "안산" },
+                { code: "51003166", name: "토마토소스", unit: "PK(2kg)", qty: 14, center: "음성" },
+                { code: "51003177", name: "크림소스", unit: "EA(1kg)", qty: 9, center: "제주" },
+                { code: "51003188", name: "머스타드", unit: "BOX(500g)", qty: 22, center: "제천" },
+                { code: "51003199", name: "와사비소스", unit: "EA(300g)", qty: 16, center: "호남" },
+                { code: "51003210", name: "칠리소스", unit: "PK(1kg)", qty: 11, center: "구미" },
+                { code: "51003221", name: "마요네즈", unit: "EA(2kg)", qty: 28, center: "계룡" },
+                { code: "51003232", name: "타르타르", unit: "BOX(1kg)", qty: 6, center: "용인" },
+                { code: "51003243", name: "사우전드", unit: "EA(500g)", qty: 19, center: "양산" },
+                { code: "51003254", name: "시저드레싱", unit: "PK(1kg)", qty: 13, center: "제주" },
+                { code: "51003265", name: "발사믹", unit: "EA(500ml)", qty: 8, center: "호남" },
+                { code: "51003276", name: "올리브오일", unit: "BOX(1L)", qty: 17, center: "구미" }
+            ]
+        };
+
+        // 현재 선택된 건수 상태
+        let currentCount = { fifo: 0, partial: 0, deleteAnsan: 0, deleteEumseong: 0, unallocated: 0 };
+        let unallocatedType = 'table'; // 'table' 또는 'compact'
+
+        // 버튼 활성화 헬퍼
+        function activateButton(section, count) {
+            const buttons = document.querySelectorAll(`.test-row[data-section="${section}"] .time-btn`);
+            buttons.forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === count);
+            });
+        }
+
+        // 선입선출 건수 변경
+        function setFifo(count) {
+            currentCount.fifo = count;
+            activateButton('fifo', count);
+            renderLayout();
+        }
+
+        // 미출/부분출고 건수 변경
+        function setPartial(count) {
+            currentCount.partial = count;
+            activateButton('partial', count);
+            renderLayout();
+        }
+
+        // 삭제(안산) 건수 변경
+        function setDeleteAnsan(count) {
+            currentCount.deleteAnsan = count;
+            activateButton('deleteAnsan', count);
+            renderLayout();
+        }
+
+        // 삭제(음성) 건수 변경
+        function setDeleteEumseong(count) {
+            currentCount.deleteEumseong = count;
+            activateButton('deleteEumseong', count);
+            renderLayout();
+        }
+
+        // 미할당 건수 변경
+        function setUnallocated(count) {
+            currentCount.unallocated = count;
+            // 미할당은 버튼 값이 불규칙(0,2,5,10,15,21)이므로 별도 처리
+            const countMap = {0:0, 2:1, 5:2, 10:3, 15:4, 21:5};
+            const buttons = document.querySelectorAll('.test-row[data-section="unallocated"] .time-btn');
+            buttons.forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === countMap[count]);
+            });
+            renderLayout();
+        }
+
+        // 미할당 레이아웃 타입 변경
+        function setUnallocatedType(type) {
+            unallocatedType = type;
+            const buttons = document.querySelectorAll('.test-row[data-section="unallocatedType"] .time-btn');
+            buttons.forEach((btn, idx) => {
+                btn.classList.toggle('active', (type === 'table' && idx === 0) || (type === 'compact' && idx === 1));
+            });
+            renderLayout();
+        }
+
+        // 레이아웃 렌더링
+        function renderLayout() {
+            const container = document.getElementById('card6Content');
+            container.innerHTML = '';
+            container.innerHTML += renderTopRow();
+            container.innerHTML += renderFifoSection();
+            container.innerHTML += renderPartialShipment();
+            container.innerHTML += renderDeleteStatus();
+            container.innerHTML += renderUnallocated();
+        }
+
+        // 1. 최상단: 총재고 + 적치율
+        function renderTopRow() {
+            const formatted = dataPool.inventory.total_value.toLocaleString('ko-KR');
+            return `
+                <div class="section-top-row">
+                    <div class="top-item">
+                        <span class="top-item-title">💰 총 재고</span>
+                        <span class="top-item-value">${formatted} 원</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="top-item">
+                        <span class="top-item-title">📊 상단 적치율</span>
+                        <span class="top-item-value">${dataPool.storageRate.rate}%</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 2. 선입선출 위반
+        function renderFifoSection() {
+            const data = dataPool.fifo.slice(0, currentCount.fifo);
+            if (data.length === 0) {
+                return `
+                    <div class="section-fifo-normal">
+                        <div class="section-title">⚠️ 선입선출 위반 상품</div>
+                        <div class="section-value" style="color: #10B981;">✅ 정상 진행중</div>
+                    </div>
+                `;
+            }
+            const items = data.map(item => `
+                <div class="fifo-item">
+                    <span class="product-name">🔴 ${item.lower.product}</span>
+                    <span class="left-section">[하단] ${item.lower.location} (${item.lower.expiry})</span>
+                    <span class="arrow">→</span>
+                    <span class="right-section">[상단] ${item.upper.location} (${item.upper.expiry})</span>
+                </div>
+            `).join('');
+            return `
+                <div class="section-fifo">
+                    <div class="section-title">⚠️ 선입선출 위반 상품 (${data.length}건)</div>
+                    <div class="fifo-list">${items}</div>
+                </div>
+            `;
+        }
+
+        // 3. 미출/부분출고
+        function renderPartialShipment() {
+            const data = dataPool.partial.slice(0, currentCount.partial);
+            if (data.length === 0) {
+                return `
+                    <div class="section">
+                        <div class="section-title">🔔 미출/부분출고 내역</div>
+                        <div class="section-value" style="color: #6B7280; font-size: 16px;">내역 없음</div>
+                    </div>
+                `;
+            }
+            const rows = data.map(item => {
+                const remark = item.order_qty >= 1 ? '부분출고' : '미출';
+                const remarkClass = item.order_qty >= 1 ? 'partial' : 'shortage';
+                return `<tr><td>${item.delivery_group}</td><td class="left">${item.delivery_name}</td><td class="left">${item.product_name}</td><td>${item.unit}</td><td class="right">${item.original_qty}</td><td class="right">${item.order_qty}</td><td class="${remarkClass}">${remark}</td></tr>`;
+            }).join('');
+            return `
+                <div class="section">
+                    <div class="section-title">🔔 미출/부분출고 (${data.length}건)</div>
+                    <table class="partial-table">
+                        <thead><tr><th>배송군</th><th>배송처명</th><th>상품명</th><th>단위</th><th>원주문</th><th>오더</th><th>비고</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // 4. 삭제 현황
+        function renderDeleteStatus() {
+            const ansan = dataPool.deleteAnsan.slice(0, currentCount.deleteAnsan);
+            const eumseong = dataPool.deleteEumseong.slice(0, currentCount.deleteEumseong);
+            const totalCount = ansan.length + eumseong.length;
+            
+            if (totalCount === 0) {
+                return `
+                    <div class="section">
+                        <div class="section-title">🗑️ 금일 삭제 현황</div>
+                        <div class="section-value" style="color: #6B7280; font-size: 16px;">내역 없음</div>
+                    </div>
+                `;
+            }
+            
+            const ansanRows = ansan.length > 0 ? ansan.map(item => `<tr><td class="left">${item.name}</td><td>${item.unit}</td><td class="right">${item.count}</td></tr>`).join('') : '<tr><td colspan="3" style="color:#9CA3AF;">내역 없음</td></tr>';
+            const eumseongRows = eumseong.length > 0 ? eumseong.map(item => `<tr><td class="left">${item.name}</td><td>${item.unit}</td><td class="right">${item.count}</td></tr>`).join('') : '<tr><td colspan="3" style="color:#9CA3AF;">내역 없음</td></tr>';
+            
+            return `
+                <div class="section">
+                    <div class="section-title">🗑️ 금일 삭제 현황 (${totalCount}건)</div>
+                    <div class="delete-container">
+                        <div class="delete-group">
+                            <div class="delete-group-title ansan">📍 안산 (${ansan.length}건)</div>
+                            <table class="delete-table"><thead><tr><th>상품명</th><th>단위</th><th>수량</th></tr></thead><tbody>${ansanRows}</tbody></table>
+                        </div>
+                        <div class="delete-group">
+                            <div class="delete-group-title eumseong">📍 음성 (${eumseong.length}건)</div>
+                            <table class="delete-table"><thead><tr><th>상품명</th><th>단위</th><th>수량</th></tr></thead><tbody>${eumseongRows}</tbody></table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 5. 미할당 입고현황
+        function renderUnallocated() {
+            const data = dataPool.unallocated.slice(0, currentCount.unallocated);
+            
+            if (data.length === 0) {
+                return `
+                    <div class="unallocated-section">
+                        <div class="section-title">📦 미할당 상품 입고현황</div>
+                        <div class="section-value" style="color: #6B7280; font-size: 16px;">내역 없음</div>
+                    </div>
+                `;
+            }
+            
+            if (unallocatedType === 'table') {
+                return renderUnallocatedTable(data);
+            } else {
+                return renderUnallocatedCompact(data);
+            }
+        }
+        
+        // 센터명 → 클래스명 매핑
+        const centerClassMap = {
+            '안산': 'ansan', '음성': 'eumseong', '제주': 'jeju', '제천': 'jecheon',
+            '호남': 'honam', '구미': 'gumi', '계룡': 'gyeryong', '용인': 'yongin', '양산': 'yangsan'
+        };
+        
+        // 방안2: 2열 테이블
+        function renderUnallocatedTable(data) {
+            const mid = Math.ceil(data.length / 2);
+            const leftData = data.slice(0, mid);
+            const rightData = data.slice(mid);
+            
+            const makeRows = (items) => items.map(item => {
+                const centerClass = 'center-' + (centerClassMap[item.center] || 'ansan');
+                return `<tr><td>${item.name}</td><td>${item.unit}</td><td class="qty">${item.qty}</td><td class="center ${centerClass}">${item.center}</td></tr>`;
+            }).join('');
+            
+            const leftRows = makeRows(leftData);
+            const rightRows = rightData.length > 0 ? makeRows(rightData) : '<tr><td colspan="4" style="color:#9CA3AF;text-align:center;">-</td></tr>';
+            
+            return `
+                <div class="unallocated-section">
+                    <div class="section-title">📦 미할당 상품 입고현황 (${data.length}건)</div>
+                    <div class="unallocated-tables">
+                        <div class="table-col">
+                            <table class="unallocated-table">
+                                <thead><tr><th>상품명</th><th>단위</th><th>수량</th><th>센터</th></tr></thead>
+                                <tbody>${leftRows}</tbody>
+                            </table>
+                        </div>
+                        <div class="table-col">
+                            <table class="unallocated-table">
+                                <thead><tr><th>상품명</th><th>단위</th><th>수량</th><th>센터</th></tr></thead>
+                                <tbody>${rightRows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 방안3: 컴팩트 리스트
+        function renderUnallocatedCompact(data) {
+            const items = data.map(item => {
+                const badgeClass = centerClassMap[item.center] || 'ansan';
+                return `<span class="compact-item"><span class="code">${item.code}</span> <span class="name">${item.name}</span> <span class="qty">${item.qty}개</span> <span class="badge ${badgeClass}">${item.center}</span></span>`;
+            }).join('');
+            
+            return `
+                <div class="unallocated-section">
+                    <div class="section-title">📦 미할당 상품 입고현황 (${data.length}건)</div>
+                    <div class="unallocated-compact">
+                        <div class="compact-row">${items}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 초기화
+        window.addEventListener('DOMContentLoaded', renderLayout);
+    </script>
+</body>
+</html>

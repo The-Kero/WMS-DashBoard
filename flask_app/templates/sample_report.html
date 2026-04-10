@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0, user-scalable=no">
+    <title>WMS 동서울물류센터 냉장파트 - 샘플</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Malgun Gothic', sans-serif; background: #E8EAED; width: 1920px; height: 1080px; overflow: hidden; }
+        
+        /* 헤더 */
+        .header { background: #3B4458; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; }
+        .header .leftSection { display: flex; align-items: center; gap: 15px; flex: 1; }
+        .header .logo { height: 40px; width: auto; }
+        .header h1 { font-size: 24px; color: #FFFFFF; font-weight: bold; }
+        .header .centerSection { position: absolute; left: 50%; transform: translateX(-50%); }
+        .header .time { font-size: 20px; color: #FFFFFF; font-weight: bold; }
+        .system-status { display: flex; align-items: center; gap: 10px; }
+        .system-status .status-label { font-size: 14px; color: #999; }
+        .signal-lights { display: flex; gap: 6px; }
+        .system-status .update-time { font-size: 14px; color: #B0B8C4; }
+        .signal { width: 16px; height: 16px; border-radius: 50%; }
+        .signal.red { background: #5C1F1F; }
+        .signal.orange { background: #5C3D1F; }
+        .signal.green { background: #1F5C2E; }
+        .signal.green.on { background: radial-gradient(circle at 30% 30%, #90EE90, #00CC44); box-shadow: 0 0 8px #00CC44; }
+        
+        /* 메인 */
+        .mainList { padding: 20px; height: calc(1080px - 60px); display: flex; gap: 20px; }
+        .leftSection-main, .rightSection-main { flex: 1; display: flex; flex-direction: column; }
+        .gaugeItem { background: #FFFFFF; border: 2px solid #D1D5DB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; height: 100%; }
+        .gaugeItem h2 { font-size: 22px; color: #4B5563; font-weight: 600; margin-bottom: 15px; text-align: center; }
+        
+        /* 카드5 메트릭 */
+        .picking-metrics { display: flex; gap: 10px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #E8EAED; }
+        .picking-metric-box { flex: 1; text-align: center; padding: 10px; border-radius: 8px; border: 1px solid #FCA5A5; }
+        .picking-metric-box.total { background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%); }
+        .picking-metric-box.urgent { background: linear-gradient(135deg, #FEE2E2 0%, #FEF2F2 100%); }
+        .picking-metric-box.warning { background: linear-gradient(135deg, #FEF9C3 0%, #FEF3C7 100%); border-color: #FCD34D; }
+        .picking-metric-label { font-size: 11px; color: #991B1B; margin-bottom: 6px; font-weight: 600; }
+        .picking-metric-box.warning .picking-metric-label { color: #78350F; }
+        .picking-metric-value { font-size: 28px; font-weight: bold; color: #DC2626; }
+        .picking-metric-box.warning .picking-metric-value { color: #CA8A04; }
+        
+        /* 카드5 리스트 - 자연스러운 높이 */
+        .risky-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .risky-item { padding: 10px 12px; background: linear-gradient(135deg, #FFFBFB 0%, #FEF2F2 100%); border-left: 3px solid #F87171; border-radius: 6px; }
+        .picking-row1 { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .picking-row2 { display: flex; align-items: center; gap: 10px; padding-left: 44px; }
+        .picking-badge { min-width: 38px; height: 24px; border-radius: 12px; font-size: 12px; font-weight: 700; color: #FFFFFF; display: flex; align-items: center; justify-content: center; }
+        .picking-badge.urgent { background: #DC2626; }
+        .picking-badge.warning { background: #F59E0B; }
+        .picking-location { font-size: 13px; font-weight: 700; color: #7C3AED; background: #F5F3FF; padding: 3px 6px; border-radius: 4px; }
+        .picking-name { font-size: 13px; font-weight: 600; color: #1F2937; }
+        .picking-expiry-date { font-size: 12px; font-weight: 600; color: #6B7280; }
+        .picking-expiry-date.imminent { background: #0891B2; color: #FFFFFF; padding: 3px 8px; border-radius: 4px; }
+        .picking-separator { color: #9CA3AF; font-size: 12px; }
+        .picking-qty { font-size: 12px; font-weight: 600; color: #4B5563; }
+
+        /* 카드6 */
+        .card6-header { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px; }
+        .card6-header h2 { font-size: 26px; margin-bottom: 0; }
+        .signal-with-label { position: absolute; right: 0; display: flex; align-items: center; gap: 12px; }
+        .signal-with-label .signal-lights { display: flex; gap: 6px; }
+        .signal-with-label .signal { width: 24px; height: 24px; }
+        .signal-label { font-size: 14px; color: #666; text-align: center; line-height: 1.3; }
+        .card6-content { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+        
+        /* 상단 row - 단위 포함 */
+        .section-top-row { display: flex; align-items: center; justify-content: space-around; padding: 15px 10px; border-bottom: 3px solid #E5E7EB; background: #F8FAFC; border-radius: 8px; }
+        .top-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .top-item-label { font-size: 14px; font-weight: 600; color: #6B7280; }
+        .top-item-value-row { display: flex; align-items: baseline; gap: 4px; }
+        .top-item-icon { font-size: 18px; margin-right: 4px; }
+        .top-item-value { font-size: 24px; font-weight: 800; }
+        .top-item-unit { font-size: 16px; font-weight: 600; color: #6B7280; margin-left: 2px; }
+        .top-item-slash { font-size: 20px; font-weight: 600; color: #9CA3AF; margin: 0 2px; }
+        .divider { width: 2px; height: 50px; background: #D1D5DB; }
+        .storage-color-blue { color: #2563EB; }
+        .storage-color-yellow { color: #EAB308; }
+        
+        /* FIFO - 실제 현황판 스타일 */
+        .section-fifo { background: #FEE2E2; border: 3px solid #EF4444; border-radius: 8px; padding: 12px 15px; animation: pulse-fifo 2s infinite; }
+        @keyframes pulse-fifo { 0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } }
+        .section-fifo .section-title { color: #DC2626; font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .fifo-list { display: flex; flex-direction: column; gap: 8px; }
+        .fifo-item { display: flex; align-items: center; padding: 10px 15px; background: rgba(255,255,255,0.7); border-radius: 6px; font-size: 14px; }
+        .fifo-product { display: flex; align-items: center; gap: 8px; min-width: 280px; }
+        .fifo-dot { width: 10px; height: 10px; background: #DC2626; border-radius: 50%; }
+        .fifo-product-name { font-weight: 700; color: #DC2626; }
+        .fifo-location { display: flex; align-items: center; gap: 8px; color: #374151; flex: 1; }
+        .fifo-arrow { color: #DC2626; font-weight: 700; font-size: 16px; margin: 0 15px; }
+
+        /* 섹션 */
+        .section { padding: 12px 0; }
+        .section-title { font-size: 18px; font-weight: 600; color: #4B5563; margin-bottom: 12px; }
+        
+        /* 테이블 공통 - 비율 조정 */
+        .partial-table, .delete-table { width: 100%; border-collapse: collapse; font-size: 13px; border: 1px solid #D1D5DB; }
+        .partial-table th, .delete-table th { background: #F3F4F6; color: #4B5563; font-weight: 600; padding: 8px 10px; border: 1px solid #D1D5DB; text-align: center; }
+        .partial-table td, .delete-table td { padding: 8px 10px; border: 1px solid #E5E7EB; color: #374151; }
+        .partial-table td.left, .delete-table td.left { text-align: left; }
+        .partial-table td.center, .delete-table td.center { text-align: center; }
+        .partial-table td.right, .delete-table td.right { text-align: right; }
+        .partial-table td.shortage { color: #DC2626; font-weight: 700; }
+        .partial-table td.partial { color: #F59E0B; font-weight: 700; }
+        
+        /* 삭제 */
+        .delete-container { display: flex; gap: 20px; }
+        .delete-group { flex: 1; }
+        .delete-group-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+        .delete-group-title.ansan { color: #2563EB; }
+        .delete-group-title.eumseong { color: #059669; }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <div class="header">
+        <div class="leftSection">
+            <img src="{{ url_for('static', filename='images/ourhome_logo.png') }}" alt="아워홈" class="logo">
+            <h1>WMS 동서울물류센터 냉장파트</h1>
+        </div>
+        <div class="centerSection">
+            <span class="time">2026. 01. 15. (수) 오후 03:30:00</span>
+        </div>
+        <div class="system-status">
+            <span class="status-label">시스템 가동상태</span>
+            <div class="signal-lights">
+                <div class="signal red"></div>
+                <div class="signal orange"></div>
+                <div class="signal green on"></div>
+            </div>
+            <span class="update-time">방금</span>
+        </div>
+    </div>
+
+    <!-- 메인 -->
+    <div class="mainList">
+        <!-- 좌측: 카드5 -->
+        <div class="leftSection-main">
+            <div class="gaugeItem">
+                <h2>⚠️ 부진재고존(L06-07) 이동대상 상품</h2>
+                <div class="picking-metrics">
+                    <div class="picking-metric-box total">
+                        <div class="picking-metric-label">🔴 유효유통비 30% 이하</div>
+                        <div class="picking-metric-value">10건</div>
+                    </div>
+                    <div class="picking-metric-box urgent">
+                        <div class="picking-metric-label">긴급 (≤15%)</div>
+                        <div class="picking-metric-value">4</div>
+                    </div>
+                    <div class="picking-metric-box warning">
+                        <div class="picking-metric-label">주의 (16~30%)</div>
+                        <div class="picking-metric-value">6</div>
+                    </div>
+                </div>
+                <div class="risky-list">
+                    <div class="risky-item">
+                        <div class="picking-row1">
+                            <span class="picking-badge urgent">7%</span>
+                            <span class="picking-location">K041201</span>
+                            <span class="picking-name">[케어플러스]저당 비빔무침소스</span>
+                        </div>
+                        <div class="picking-row2">
+                            <span class="picking-expiry-date imminent">01.29</span>
+                            <span class="picking-separator">|</span>
+                            <span class="picking-qty">45 EA</span>
+                        </div>
+                    </div>
+                    <div class="risky-item">
+                        <div class="picking-row1">
+                            <span class="picking-badge urgent">9%</span>
+                            <span class="picking-location">K051302</span>
+                            <span class="picking-name">청포묵(채묵) 행복한맛남</span>
+                        </div>
+                        <div class="picking-row2">
+                            <span class="picking-expiry-date imminent">01.20</span>
+                            <span class="picking-separator">|</span>
+                            <span class="picking-qty">28 EA</span>
+                        </div>
+                    </div>
+
+                    <div class="risky-item">
+                        <div class="picking-row1">
+                            <span class="picking-badge urgent">12%</span>
+                            <span class="picking-location">RCVLOC</span>
+                            <span class="picking-name">컨츄리소시지Ⅱ 행복한맛남</span>
+                        </div>
+                        <div class="picking-row2">
+                            <span class="picking-expiry-date imminent">01.27</span>
+                            <span class="picking-separator">|</span>
+                            <span class="picking-qty">38 EA</span>
+                        </div>
+                    </div>
+                    <div class="risky-item">
+                        <div class="picking-row1">
+                            <span class="picking-badge urgent">14%</span>
+                            <span class="picking-location">K080401</span>
+                            <span class="picking-name">청포묵(1kg) 행복한맛남</span>
+                        </div>
+                        <div class="picking-row2">
+                            <span class="picking-expiry-date imminent">01.23</span>
+                            <span class="picking-separator">|</span>
+                            <span class="picking-qty">62 EA</span>
+                        </div>
+                    </div>
+                    <div class="risky-item">
+                        <div class="picking-row1">
+                            <span class="picking-badge warning">18%</span>
+                            <span class="picking-location">K090302</span>
+                            <span class="picking-name">도토리묵(1kg) 행복한맛남</span>
+                        </div>
+                        <div class="picking-row2">
+                            <span class="picking-expiry-date imminent">01.24</span>
+                            <span class="picking-separator">|</span>
+                            <span class="picking-qty">120 EA</span>
+                        </div>
+                    </div>
+                    <div class="risky-item">
+                        <div class="picking-row1">
+                            <span class="picking-badge warning">21%</span>
+                            <span class="picking-location">K042402</span>
+                            <span class="picking-name">에그마요샐러드R 행복한맛남</span>
+                        </div>
+                        <div class="picking-row2">
+                            <span class="picking-expiry-date">02.05</span>
+                            <span class="picking-separator">|</span>
+                            <span class="picking-qty">85 EA</span>
+                        </div>
+                    </div>
+
+                    <div class="risky-item">
+                        <div class="picking-row1">
+                            <span class="picking-badge warning">24%</span>
+                            <span class="picking-location">K021103</span>
+                            <span class="picking-name">(버텍스)페퍼소스</span>
+                        </div>
+                        <div class="picking-row2">
+                            <span class="picking-expiry-date">02.12</span>
+                            <span class="picking-separator">|</span>
+                            <span class="picking-qty">52 EA</span>
+                        </div>
+                    </div>
+                    <div class="risky-item">
+                        <div class="picking-row1">
+                            <span class="picking-badge warning">26%</span>
+                            <span class="picking-location">K051001</span>
+                            <span class="picking-name">한입조랑떡 행복한맛남</span>
+                        </div>
+                        <div class="picking-row2">
+                            <span class="picking-expiry-date">02.08</span>
+                            <span class="picking-separator">|</span>
+                            <span class="picking-qty">73 EA</span>
+                        </div>
+                    </div>
+                    <div class="risky-item">
+                        <div class="picking-row1">
+                            <span class="picking-badge warning">28%</span>
+                            <span class="picking-location">K080501</span>
+                            <span class="picking-name">메추리알장조림(약270개) 행복한맛남</span>
+                        </div>
+                        <div class="picking-row2">
+                            <span class="picking-expiry-date">02.17</span>
+                            <span class="picking-separator">|</span>
+                            <span class="picking-qty">35 EA</span>
+                        </div>
+                    </div>
+                    <div class="risky-item">
+                        <div class="picking-row1">
+                            <span class="picking-badge warning">30%</span>
+                            <span class="picking-location">K041102</span>
+                            <span class="picking-name">크림스파게티소스 행복한맛남</span>
+                        </div>
+                        <div class="picking-row2">
+                            <span class="picking-expiry-date">02.13</span>
+                            <span class="picking-separator">|</span>
+                            <span class="picking-qty">42 EA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 우측: 카드6 -->
+        <div class="rightSection-main">
+            <div class="gaugeItem">
+                <div class="card6-header">
+                    <h2>📦 금일 재고 현황</h2>
+                    <div class="signal-with-label">
+                        <span class="signal-label">재고조사<br>준비</span>
+                        <div class="signal-lights">
+                            <div class="signal red"></div>
+                            <div class="signal green on"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card6-content">
+                    <!-- 상단 요약 - 단위 포함 -->
+                    <div class="section-top-row">
+                        <div class="top-item">
+                            <span class="top-item-label">총 상품수</span>
+                            <div class="top-item-value-row">
+                                <span class="top-item-icon">📦</span>
+                                <span class="top-item-value storage-color-blue">452</span>
+                                <span class="top-item-unit">개</span>
+                            </div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="top-item">
+                            <span class="top-item-label">총 재고금액</span>
+                            <div class="top-item-value-row">
+                                <span class="top-item-icon">💰</span>
+                                <span class="top-item-value storage-color-blue">900,871,748</span>
+                                <span class="top-item-unit">원</span>
+                            </div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="top-item">
+                            <span class="top-item-label">적치 현황</span>
+                            <div class="top-item-value-row">
+                                <span class="top-item-icon">🏗️</span>
+                                <span class="top-item-value storage-color-blue">369</span>
+                                <span class="top-item-slash">/</span>
+                                <span class="top-item-value" style="color: #9CA3AF;">524</span>
+                            </div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="top-item">
+                            <span class="top-item-label">적치율</span>
+                            <div class="top-item-value-row">
+                                <span class="top-item-icon">📊</span>
+                                <span class="top-item-value storage-color-yellow">70.4</span>
+                                <span class="top-item-unit">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- FIFO - 실제 현황판 스타일 -->
+                    <div class="section-fifo">
+                        <div class="section-title">⚠️ 선입선출 위반 상품 (2건)</div>
+                        <div class="fifo-list">
+                            <div class="fifo-item">
+                                <div class="fifo-product">
+                                    <span class="fifo-dot"></span>
+                                    <span class="fifo-product-name">(과세)우&비트파클_5kg 행복한맛남</span>
+                                </div>
+                                <span class="fifo-location">[하단] K092001 (26.03.25)</span>
+                                <span class="fifo-arrow">→</span>
+                                <span class="fifo-location">[상단] K091704 (26.03.18)</span>
+                            </div>
+                            <div class="fifo-item">
+                                <div class="fifo-product">
+                                    <span class="fifo-dot"></span>
+                                    <span class="fifo-product-name">(순대실록) 깍두기</span>
+                                </div>
+                                <span class="fifo-location">[하단] K020902 (26.04.11)</span>
+                                <span class="fifo-arrow">→</span>
+                                <span class="fifo-location">[상단] K021003 (26.04.06)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 미출/부분출고 - 실제 현황판 구조 (7컬럼) -->
+                    <div class="section">
+                        <div class="section-title">🔔 미출/부분출고 (3건)</div>
+                        <table class="partial-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 8%;">배송군</th>
+                                    <th style="width: 18%;">배송처명</th>
+                                    <th style="width: 30%;">상품명</th>
+                                    <th style="width: 8%;">단위</th>
+                                    <th style="width: 12%;">원주문</th>
+                                    <th style="width: 12%;">오더</th>
+                                    <th style="width: 12%;">비고</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="center">제주</td>
+                                    <td class="left">제주점</td>
+                                    <td class="left">(캘리)돈카츠소스(2kg) 캘리스코</td>
+                                    <td class="center">EA</td>
+                                    <td class="right">30</td>
+                                    <td class="right">0</td>
+                                    <td class="center shortage">미출</td>
+                                </tr>
+                                <tr>
+                                    <td class="center">호남</td>
+                                    <td class="left">광주점</td>
+                                    <td class="left">크림스파게티소스 행복한맛남</td>
+                                    <td class="center">EA</td>
+                                    <td class="right">200</td>
+                                    <td class="right">156</td>
+                                    <td class="center partial">부분출고</td>
+                                </tr>
+                                <tr>
+                                    <td class="center">용인2</td>
+                                    <td class="left">수원점</td>
+                                    <td class="left">메추리알장조림(약270개) 행복한맛남</td>
+                                    <td class="center">EA</td>
+                                    <td class="right">48</td>
+                                    <td class="right">0</td>
+                                    <td class="center shortage">미출</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 삭제현황 -->
+                    <div class="section">
+                        <div class="section-title">🗑️ 금일 삭제 현황 (6건)</div>
+                        <div class="delete-container">
+                            <div class="delete-group">
+                                <div class="delete-group-title ansan">📍 안산 (3건)</div>
+                                <table class="delete-table">
+                                    <thead><tr><th style="width: 55%;">상품명</th><th style="width: 20%;">단위</th><th style="width: 25%;">수량</th></tr></thead>
+                                    <tbody>
+                                        <tr><td class="left">닭가슴살채 행복한맛남</td><td class="center">EA</td><td class="right">45</td></tr>
+                                        <tr><td class="left">아워홈 부드럽고 연한 닭가슴살</td><td class="center">EA</td><td class="right">32</td></tr>
+                                        <tr><td class="left">소고기(양지) 장조림 행복한맛남</td><td class="center">EA</td><td class="right">50</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="delete-group">
+                                <div class="delete-group-title eumseong">📍 음성 (3건)</div>
+                                <table class="delete-table">
+                                    <thead><tr><th style="width: 55%;">상품명</th><th style="width: 20%;">단위</th><th style="width: 25%;">수량</th></tr></thead>
+                                    <tbody>
+                                        <tr><td class="left">땅콩조림 행복한맛남</td><td class="center">EA</td><td class="right">28</td></tr>
+                                        <tr><td class="left">우엉조림 행복한맛남</td><td class="center">EA</td><td class="right">35</td></tr>
+                                        <tr><td class="left">모듬모양떡 행복한맛남</td><td class="center">EA</td><td class="right">26</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

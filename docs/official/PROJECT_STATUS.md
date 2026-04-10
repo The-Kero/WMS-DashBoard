@@ -1,6 +1,6 @@
 # 🚀 WMS 대시보드 프로젝트 진행 상황
 
-## 📅 최종 업데이트: 2025-11-05
+## 📅 최종 업데이트: 2025-11-19
 
 ---
 
@@ -649,19 +649,217 @@ C:\OSIS_AUTO\inventory_status\
 
 ---
 
-## 🚀 Phase 2: TV 모니터 시스템 구축 (준비 중)
+## 🚀 Phase 2: Flask TV 시스템 (진행중)
 
-**기간:** 8일 예상 (2025-11-05 ~ 2025-11-12)  
-**목표:** ourhome_layout_v5.html에 실제 데이터 연동, 100인치 TV 표시
+**전체 기간:** 8일 (2025-11-16 ~ 2025-11-23)  
+**현재 진척률:** Day 3/8 완료 (61.8%)  
+**완료 날짜:** 진행중
 
-### 전체 목표
-- Flask API 서버 개발 (data_server.py)
-- 5개 Collector 재사용 (100% 재사용)
-- HTML JavaScript 추가 (데이터 fetch)
-- 30초 자동 갱신 구현
-- 100인치 TV 현장 테스트
+---
 
-**상세 계획:** 04_전체개발계획서.md의 Phase 2 섹션 참조
+### ✅ Day 1 완료 (2025-11-16)
+
+**Flask 기본 구조 + Collector 모듈**
+
+#### 1.1 가상환경 생성
+- [x] 터미널 열기 및 디렉토리 이동
+- [x] `python -m venv venv_flask` 실행
+- [x] 가상환경 활성화
+- [x] Python 버전 확인 (3.9+)
+
+#### 1.2 패키지 설치
+- [x] Flask==3.0.0 설치
+- [x] Flask-CORS==4.0.0 설치
+- [x] Flask-Caching==2.1.0 설치
+- [x] pandas==2.0.3 설치
+- [x] python-dotenv==1.0.0 설치
+- [x] requirements.txt 생성
+
+#### 1.3 프로젝트 구조 생성
+- [x] api/ 폴더 생성
+- [x] services/ 폴더 생성
+- [x] templates/ 폴더 생성
+- [x] static/ 폴더 생성 (css, js, images)
+- [x] logs/ 폴더 생성
+- [x] tests/ 폴더 생성
+
+#### 1.4 app.py 기본 구조
+- [x] Flask, CORS, Cache, logging 설정
+- [x] / 루트 엔드포인트
+- [x] /api/health 헬스체크
+- [x] 404, 500 에러 핸들러
+- [x] 서버 실행 확인
+
+#### 1.5 Collector 모듈 작성 (신규)
+- [x] BaseCollector 클래스 작성 (74줄)
+- [x] InboundCollector 작성 (54줄)
+- [x] OutboundCollector 작성 (56줄)
+- [x] InventoryCollector 작성 (91줄)
+- [x] DeleteCollector 작성 (58줄)
+- [x] IrregularCollector 작성 (33줄)
+
+#### 1.6 5개 API 엔드포인트
+- [x] api/inbound.py 작성 (73줄)
+- [x] api/outbound.py 작성 (55줄)
+- [x] api/inventory.py 작성 (55줄)
+- [x] api/delete.py 작성 (55줄)
+- [x] api/irregular.py 작성 (55줄)
+
+#### 1.7 Flask 서버 테스트
+- [x] 서버 정상 실행 (포트 5000)
+- [x] /api/health 200 OK
+- [x] 5개 API 모두 동작 확인
+- [x] CORS 헤더 확인
+- [x] 로그 파일 생성 확인
+
+**완료 시간**: 2025-11-16  
+**실제 소요**: 2.0시간 (예상 10시간 대비 80% 단축)
+
+---
+
+### ✅ Day 2 완료 (2025-11-19)
+
+**통합 API + v9 규칙 적용**
+
+#### 2.1 api/dashboard.py 기본 구조
+- [x] dashboard.py 생성
+- [x] Blueprint 설정
+- [x] CollectorService import
+- [x] /api/dashboard 엔드포인트 정의
+
+#### 2.2 5개 Collector 데이터 수집
+- [x] 입고 데이터 수집
+- [x] 출고 데이터 수집
+- [x] 재고 데이터 수집
+- [x] 삭제 데이터 수집 (현재 미사용)
+- [x] 비정형 오더 데이터 수집
+- [x] DataFrame 수집 완료 확인
+
+#### 2.3 카드2 계산 - 입고유의상품
+- [x] 총 건수 계산
+- [x] 평균 진척률 계산
+- [x] 입고 소비기한 집계
+- [x] 재고 소비기한 집계
+- [x] 데이터 병합
+- [x] 입고유의상품 필터링 (입고 < 재고)
+
+#### 2.4 카드3 계산 - L07 제외 + 영문키
+- [x] 유효유통비 ≤20% 필터링
+- [x] L07 로케이션 제외
+- [x] 긴급/주의 구분 (10% 기준)
+- [x] 유효비 오름차순 정렬
+- [x] JSON 변환 (영문 키)
+
+#### 2.5 카드5 계산 - 자사출고 + 라벨 + 비정형
+- [x] 자사 출고 타입 필터링 (14, 15, 18)
+- [x] 총 출하금액 계산
+- [x] 라벨 건수 (총/미발행)
+- [x] 비정형 오더 (총/미출력)
+- [x] 전일 대비 계산 (D-1~D-10 탐색)
+
+#### 2.6 카드6 계산 - 배송처 분류 + destinations
+- [x] classify_destination_card6() 함수 정의
+- [x] 05 타입 특수 규칙
+- [x] 08 타입 규칙
+- [x] 기타 타입 (04, 16, 17, 52, 53) 규칙
+- [x] 지방 출고 타입 필터링
+- [x] 배송처 분류 적용
+- [x] 13개 배송처 집계
+
+#### 2.7 JSON 응답 구조 작성
+- [x] response 기본 구조
+- [x] card2 데이터 (totalCount, progressRate, riskyCount)
+- [x] card3 데이터 (totalCount, urgentCount, warningCount, items)
+- [x] card5 데이터 (totalAmount, comparePercent, labels, irregular)
+- [x] card6 데이터 (totalCount, totalAmount, destinations)
+- [x] timestamp, data_counts 포함
+
+#### 2.8 고급 에러 처리
+- [x] FileNotFoundError 처리
+- [x] ValueError 처리
+- [x] KeyError 처리
+- [x] Exception 통합 처리
+
+#### 2.9 통합 테스트
+- [x] Flask 서버 실행
+- [x] /api/dashboard 호출
+- [x] HTTP 200 OK 확인
+- [x] JSON 구조 확인
+- [x] 카드2~6 데이터 정확성 검증
+- [x] 카드6 미발행 피킹리스트 확인
+- [x] 서버 중지
+
+#### 2.10 리팩토링 (Service 제거)
+- [x] CollectorService 삭제
+- [x] Collector 직접 호출로 변경
+- [x] 코드 간소화
+- [x] yesterday → today 수정
+
+#### 2.11 Git 커밋
+- [x] git add . 실행
+- [x] git commit 실행
+- [x] 커밋 성공 확인
+
+**완료 시간**: 2025-11-19 22:12  
+**실제 소요**: 4.0시간 (예상 12시간 대비 67% 단축)  
+**커밋 해시**: 03dc291
+
+---
+
+### ✅ Day 3 완료 (2025-11-20)
+
+**pytest 테스트 작성**
+
+**목표**: Flask API 전체 테스트 커버리지 확보  
+**완료 시간**: 2025-11-20 15:15  
+**실제 소요**: 1.3시간 (예상 4-5시간 대비 74% 단축)  
+**테스트 결과**: pytest 37개 PASSED  
+**완료율**: 100% (44/44개 완료)
+
+**완료 작업:**
+- [x] pytest 환경 구축
+- [x] BaseCollector 테스트 (8개)
+- [x] 5개 Collector 단위 테스트 (29개)
+- [x] 6개 API 엔드포인트 테스트 (30개)
+- [x] 통합 테스트 시나리오 (5개)
+- [x] 테스트 커버리지 80% 이상
+- [x] Git 커밋
+
+---
+
+### 📊 Phase 2 진행 요약
+
+| Day | 날짜 | 주요 작업 | 체크박스 | 완료 | 진척률 | 상태 | 소요시간 |
+|-----|------|----------|----------|------|--------|------|----------|
+| Day 1 | 2025-11-16 | Flask 환경 + Collector + API | 120개 | 120 | 100% | ✅ 완료 | 2.0시간 |
+| Day 2 | 2025-11-19 | 통합 API + v9 규칙 적용 | 165개 | 165 | 100% | ✅ 완료 | 4.0시간 |
+| Day 3 | 2025-11-20 | pytest 테스트 | 44개 | 44 | 100% | ✅ 완료 | 1.3시간 |
+| Day 4 | 2025-11-20 | HTML 템플릿 | 45개 | 0 | 0% | ⏳ 대기 | - |
+| Day 5 | 2025-11-21 | JavaScript 30초 갱신 | 50개 | 0 | 0% | ⏳ 대기 | - |
+| Day 6 | 2025-11-22 | CSS TV 최적화 | 37개 | 0 | 0% | ⏳ 대기 | - |
+| Day 7 | 2025-11-23 | 성능 + 안정성 | 40개 | 0 | 0% | ⏳ 대기 | - |
+| Day 8 | 2025-11-24 | 배포 + 검증 | 35개 | 0 | 0% | ⏳ 대기 | - |
+| **합계** | **8일** | **Flask TV 시스템** | **532개** | **329** | **61.8%** | 🔄 | **7.3시간** |
+
+---
+
+### ✅ Phase 2 완료 기준
+
+**필수 완료 항목:**
+- [x] Flask 서버 정상 실행 ✅
+- [x] 5개 Collector 모듈 작성 ✅
+- [x] 6개 API 엔드포인트 구현 ✅
+- [x] /api/dashboard 통합 API ✅
+- [x] v9 데이터 규칙 100% 적용 ✅
+- [ ] pytest 테스트 커버리지 80% 이상
+- [ ] HTML 템플릿 완성
+- [ ] JavaScript 30초 자동 갱신
+- [ ] CSS TV 최적화 (1920×1080)
+- [ ] 100인치 TV 현장 테스트
+- [ ] Windows 서비스 등록
+- [ ] 24/7 운영 준비
+
+**현재 완료율**: 35% (5/14개 필수 항목)
 
 ---
 
@@ -679,29 +877,40 @@ C:\OSIS_AUTO\inventory_status\
 
 ---
 
-## 🎯 Phase 2: 확장 및 최적화 (예정)
-
-**예상 기간:** 5일 (Day 16-20)
-
-### 예정 작업
-- [ ] 실시간 자동 새로고침
-- [ ] 알림 시스템 (위험 상품, 재고 부족 등)
-- [ ] 데이터 필터링 및 검색 기능
-- [ ] 엑셀 내보내기 기능
-- [ ] 반응형 레이아웃 개선
-- [ ] 성능 최적화 (대용량 데이터 처리)
-- [ ] 사용자 설정 저장 기능
-
----
-
-
 ## 📁 프로젝트 구조
 
 ```
 C:\Projects\WMS-DashBoard\
 │
-├── dashboard/                      # Streamlit 대시보드
-│   ├── app.py                     # 메인 앱 (3개 탭 완성)
+├── flask_app/                      # 🆕 Flask API 서버 (Phase 2)
+│   ├── app.py                     # Flask 메인 (102줄)
+│   ├── requirements.txt           # 패키지 의존성
+│   ├── venv_flask/                # 가상환경
+│   │
+│   ├── api/                       # API 엔드포인트
+│   │   ├── __init__.py
+│   │   ├── inbound.py             # 입고 API (73줄)
+│   │   ├── outbound.py            # 출고 API (55줄)
+│   │   ├── inventory.py           # 재고 API (55줄)
+│   │   ├── delete.py              # 삭제 API (55줄)
+│   │   ├── irregular.py           # 비정형 API (55줄)
+│   │   └── dashboard.py           # 통합 API (v9 규칙 적용)
+│   │
+│   ├── templates/                 # HTML 템플릿 (Day 4 예정)
+│   ├── static/                    # CSS/JS (Day 5-6 예정)
+│   │   ├── css/
+│   │   └── js/
+│   │
+│   ├── logs/                      # 로그 파일
+│   │   └── app.log
+│   │
+│   └── tests/                     # pytest 테스트 (Day 3 예정)
+│       ├── conftest.py
+│       ├── unit/
+│       └── integration/
+│
+├── dashboard/                      # Streamlit 대시보드 (Phase 1)
+│   ├── app.py                     # 메인 앱 (5개 탭 완성)
 │   ├── requirements.txt           # 패키지 의존성
 │   ├── README.md                  # 프로젝트 설명
 │   │
@@ -716,8 +925,8 @@ C:\Projects\WMS-DashBoard\
 │   │   │       ├── inbound.py     # 입고 수집기 ✅
 │   │   │       ├── outbound.py    # 출고 수집기 ✅
 │   │   │       ├── inventory.py   # 재고 수집기 ✅
-│   │   │       ├── delete.py      # 삭제 수집기 (다음 작업)
-│   │   │       └── irregular.py   # 비정형 수집기 (예정)
+│   │   │       ├── delete.py      # 삭제 수집기 ✅
+│   │   │       └── irregular.py   # 비정형 수집기 ✅
 │   │   │
 │   │   ├── business/              # 비즈니스 로직
 │   │   │   └── analytics.py       # 분석 로직
@@ -782,10 +991,11 @@ C:\Projects\WMS-DashBoard\
 | v1.0 | 2025-10-17 | 초안 작성 | 개발팀 |
 | v2.0 | 2025-10-20 | Phase 1 진행 상황 (60%) | 개발팀 |
 | v3.0 | 2025-10-30 | 백엔드 v2.0~v3.0 완성 반영 | 개발팀 |
-| **v4.0** | **2025-11-05** | **• Phase 1 완료 (100%) 반영**<br>**• 5/5 Collector 완성**<br>**• 60개 테스트 100% 통과**<br>**• Day 10-20 작업 내역 추가**<br>**• Phase 2, 3 계획 추가** | **개발팀** |
+| v4.0 | 2025-11-05 | Phase 1 완료 (100%) 반영 | 개발팀 |
+| **v5.0** | **2025-11-19** | **• Phase 2 Day 1-2 완료 반영 (53.6%)**<br>**• Flask 환경 구축 완료**<br>**• BaseCollector 패턴 확립**<br>**• /api/dashboard 통합 API 완성**<br>**• v9 데이터 규칙 100% 적용**<br>**• Service 제거 리팩토링 완료** | **개발팀** |
 
 ---
 
-**마지막 업데이트**: 2025-11-05  
-**다음 업데이트**: Phase 2 시작 시 (2025-11-05 예정)  
+**마지막 업데이트**: 2025-11-19  
+**다음 업데이트**: Phase 2 Day 3 완료 시 (2025-11-20 예정)  
 **작성자**: WMS 개발팀

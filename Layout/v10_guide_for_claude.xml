@@ -1,0 +1,1352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  v10 레이아웃 업데이트 완벽 가이드 (Claude 최적화 버전)
+  
+  목적: Claude가 v10 레이아웃을 완벽히 이해하고 Day 4를 정확히 구현
+  작성일: 2025-11-20
+  버전: 1.0
+  원본: v10_업데이트_가이드.md (1,316줄)
+  
+  구조:
+  1. metadata - 문서 메타정보
+  2. workflow - 3단계 워크플로우
+  3. reference_docs - 필수 참고 문서 3종
+  4. current_system - 현재 시스템 이해
+  5. constraints - TV 스펙 제약사항
+  6. design_process - v10 설계 프로세스
+  7. api_expansion - API 확장 가능성
+  8. design_template - v10 설계서 템플릿
+  9. implementation - Day 4 구현 프로세스
+  10. validation - 검증 체크리스트
+-->
+
+<v10_guide>
+  
+  <!-- ============================================ -->
+  <!-- 1. 메타데이터 -->
+  <!-- ============================================ -->
+  <metadata>
+    <document>
+      <title>v10 레이아웃 업데이트 완벽 가이드</title>
+      <version>1.0</version>
+      <created_date>2025-11-20</created_date>
+      <author>WMS 개발팀 (4인 전문가팀)</author>
+      <purpose>v9 기반 v10 레이아웃 설계 및 Day 4 구현</purpose>
+      <source_file>v10_업데이트_가이드.md</source_file>
+      <source_lines>1316</source_lines>
+    </document>
+    
+    <project_info>
+      <name>WMS Dashboard Phase 2</name>
+      <location>C:\Projects\WMS-DashBoard\</location>
+      <backend_location>C:\OSIS_AUTO\</backend_location>
+      <target_device>100인치 TV (10.60.27.130:8080)</target_device>
+    </project_info>
+    
+    <critical_principle>
+      <rule priority="1">Collector 5개는 절대 수정 금지 (100% 재사용)</rule>
+      <rule priority="2">체크박스 순서대로 진행 (건너뛰기 금지)</rule>
+      <rule priority="3">매 작업 후 검증 필수</rule>
+    </critical_principle>
+  </metadata>
+  
+  <!-- ============================================ -->
+  <!-- 2. 3단계 워크플로우 -->
+  <!-- ============================================ -->
+  <workflow>
+    <overview>
+      <total_time unit="hours">6-10</total_time>
+      <total_phases>3</total_phases>
+      <goal>v9 레이아웃을 케로님이 원하는 v10으로 확장하고 Day 4에서 구현</goal>
+    </overview>
+    
+    <phase id="1" owner="케로">
+      <name>v10 설계</name>
+      <duration unit="hours">2-3</duration>
+      <tasks>
+        <task seq="1" time="30분">
+          <name>참고 문서 학습</name>
+          <inputs>
+            <input>API 응답 구조 (Phase2_진척도.md Day 2)</input>
+            <input>백엔드 CSV 컬럼 정보</input>
+            <input>TV 스펙 제약사항 (Phase2_진척도.md Day 6)</input>
+          </inputs>
+        </task>
+        
+        <task seq="2" time="1-2시간">
+          <name>v10 HTML 작성</name>
+          <steps>
+            <step>v9.html 복사</step>
+            <step>카드 개수 조정 (6개 → 8~12개)</step>
+            <step>카드 배치 결정</step>
+            <step>데이터 영역 주석 표시</step>
+          </steps>
+          <output>C:\Projects\WMS-DashBoard\Layout\v10.html</output>
+        </task>
+        
+        <task seq="3" time="30분">
+          <name>v10 설계서 작성</name>
+          <steps>
+            <step>카드별 상세 명세</step>
+            <step>데이터 매핑표</step>
+            <step>API 수정 필요 여부 판단</step>
+          </steps>
+          <output>C:\Projects\WMS-DashBoard\Layout\v10_설계서.md</output>
+        </task>
+      </tasks>
+      
+      <checkpoint>
+        <verify>v10.html 파일 존재</verify>
+        <verify>v10_설계서.md 파일 존재</verify>
+        <verify>모든 카드 데이터 소스 명시</verify>
+        <verify>API 수정 필요 여부 결정</verify>
+      </checkpoint>
+    </phase>
+    
+    <phase id="2" owner="Claude" conditional="true">
+      <name>API 확장</name>
+      <duration unit="hours">0-1</duration>
+      <condition>v10 설계서에서 API 수정 필요로 판단된 경우만</condition>
+      
+      <tasks>
+        <task seq="1" time="10분">
+          <name>API 수정 판단</name>
+          <questions>
+            <question>현재 데이터로 충분한가?</question>
+            <question>백엔드 CSV에 있지만 API에 없는 컬럼이 필요한가?</question>
+            <question>새로운 계산 로직이 필요한가?</question>
+          </questions>
+        </task>
+        
+        <task seq="2" time="30분-1시간">
+          <name>api/dashboard.py 수정</name>
+          <steps>
+            <step>필요한 컬럼 추가</step>
+            <step>계산 로직 구현</step>
+            <step>JSON 응답 구조 확장</step>
+            <step>테스트 및 검증</step>
+          </steps>
+          <output>C:\Projects\WMS-DashBoard\flask_app\api\dashboard.py</output>
+        </task>
+      </tasks>
+      
+      <checkpoint>
+        <verify>Flask 서버 정상 실행</verify>
+        <verify>/api/dashboard 응답 정상</verify>
+        <verify>추가된 데이터 확인</verify>
+      </checkpoint>
+    </phase>
+    
+    <phase id="3" owner="Claude">
+      <name>Day 4 구현</name>
+      <duration unit="hours">4-6</duration>
+      
+      <tasks>
+        <task seq="1" time="2-3시간">
+          <name>HTML 작성</name>
+          <input>v10.html</input>
+          <steps>
+            <step>v10 구조 그대로 복사</step>
+            <step>Jinja2 템플릿 적용</step>
+            <step>데이터 바인딩</step>
+          </steps>
+          <output>C:\Projects\WMS-DashBoard\flask_app\templates\dashboard.html</output>
+        </task>
+        
+        <task seq="2" time="1-2시간">
+          <name>CSS 기본 스타일</name>
+          <steps>
+            <step>v10 레이아웃 반영</step>
+            <step>그리드 시스템 구축</step>
+            <step>TV 제약사항 적용</step>
+          </steps>
+          <output>C:\Projects\WMS-DashBoard\flask_app\static\css\dashboard.css</output>
+        </task>
+        
+        <task seq="3" time="1시간">
+          <name>테스트 및 검증</name>
+          <steps>
+            <step>렌더링 확인</step>
+            <step>데이터 정확성 검증</step>
+            <step>레이아웃 검증</step>
+            <step>Git 커밋</step>
+          </steps>
+        </task>
+      </tasks>
+      
+      <checkpoint>
+        <verify>localhost:5000 접속 성공</verify>
+        <verify>모든 카드 표시 확인</verify>
+        <verify>데이터 정상 바인딩</verify>
+        <verify>폰트 크기 제약 준수</verify>
+        <verify>색상 대비율 5:1 이상</verify>
+        <verify>Day 4 완료!</verify>
+      </checkpoint>
+    </phase>
+  </workflow>
+  
+  <!-- ============================================ -->
+  <!-- 3. 필수 참고 문서 3종 -->
+  <!-- ============================================ -->
+  <reference_docs>
+    
+    <!-- 문서 1: API 응답 구조 -->
+    <doc id="1" priority="highest">
+      <name>API 응답 구조</name>
+      <location>Phase2_진척도.md Day 2 섹션</location>
+      <purpose>현재 사용 가능한 데이터 파악</purpose>
+      
+      <api_structure>
+        <!-- card2: 입고 현황 -->
+        <card id="card2" category="입고">
+          <field name="totalCount" type="integer">
+            <description>입고 총 건수</description>
+            <example>57</example>
+          </field>
+          <field name="progressRate" type="float">
+            <description>평균 진척률 (%)</description>
+            <example>67.5</example>
+            <format>소수점 1자리</format>
+          </field>
+          <field name="inboundRiskyCount" type="integer">
+            <description>입고유의상품 (입고기한 &lt; 재고기한)</description>
+            <example>5</example>
+          </field>
+        </card>
+        
+        <!-- card3: 재고 현황 -->
+        <card id="card3" category="재고">
+          <field name="totalCount" type="integer">
+            <description>전체 유의상품</description>
+            <example>12</example>
+          </field>
+          <field name="urgentCount" type="integer">
+            <description>긴급 (유효비 ≤10%)</description>
+            <example>3</example>
+          </field>
+          <field name="warningCount" type="integer">
+            <description>주의 (유효비 10~20%)</description>
+            <example>9</example>
+          </field>
+          <field name="items" type="array">
+            <description>유의상품 리스트</description>
+            <item_structure>
+              <field name="product" type="string">상품명</field>
+              <field name="validityRatio" type="float">유효유통비 (%)</field>
+              <field name="quantity" type="integer">재고수량</field>
+              <field name="location" type="string">로케이션</field>
+              <field name="expiryDate" type="string">소비기한 (YYYY-MM-DD)</field>
+            </item_structure>
+          </field>
+        </card>
+        
+        <!-- card5: 자사 출고 현황 -->        <card id="card5" category="자사출고">
+          <field name="totalAmount" type="integer">
+            <description>자사 출하금액</description>
+            <example>79420000</example>
+            <format>원 단위</format>
+          </field>
+          <field name="comparePercent" type="float">
+            <description>전일 대비 (%)</description>
+            <example>15.3</example>
+            <format>소수점 1자리</format>
+          </field>
+          <field name="labels" type="object">
+            <field name="total" type="integer">총 라벨</field>
+            <field name="unpublished" type="integer">미발행 라벨</field>
+          </field>
+          <field name="irregular" type="object">
+            <field name="total" type="integer">비정형 오더</field>
+            <field name="unpublished" type="integer">미출력 비정형</field>
+          </field>
+        </card>
+        
+        <!-- card6: 지방 출고 현황 -->
+        <card id="card6" category="지방출고">
+          <field name="totalCount" type="integer">
+            <description>지방 총 건수</description>
+            <example>67</example>
+          </field>
+          <field name="totalAmount" type="integer">
+            <description>지방 출하금액</description>
+            <example>32150000</example>
+          </field>
+          <field name="destinations" type="array">
+            <description>13개 배송처 (양산, 대구, 광주, 전주, 부산, 충북, 원주, 대전, 강릉, 경남, 울산, 충남, 포항)</description>
+            <item_structure>
+              <field name="name" type="string">배송처명</field>
+              <field name="count" type="integer">건수</field>
+              <field name="amount" type="integer">금액</field>
+              <field name="unpublishedCount" type="integer">미발행 피킹리스트</field>
+            </item_structure>
+          </field>
+        </card>
+        
+        <!-- data_counts: 데이터 건수 -->
+        <card id="data_counts" category="메타">
+          <field name="inbound" type="integer">입고 데이터 건수</field>
+          <field name="outbound" type="integer">출고 데이터 건수</field>
+          <field name="inventory" type="integer">재고 데이터 건수</field>
+          <field name="irregular" type="integer">비정형 데이터 건수</field>
+        </card>
+      </api_structure>
+      
+      <critical_note>
+        이 데이터만 현재 사용 가능! 추가 데이터는 API 수정 필요.
+      </critical_note>
+    </doc>
+    
+    <!-- 문서 2: 백엔드 CSV 컬럼 정보 -->
+    <doc id="2" priority="high">
+      <n>백엔드 CSV 원본 컬럼 정보</n>
+      <location>각 README 파일 또는 실제 CSV</location>
+      <purpose>API에 없는 데이터 확장 가능성 파악</purpose>
+      
+      <csv_files>
+        <!-- 입고현황 CSV -->
+        <csv name="integrated_inbound" path="C:\OSIS_AUTO\Inbound Status\integrated_inbound_YYYYMMDD.csv">
+          <columns total="12">
+            <column seq="1" name="입고예정번호" type="string"/>
+            <column seq="2" name="상품코드" type="string"/>
+            <column seq="3" name="상품명" type="string"/>
+            <column seq="4" name="입고예정수량" type="integer"/>
+            <column seq="5" name="입고수량" type="integer"/>
+            <column seq="6" name="진척률" type="float" unit="%"/>
+            <column seq="7" name="소비기한" type="date"/>
+            <column seq="8" name="로케이션" type="string"/>
+            <column seq="9" name="입고센터" type="string" api_available="false"/>
+            <column seq="10" name="공급사명" type="string" api_available="false"/>
+            <column seq="11" name="입고유형" type="string" api_available="false"/>
+            <column seq="12" name="최초입력시각" type="datetime"/>
+          </columns>
+        </csv>
+        
+        <!-- 출고현황 CSV -->
+        <csv name="outbound_all" path="C:\OSIS_AUTO\Outbound Status\outbound_all_YYYYMMDD.csv">
+          <columns total="13">
+            <column seq="1" name="출하바코드" type="string"/>
+            <column seq="2" name="상품코드" type="string"/>
+            <column seq="3" name="상품명" type="string"/>
+            <column seq="4" name="오더수량" type="integer"/>
+            <column seq="5" name="오더수량*" type="integer" note="미발행 판단용"/>
+            <column seq="6" name="단가" type="integer"/>
+            <column seq="7" name="출하금액" type="integer" calculated="true"/>
+            <column seq="8" name="배송처명" type="string"/>
+            <column seq="9" name="배송군" type="string" api_available="false"/>
+            <column seq="10" name="출고유형" type="string" values="1~10, 14~18, 52~53"/>
+            <column seq="11" name="출고센터명" type="string" api_available="false"/>
+            <column seq="12" name="오더일시" type="datetime"/>
+            <column seq="13" name="배송처_분류" type="string" note="13개 분류, v9 규칙"/>
+          </columns>
+        </csv>
+        
+        <!-- 재고현황 CSV -->
+        <csv name="inventory_status" path="C:\OSIS_AUTO\inventory_status\inventory_status_YYYYMMDD.csv">
+          <columns total="12">
+            <column seq="1" name="로케이션" type="string"/>
+            <column seq="2" name="상품코드" type="string"/>
+            <column seq="3" name="상품명" type="string"/>
+            <column seq="4" name="재고수량" type="integer"/>
+            <column seq="5" name="가용수량" type="integer"/>
+            <column seq="6" name="유효유통비" type="float" unit="%" calculated="true"/>
+            <column seq="7" name="소비기한" type="date"/>
+            <column seq="8" name="제조일" type="date" api_available="false"/>
+            <column seq="9" name="입고일" type="date" api_available="false"/>
+            <column seq="10" name="단가" type="integer"/>
+            <column seq="11" name="재고금액" type="integer"/>
+            <column seq="12" name="센터" type="string" api_available="false"/>
+          </columns>
+        </csv>
+        
+        <!-- 삭제현황 CSV -->
+        <csv name="delete_status" path="C:\OSIS_AUTO\Delete Status\delete_status_YYYYMMDD.csv">
+          <columns total="10">
+            <column seq="1" name="삭제일시" type="datetime"/>
+            <column seq="2" name="출하바코드" type="string"/>
+            <column seq="3" name="상품코드" type="string"/>
+            <column seq="4" name="상품명" type="string"/>
+            <column seq="5" name="삭제수량" type="integer"/>
+            <column seq="6" name="삭제센터" type="string" api_available="false"/>
+            <column seq="7" name="삭제사유" type="string" api_available="false"/>
+            <column seq="8" name="알림여부" type="string" values="Y/N" note="18시 이후"/>
+            <column seq="9" name="알림시각" type="datetime"/>
+            <column seq="10" name="최초입력시각" type="datetime"/>
+          </columns>
+        </csv>
+        
+        <!-- 비정형오더 CSV -->
+        <csv name="irregular_order" path="C:\OSIS_AUTO\IrregularOrder Status\irregular_order_YYYYMMDD.csv">
+          <columns total="8">
+            <column seq="1" name="상세내용" type="string" note="상품코드+수량"/>
+            <column seq="2" name="출고센터명" type="string" api_available="false"/>
+            <column seq="3" name="입고센터명" type="string" api_available="false"/>
+            <column seq="4" name="상품명" type="string"/>
+            <column seq="5" name="입출수량" type="integer"/>
+            <column seq="6" name="라벨출력" type="string" values="N/Y"/>
+            <column seq="7" name="출고지시방법" type="string" api_available="false"/>
+            <column seq="8" name="최초입력시각" type="datetime"/>
+          </columns>
+        </csv>
+      </csv_files>
+      
+      <expansion_opportunity>
+        <category name="입고 관련">
+          <item>입고센터별 통계 (CSV: 입고센터)</item>
+          <item>공급사별 통계 (CSV: 공급사명)</item>
+          <item>입고유형별 통계 (CSV: 입고유형)</item>
+        </category>
+        <category name="출고 관련">
+          <item>출고센터명 표시 (CSV: 출고센터명)</item>
+          <item>배송군 정보 (CSV: 배송군)</item>
+          <item>시간대별 오더 (CSV: 오더일시 파싱)</item>
+        </category>
+        <category name="재고 관련">
+          <item>센터별 재고 현황 (CSV: 센터)</item>
+          <item>제조일/입고일 정보 (CSV: 제조일, 입고일)</item>
+        </category>
+        <category name="삭제 관련">
+          <item>삭제사유별 통계 (CSV: 삭제사유)</item>
+          <item>센터별 삭제 현황 (CSV: 삭제센터)</item>
+          <item>18시 이후 알림 건수 (CSV: 알림여부='Y')</item>
+        </category>
+        <category name="비정형 관련">
+          <item>출고지시방법별 통계 (CSV: 출고지시방법)</item>
+          <item>센터별 비정형 현황 (CSV: 출고센터명, 입고센터명)</item>
+        </category>
+      </expansion_opportunity>
+    </doc>
+    
+    <!-- 문서 3: 100인치 TV 스펙 및 제약사항 -->
+    <doc id="3" priority="highest">
+      <n>100인치 TV 스펙 및 제약사항</n>
+      <location>Phase2_진척도.md Day 6 섹션</location>
+      <purpose>레이아웃 설계 시 준수해야 할 하드웨어 제약</purpose>
+      
+      <hardware_specs>
+        <screen>
+          <resolution width="1920" height="1080" total_pixels="2073600"/>
+          <viewing_distance unit="meter">10</viewing_distance>
+          <lighting>창고 조명 (밝음)</lighting>
+          <operation>24/7 무인 운영</operation>
+          <interaction>없음 (클릭, 호버 불가)</interaction>
+        </screen>
+      </hardware_specs>
+      
+      <font_size_constraints viewing_distance="10m">
+        <font type="제목/헤더" min_size="48px" recommended="56-64px"/>
+        <font type="카드 타이틀" min_size="32px" recommended="36-42px"/>
+        <font type="숫자(값)" min_size="72px" recommended="80-96px" critical="true"/>
+        <font type="단위" min_size="28px" recommended="32-36px"/>
+        <font type="서브텍스트" min_size="24px" recommended="28-32px"/>
+        <font type="테이블 셀" min_size="20px" recommended="24-28px"/>
+        
+        <warning>
+          이보다 작으면 10m에서 안 보임!
+        </warning>
+      </font_size_constraints>
+      
+      <color_contrast>
+        <minimum_ratio>5:1</minimum_ratio>
+        <standard>WCAG AA</standard>
+        
+        <recommended_combinations>
+          <combo bg="#1a1a1a" fg="#ffffff" ratio="15:1" status="excellent"/>
+          <combo bg="#ffffff" fg="#333333" ratio="12.6:1" status="excellent"/>
+          <combo bg="#FFE6E6" fg="#FF4444" ratio="4.5:1" status="acceptable"/>
+          <combo bg="#FFF4E6" fg="#FF8800" ratio="3.2:1" status="poor"/>
+        </recommended_combinations>
+        
+        <rule>
+          긴급/주의 색상은 진한 배경 필수!
+        </rule>
+      </color_contrast>
+      
+      <card_limit>
+        <calculation>
+          <total_pixels>2073600</total_pixels>
+          <card_count options="6,8,9,10,12">
+            <option count="6" card_size="460x360" space_per_card="165600" status="excellent" note="여유"/>
+            <option count="8" card_size="460x270" space_per_card="124200" status="good" note="적정"/>
+            <option count="9" card_size="420x320" space_per_card="134400" status="good" note="균형"/>
+            <option count="10" card_size="370x270" space_per_card="99900" status="acceptable" note="최소"/>
+            <option count="12" card_size="370x216" space_per_card="79920" status="limit" note="한계"/>
+            <option count="13" card_size="too_small" space_per_card="insufficient" status="not_recommended" note="가독성 저하"/>
+          </card_count>
+        </calculation>
+        
+        <recommendation>
+          <min>6</min>
+          <optimal>8-10</optimal>
+          <max>12</max>
+          <forbidden>13+</forbidden>
+        </recommendation>
+        
+        <reason>
+          12개 초과 시 큰 숫자(72px) 표시 공간 확보 불가능!
+          수학적 증명:
+          - 카드 12개 → 1개당 약 370×216px
+          - 큰 숫자(72px) 필요 공간: 약 150×100px
+          - 서브텍스트(24px) 필요 공간: 약 200×50px
+          - 여백 최소 20px
+          → 370×216px로 간신히 가능
+          → 13개부터는 72px 숫자 표시 불가능
+        </reason>
+      </card_limit>
+      
+      <layout_constraints>
+        <grid_system>
+          <option pattern="3x2" count="6" status="recommended"/>
+          <option pattern="4x2" count="8" status="recommended"/>
+          <option pattern="3x3" count="9" status="recommended"/>
+          <option pattern="4x3" count="12" status="maximum"/>
+          <option pattern="5x3" count="15" status="not_recommended"/>
+        </grid_system>
+        
+        <spacing>
+          <card_gap min="20px" recommended="24-30px"/>
+          <outer_margin min="30px" recommended="40-50px"/>
+        </spacing>
+      </layout_constraints>
+    </doc>
+    
+  </reference_docs>
+  
+  <!-- ============================================ -->
+  <!-- 4. 현재 시스템 이해 -->
+  <!-- ============================================ -->
+  <current_system>
+    <data_flow>
+      <step seq="1">
+        <component>백엔드 5개 모듈</component>
+        <location>C:\OSIS_AUTO\</location>
+        <modules>
+          <module>inbound_status.py</module>
+          <module>collect_outbound_status.py</module>
+          <module>inventory_status.py</module>
+          <module>delete_status.py</module>
+          <module>irregular_order_status.py</module>
+        </modules>
+        <interval>매 1-10분마다 자동 수집</interval>
+        <status>Phase 1 완료, 프로덕션 운영 중</status>
+        <modification>절대 금지 (100% 재사용)</modification>
+      </step>
+      
+      <step seq="2">
+        <component>CSV 파일 (5개)</component>
+        <files>
+          <file>integrated_inbound_YYYYMMDD.csv</file>
+          <file>outbound_all_YYYYMMDD.csv</file>
+          <file>inventory_status_YYYYMMDD.csv</file>
+          <file>delete_status_YYYYMMDD.csv</file>
+          <file>irregular_order_YYYYMMDD.csv</file>
+        </files>
+        <encoding>UTF-8-BOM</encoding>
+      </step>
+      
+      <step seq="3">
+        <component>Flask API (/api/dashboard)</component>
+        <location>C:\Projects\WMS-DashBoard\flask_app\api\dashboard.py</location>
+        <function>CSV 읽기 → 데이터 가공 → JSON 응답</function>
+        <status>Day 2 완료</status>
+      </step>
+      
+      <step seq="4">
+        <component>HTML (dashboard.html)</component>
+        <location>C:\Projects\WMS-DashBoard\flask_app\templates\dashboard.html</location>
+        <function>6~12개 카드 표시, 30초 자동 갱신</function>
+        <status>Day 4 작업 예정</status>
+      </step>
+      
+      <step seq="5">
+        <component>100인치 TV</component>
+        <url>http://10.60.27.130:8080</url>
+        <function>최종 표시 장치</function>
+      </step>
+    </data_flow>
+    
+    <v9_vs_v10>
+      <v9>
+        <cards>6</cards>
+        <grid>3×2</grid>
+        <data_mapping>API 데이터 1:1 매핑</data_mapping>
+        <info_level>기본 정보만</info_level>
+        <role>기본 틀</role>
+      </v9>
+      
+      <v10>
+        <cards>6~12 (케로님 결정)</cards>
+        <grid>케로님이 원하는 배치</grid>
+        <data_mapping>같은 API 데이터를 더 세분화</data_mapping>
+        <info_level>기본 + 상세 정보, 차트/그래프</info_level>
+        <api_expansion>필요시 확장</api_expansion>
+        <role>Day 4의 설계도</role>
+      </v10>
+      
+      <relationship>v10은 v9를 확장/개선한 버전</relationship>
+    </v9_vs_v10>
+  </current_system>
+  
+  <!-- ============================================ -->
+  <!-- 5. v10 설계 프로세스 -->
+  <!-- ============================================ -->
+  <design_process owner="케로">
+    
+    <!-- Step 1: 정보 우선순위 결정 -->
+    <step seq="1" duration="10분">
+      <n>정보 우선순위 결정</n>
+      <method>
+        <question>가장 중요한 정보 3가지는?</question>
+        <options>
+          <option priority="high">입고 진행 상황</option>
+          <option priority="high">출하 금액</option>
+          <option priority="high">유의상품 (재고/입고)</option>
+          <option priority="medium">미할당 상품</option>
+          <option priority="medium">삭제 현황</option>
+          <option priority="medium">비정형 오더</option>
+          <option priority="medium">라벨 미발행</option>
+          <option priority="medium">배송처별 현황</option>
+        </options>
+        <rule>선택한 3가지를 큰 카드로 상단 배치!</rule>
+      </method>
+    </step>
+    
+    <!-- Step 2: 카드 개수 결정 -->
+    <step seq="2" duration="10분">
+      <n>카드 개수 결정</n>
+      
+      <available_cards source="current_api">
+        <group category="입고" source="card2">
+          <card id="1">입고 총 건수</card>
+          <card id="2">입고 진척률 (게이지)</card>
+          <card id="3">입고 유의상품</card>
+          <card id="4" api_mod="required">센터별 입고 현황</card>
+        </group>
+        
+        <group category="재고" source="card3">
+          <card id="5">전체 유의상품</card>
+          <card id="6">긴급 상품 (≤10%)</card>
+          <card id="7">주의 상품 (10~20%)</card>
+          <card id="8">유의상품 TOP 5 리스트</card>
+          <card id="9" new="true">유효비 분포 차트</card>
+        </group>
+        
+        <group category="자사출고" source="card5">
+          <card id="10">자사 출하금액</card>
+          <card id="11">전일 대비 그래프</card>
+          <card id="12">라벨 발행 현황</card>
+          <card id="13">비정형 오더 현황</card>
+        </group>
+        
+        <group category="지방출고" source="card6">
+          <card id="14">지방 출하금액</card>
+          <card id="15">배송처 TOP 5</card>
+          <card id="16">배송처별 차트</card>
+        </group>
+        
+        <group category="기타">
+          <card id="17">전체 요약 카드</card>
+          <card id="18">시간 표시</card>
+          <card id="19" phase="3">알림 영역</card>
+          <card id="20">상세 테이블</card>
+        </group>
+      </available_cards>
+      
+      <selection_guide>
+        <level cards="6-8" info="기본 정보 중심" complexity="simple"/>
+        <level cards="9-10" info="기본 + 상세 정보" complexity="moderate"/>
+        <level cards="11-12" info="최대 정보량" complexity="maximum"/>
+      </selection_guide>
+      
+      <decision_point>
+        케로님 선택: ___개
+      </decision_point>
+    </step>
+    
+    <!-- Step 3: 배치 결정 -->
+    <step seq="3" duration="10분">
+      <n>배치 결정</n>
+      
+      <grid_options>
+        <option id="A" pattern="3x2" count="6">
+          <layout>
+            ┌──────┬──────┬──────┐
+            │  1   │  2   │  3   │
+            ├──────┼──────┼──────┤
+            │  4   │  5   │  6   │
+            └──────┴──────┴──────┘
+          </layout>
+          <pros>큰 카드, 가독성 우수</pros>
+          <cons>정보량 적음</cons>
+        </option>
+        
+        <option id="B" pattern="4x2" count="8">
+          <layout>
+            ┌──────┬──────┬──────┬──────┐
+            │  1   │  2   │  3   │  4   │
+            ├──────┼──────┼──────┼──────┤
+            │  5   │  6   │  7   │  8   │
+            └──────┴──────┴──────┴──────┘
+          </layout>
+          <pros>균형적</pros>
+          <cons>약간 좁음</cons>
+        </option>
+        
+        <option id="C" pattern="3x3" count="9">
+          <layout>
+            ┌──────┬──────┬──────┐
+            │  1   │  2   │  3   │
+            ├──────┼──────┼──────┤
+            │  4   │  5   │  6   │
+            ├──────┼──────┼──────┤
+            │  7   │  8   │  9   │
+            └──────┴──────┴──────┘
+          </layout>
+          <pros>정보량 많음</pros>
+          <cons>카드 작음</cons>
+        </option>
+        
+        <option id="D" pattern="4x3" count="12">
+          <layout>
+            ┌──────┬──────┬──────┬──────┐
+            │  1   │  2   │  3   │  4   │
+            ├──────┼──────┼──────┼──────┤
+            │  5   │  6   │  7   │  8   │
+            ├──────┼──────┼──────┼──────┤
+            │  9   │  10  │  11  │  12  │
+            └──────┴──────┴──────┴──────┘
+          </layout>
+          <pros>최대 정보</pros>
+          <cons>글자 작음 (한계)</cons>
+        </option>
+        
+        <option id="E" pattern="custom" count="variable">
+          <layout>
+            ┌─────────┬─────────┬─────────┐
+            │    1    │    2    │    3    │  ← 상단 (큰 카드)
+            ├─────────┴─────────┴─────────┤
+            │  4  │  5  │  6  │  7  │  8  │  ← 중단 (중간 카드)
+            ├─────────┴─────────┴─────────┤
+            │         9 (테이블)           │  ← 하단 (넓은 카드)
+            └─────────────────────────────┘
+          </layout>
+          <pros>유연성, 중요도 구분</pros>
+          <cons>구현 복잡도 증가</cons>
+        </option>
+      </grid_options>
+      
+      <decision_point>
+        케로님 선택: 옵션 ___
+      </decision_point>
+    </step>
+    
+    <!-- Step 4: 각 카드 내용 결정 -->
+    <step seq="4" duration="30분">
+      <n>각 카드 내용 결정</n>
+      
+      <card_specification_template>
+        <card id="example">
+          <metadata>
+            <n>입고 총 건수</n>
+            <position row="1" col="1"/>
+            <size width="1" height="1"/>
+            <priority level="high" stars="3"/>
+          </metadata>
+          
+          <data_source>
+            <api_path>card2.totalCount</api_path>
+            <backup_csv>integrated_inbound_YYYYMMDD.csv</backup_csv>
+            <data_type>integer</data_type>
+          </data_source>
+          
+          <display_content>
+            <title font_size="32px">오늘 입고 총 건수</title>
+            <main_value font_size="72px" format="숫자+단위">57건</main_value>
+            <sub_text font_size="24px" format="비교">전일: 42건 (+35.7%)</sub_text>
+          </display_content>
+          
+          <styling>
+            <background_color>#ffffff</background_color>
+            <border>1px solid #e0e0e0</border>
+            <main_value_color>#2196F3</main_value_color>
+            <change_indicator increase="#4CAF50" decrease="#FF4444"/>
+          </styling>
+          
+          <special_effects>
+            <animation condition="value_changed" effect="pulse"/>
+            <hover>none</hover>
+            <alert condition="custom" effect="blink"/>
+          </special_effects>
+          
+          <update_logic>
+            <interval>30초</interval>
+            <js_function>updateCard1(data)</js_function>
+          </update_logic>
+        </card>
+      </card_specification_template>
+      
+      <guidelines>
+        <rule>큰 숫자는 72px 이상</rule>
+        <rule>서브텍스트는 24px 이상</rule>
+        <rule>차트는 카드 크기 2×1 이상 권장</rule>
+      </guidelines>
+    </step>
+    
+  </design_process>
+  
+  <!-- ============================================ -->
+  <!-- 6. API 확장 가능성 검토 -->
+  <!-- ============================================ -->
+  <api_expansion>
+    
+    <decision_framework>
+      <question>v10에 필요한 데이터가 현재 API에 있는가?</question>
+      
+      <case id="1" status="no_modification">
+        <condition>모두 있음 ✅</condition>
+        <action>API 수정 불필요</action>
+        <next_step>Day 4 바로 진행 가능</next_step>
+        <time unit="hours">0</time>
+      </case>
+      
+      <case id="2" status="minor_modification">
+        <condition>일부 없음 🟡</condition>
+        <action>API 수정 필요</action>
+        <sequence>Day 2 수정 → Day 4 구현</sequence>
+        <time unit="hours">0.5-1</time>
+        <examples>
+          <example>단순 컬럼 추가 (30분)</example>
+          <example>그룹화/집계 (1시간)</example>
+        </examples>
+      </case>
+      
+      <case id="3" status="major_modification">
+        <condition>새로운 계산 필요 🔴</condition>
+        <action>API 로직 추가 필요</action>
+        <complexity>높음</complexity>
+        <time unit="hours">1-2</time>
+        <examples>
+          <example>시간대별 오더 집계</example>
+          <example>패턴 분석</example>
+        </examples>
+      </case>
+    </decision_framework>
+    
+    <modification_difficulty>
+      <level id="1" name="단순 컬럼 추가" time="30분">
+        <description>CSV에 있는 컬럼을 API에 추가만</description>
+        <examples>
+          <example>입고센터</example>
+          <example>삭제사유</example>
+          <example>출고센터명</example>
+        </examples>
+      </level>
+      
+      <level id="2" name="중급 계산" time="1시간">
+        <description>그룹화/집계 필요</description>
+        <examples>
+          <example>센터별 합계</example>
+          <example>사유별 개수</example>
+          <example>배송처별 통계</example>
+        </examples>
+      </level>
+      
+      <level id="3" name="고급 로직" time="2시간">
+        <description>복잡한 조건/계산</description>
+        <examples>
+          <example>시간대별 추이</example>
+          <example>패턴 분석</example>
+          <example>예측 모델</example>
+        </examples>
+      </level>
+    </modification_difficulty>
+    
+    <request_template>
+      <title>API 수정 요청서</title>
+      <sections>
+        <section id="1">
+          <n>추가 필요 데이터</n>
+          <fields>
+            <field>데이터명</field>
+            <field>출처 (CSV 파일명 - 컬럼명)</field>
+            <field>용도 (v10 카드 번호)</field>
+            <field>계산 방법</field>
+            <field>예상 응답 구조 (JSON)</field>
+            <field>예상 작업 시간</field>
+          </fields>
+        </section>
+      </sections>
+    </request_template>
+    
+  </api_expansion>
+  
+  <!-- ============================================ -->
+  <!-- 7. Day 4 구현 프로세스 (Claude 주도) -->
+  <!-- ============================================ -->
+  <implementation phase="Day 4" owner="Claude">
+    
+    <!-- Step 1: v10 파일 확인 및 분석 -->
+    <step seq="1" duration="10분">
+      <n>v10 파일 확인 및 분석</n>
+      <tasks>
+        <task>v10.html 파일 읽기</task>
+        <task>v10_설계서.md 파일 읽기</task>
+        <task>구조 분석 및 이해</task>
+        <task>API 수정 필요 여부 확인</task>
+        <task>Day 4 체크리스트 조정</task>
+      </tasks>
+      <checkpoint>
+        <verify>v10 구조 완전 이해</verify>
+        <verify>모든 카드 데이터 소스 파악</verify>
+        <verify>구현 계획 수립 완료</verify>
+      </checkpoint>
+    </step>
+    
+    <!-- Step 2: API 수정 (필요시만) -->
+    <step seq="2" duration="30분-1시간" conditional="true">
+      <n>API 수정</n>
+      <file>C:\Projects\WMS-DashBoard\flask_app\api\dashboard.py</file>
+      
+      <tasks>
+        <task seq="1">CSV에서 추가 컬럼 읽기 로직 작성</task>
+        <task seq="2">필요한 계산 로직 구현</task>
+        <task seq="3">JSON 응답 구조 확장</task>
+        <task seq="4">테스트 및 검증</task>
+        <task seq="5">Git 커밋</task>
+      </tasks>
+      
+      <checkpoint>
+        <verify>Flask 서버 정상 실행</verify>
+        <verify>/api/dashboard 응답 200 OK</verify>
+        <verify>추가된 데이터 JSON에 포함</verify>
+        <verify>기존 데이터 정상 유지</verify>
+      </checkpoint>
+    </step>
+    
+    <!-- Step 3: HTML 구현 -->
+    <step seq="3" duration="2-3시간">
+      <n>HTML 구현</n>
+      <file>C:\Projects\WMS-DashBoard\flask_app\templates\dashboard.html</file>
+      
+      <tasks>
+        <task seq="1" time="30분">
+          <n>v10.html 구조 복사</n>
+          <method>v10.html 전체 구조를 dashboard.html로 복사</method>
+        </task>
+        
+        <task seq="2" time="1-1.5시간">
+          <n>Jinja2 템플릿 적용</n>
+          <patterns>
+            <pattern type="단순 값">
+              <before>&lt;div class="value"&gt;57&lt;/div&gt;</before>
+              <after>&lt;div class="value"&gt;{{ card2.totalCount }}&lt;/div&gt;</after>
+            </pattern>
+            
+            <pattern type="반복문">
+              <before>
+                &lt;div class="item"&gt;...&lt;/div&gt;
+                &lt;div class="item"&gt;...&lt;/div&gt;
+              </before>
+              <after>
+                {% for item in card3.items %}
+                  &lt;div class="item"&gt;{{ item.product }}&lt;/div&gt;
+                {% endfor %}
+              </after>
+            </pattern>
+            
+            <pattern type="조건부">
+              <before>&lt;div class="status-urgent"&gt;긴급&lt;/div&gt;</before>
+              <after>
+                {% if item.validityRatio &lt;= 10 %}
+                  &lt;div class="status-urgent"&gt;긴급&lt;/div&gt;
+                {% endif %}
+              </after>
+            </pattern>
+          </patterns>
+        </task>
+        
+        <task seq="3" time="30분-1시간">
+          <n>모든 카드 마크업 완료</n>
+          <method>v10 설계서의 각 카드 명세에 따라 하나씩 구현</method>
+        </task>
+      </tasks>
+      
+      <checkpoint>
+        <verify>HTML 파일 저장 확인</verify>
+        <verify>Jinja2 문법 오류 없음</verify>
+        <verify>모든 카드 마크업 완료</verify>
+        <verify>데이터 바인딩 정확</verify>
+      </checkpoint>
+    </step>
+    
+    <!-- Step 4: CSS 기본 스타일 -->
+    <step seq="4" duration="1-2시간">
+      <n>CSS 기본 스타일</n>
+      <file>C:\Projects\WMS-DashBoard\flask_app\static\css\dashboard.css</file>
+      
+      <tasks>
+        <task seq="1" time="30분">
+          <n>v10 레이아웃 그리드 시스템</n>
+          <css_structure>
+            .dashboard-container {
+              display: grid;
+              grid-template-columns: repeat(4, 1fr); /* 예: 4열 */
+              grid-template-rows: repeat(3, 1fr);    /* 예: 3행 */
+              gap: 24px;
+              padding: 40px;
+            }
+          </css_structure>
+        </task>
+        
+        <task seq="2" time="30분">
+          <n>카드 공통 스타일</n>
+          <requirements>
+            <req>배경색: #ffffff</req>
+            <req>테두리: 1px solid #e0e0e0</req>
+            <req>border-radius: 8px</req>
+            <req>padding: 24px</req>
+            <req>box-shadow: 0 2px 4px rgba(0,0,0,0.1)</req>
+          </requirements>
+        </task>
+        
+        <task seq="3" time="30분-1시간">
+          <n>TV 제약사항 적용</n>
+          <requirements>
+            <req>큰 숫자: font-size 72px 이상</req>
+            <req>카드 타이틀: font-size 32px 이상</req>
+            <req>서브텍스트: font-size 24px 이상</req>
+            <req>색상 대비율: 5:1 이상</req>
+          </requirements>
+        </task>
+      </tasks>
+      
+      <checkpoint>
+        <verify>CSS 파일 저장 확인</verify>
+        <verify>그리드 레이아웃 정상 작동</verify>
+        <verify>모든 폰트 크기 제약 준수</verify>
+        <verify>색상 대비율 검증</verify>
+      </checkpoint>
+    </step>
+    
+    <!-- Step 5: Flask 라우트 연결 -->
+    <step seq="5" duration="15분">
+      <n>Flask 라우트 연결</n>
+      <file>C:\Projects\WMS-DashBoard\flask_app\app.py</file>
+      
+      <code_changes>
+        <change type="import">
+          from flask import render_template
+        </change>
+        <change type="route">
+          @app.route('/')
+          def index():
+              return render_template('dashboard.html')
+        </change>
+      </code_changes>
+      
+      <checkpoint>
+        <verify>app.py 수정 완료</verify>
+        <verify>import 오류 없음</verify>
+      </checkpoint>
+    </step>
+    
+    <!-- Step 6: 통합 테스트 -->
+    <step seq="6" duration="30분">
+      <n>통합 테스트</n>
+      
+      <test_items>
+        <test id="1">
+          <n>Flask 서버 실행</n>
+          <command>python app.py</command>
+          <expected>서버 시작 메시지 확인</expected>
+        </test>
+        
+        <test id="2">
+          <n>localhost:5000 접속</n>
+          <method>브라우저에서 접속</method>
+          <expected>dashboard.html 렌더링 확인</expected>
+        </test>
+        
+        <test id="3">
+          <n>모든 카드 표시 확인</n>
+          <method>시각적 검증</method>
+          <expected>v10 설계한 모든 카드 표시</expected>
+        </test>
+        
+        <test id="4">
+          <n>데이터 정확성 검증</n>
+          <method>API 응답과 화면 비교</method>
+          <expected>모든 데이터 정확히 표시</expected>
+        </test>
+        
+        <test id="5">
+          <n>레이아웃 문제 확인</n>
+          <method>그리드 정렬, 간격 확인</method>
+          <expected>설계대로 배치</expected>
+        </test>
+        
+        <test id="6">
+          <n>브라우저 콘솔 에러 확인</n>
+          <method>F12 개발자 도구</method>
+          <expected>에러 없음</expected>
+        </test>
+      </test_items>
+      
+      <checkpoint>
+        <verify>모든 테스트 통과</verify>
+        <verify>에러 없음</verify>
+        <verify>Day 4 완료 준비!</verify>
+      </checkpoint>
+    </step>
+    
+    <!-- Step 7: Git 커밋 -->
+    <step seq="7" duration="15분">
+      <n>Git 커밋</n>
+      
+      <commands>
+        <cmd>git add .</cmd>
+        <cmd>git commit -m "Phase 2 Day 4: v10 레이아웃 HTML 완성"</cmd>
+        <cmd>git log --oneline -3</cmd>
+      </commands>
+      
+      <checkpoint>
+        <verify>커밋 성공</verify>
+        <verify>변경 파일 확인</verify>
+        <verify>Day 4 완료! 🎉</verify>
+      </checkpoint>
+    </step>
+    
+  </implementation>
+  
+  <!-- ============================================ -->
+  <!-- 8. 검증 체크리스트 -->
+  <!-- ============================================ -->
+  <validation>
+    
+    <!-- 케로님 작업 체크리스트 -->
+    <checklist owner="케로" phase="Phase 1: v10 설계">
+      <section name="준비 (30분)">
+        <item>Phase2_진척도.md Day 2 섹션 읽기 (API 응답 구조)</item>
+        <item>백엔드 CSV 컬럼 정보 확인</item>
+        <item>Phase2_진척도.md Day 6 섹션 읽기 (TV 스펙)</item>
+        <item>v9.html 파일 위치 확인</item>
+      </section>
+      
+      <section name="v10 HTML 작성 (1-2시간)">
+        <item>v9.html 복사</item>
+        <item>카드 개수 결정 (6~12개)</item>
+        <item>그리드 배치 결정</item>
+        <item>각 카드 내용 작성</item>
+        <item>데이터 영역 주석 표시 (&lt;!-- card2.totalCount --&gt;)</item>
+        <item>카드 ID 부여 (id="card-inbound-count")</item>
+        <item>기본 CSS 스타일 작성</item>
+        <item>브라우저에서 렌더링 확인</item>
+        <item>v10.html 저장 (C:\Projects\WMS-DashBoard\Layout\v10.html)</item>
+      </section>
+      
+      <section name="v10 설계서 작성 (30분)">
+        <item>v10_설계서.md 파일 생성</item>
+        <item>Section 1: 전체 개요 작성</item>
+        <item>Section 2: 카드별 상세 명세 작성 (모든 카드)</item>
+        <item>Section 3: 데이터 매핑표 작성</item>
+        <item>Section 4: 색상 체계 정의</item>
+        <item>Section 5: API 수정 요구사항 작성 (필요시만)</item>
+        <item>Section 6: 특이사항 작성</item>
+        <item>Section 7: 체크리스트 확인</item>
+        <item>v10_설계서.md 저장 (C:\Projects\WMS-DashBoard\Layout\v10_설계서.md)</item>
+      </section>
+      
+      <section name="Claude에게 전달">
+        <item>Claude에게 완료 알림: "v10 완성했어! C:\Projects\WMS-DashBoard\Layout\ 에 있어"</item>
+        <item>(필요시) API 수정 요청서 전달</item>
+        <item>Day 4 시작!</item>
+      </section>
+    </checklist>
+    
+    <!-- Claude 작업 체크리스트 -->
+    <checklist owner="Claude" phase="Phase 2-3: 구현">
+      <section name="v10 분석 (10분)">
+        <item>v10.html 파일 읽기</item>
+        <item>v10_설계서.md 파일 읽기</item>
+        <item>구조 이해 및 분석</item>
+        <item>API 수정 필요 여부 확인</item>
+        <item>Day 4 체크리스트 조정</item>
+      </section>
+      
+      <section name="API 수정 (필요시만, 30분-1시간)">
+        <item>api/dashboard.py 열기</item>
+        <item>추가 컬럼 읽기 로직 작성</item>
+        <item>계산 로직 추가</item>
+        <item>JSON 응답 구조 확장</item>
+        <item>Flask 서버 테스트</item>
+        <item>API 응답 확인</item>
+        <item>Git 커밋</item>
+      </section>
+      
+      <section name="Day 4 구현 (4-6시간)">
+        <item>4.1 dashboard.html 생성</item>
+        <item>├─ v10.html 구조 복사</item>
+        <item>├─ Jinja2 템플릿 적용</item>
+        <item>└─ 모든 카드 마크업 완료</item>
+        <item>4.2 dashboard.css 작성</item>
+        <item>├─ v10 그리드 시스템</item>
+        <item>├─ 카드 공통 스타일</item>
+        <item>└─ 색상 체계 적용</item>
+        <item>4.3 Flask 라우트 연결</item>
+        <item>├─ app.py 수정</item>
+        <item>└─ render_template 추가</item>
+        <item>4.4 렌더링 테스트</item>
+        <item>├─ 서버 실행</item>
+        <item>├─ 브라우저 확인</item>
+        <item>└─ 모든 카드 표시 확인</item>
+        <item>4.5 Git 커밋</item>
+        <item>├─ git add .</item>
+        <item>├─ git commit</item>
+        <item>└─ Day 4 완료!</item>
+      </section>
+    </checklist>
+    
+    <!-- 최종 검증 항목 -->
+    <final_validation phase="Day 4 완료">
+      <critical_checks>
+        <check priority="highest">localhost:5000 접속 성공</check>
+        <check priority="highest">모든 카드 표시 확인</check>
+        <check priority="highest">데이터 정상 바인딩</check>
+        <check priority="high">폰트 크기 제약 준수 (큰 숫자 72px+)</check>
+        <check priority="high">색상 대비율 5:1 이상</check>
+        <check priority="high">그리드 레이아웃 정확</check>
+        <check priority="medium">브라우저 콘솔 에러 없음</check>
+        <check priority="medium">Git 커밋 완료</check>
+      </critical_checks>
+      
+      <success_criteria>
+        <criterion>모든 critical_checks 통과</criterion>
+        <criterion>v10 설계서와 100% 일치</criterion>
+        <criterion>Phase2_진척도.md Day 4 체크박스 완료</criterion>
+      </success_criteria>
+    </final_validation>
+    
+  </validation>
+  
+  <!-- ============================================ -->
+  <!-- 9. FAQ 및 트러블슈팅 -->
+  <!-- ============================================ -->
+  <faq>
+    
+    <question id="1">
+      <q>v10 파일은 어디에 저장하나요?</q>
+      <a>
+        C:\Projects\WMS-DashBoard\Layout\v10.html
+        C:\Projects\WMS-DashBoard\Layout\v10_설계서.md
+        이 폴더에 모두 저장하면 Claude가 바로 읽을 수 있습니다.
+      </a>
+    </question>
+    
+    <question id="2">
+      <q>API 수정이 꼭 필요한가요?</q>
+      <a>
+        케이스별로 다릅니다:
+        • 현재 API 데이터만 사용 → 수정 불필요
+        • 백엔드 CSV의 다른 컬럼 필요 → 수정 필요 (30분~1시간)
+        • 새로운 계산 로직 필요 → 수정 필요 (1~2시간)
+        v10 설계서 작성하면서 판단하시면 됩니다.
+      </a>
+    </question>
+    
+    <question id="3">
+      <q>카드는 몇 개가 적당한가요?</q>
+      <a>
+        권장 6~10개
+        • 6-8개: 가독성 우수, 정보량 적음
+        • 9-10개: 균형적
+        • 11-12개: 최대치, 글자 작아짐
+        • 13개 이상: 비권장 (10m 거리 가독성 저하)
+      </a>
+    </question>
+    
+    <question id="4">
+      <q>v9를 완전히 버리고 새로 만드나요?</q>
+      <a>
+        아니요! v9는 기본 틀입니다. v10은 v9를 확장/개선한 버전입니다.
+        v9 → v10 관계:
+        • v9 카드 구조 유지
+        • 카드 개수 증가 (6개 → 8~10개)
+        • 같은 데이터를 더 세분화
+        • 필요시 API 확장
+      </a>
+    </question>
+    
+    <question id="5">
+      <q>Day 4 전에 v10을 꼭 완성해야 하나요?</q>
+      <a>
+        네, 필수입니다! v10이 Day 4의 "설계도"입니다.
+        
+        v10 없으면:
+        • Claude가 무엇을 만들지 모름
+        • 시행착오 반복
+        • 재작업 발생
+        • 시간 2배 소요
+        
+        v10 있으면:
+        • 명확한 목표
+        • 체크리스트처럼 진행
+        • 재작업 없음
+        • 시간 절반
+      </a>
+    </question>
+    
+  </faq>
+  
+  <!-- ============================================ -->
+  <!-- 10. 요약 및 중요 원칙 -->
+  <!-- ============================================ -->
+  <summary>
+    
+    <key_principles>
+      <principle priority="1">
+        <title>Collector 절대 수정 금지</title>
+        <description>Phase 1 완성된 5개 Collector는 코드 수정 0%, import만으로 100% 재사용</description>
+      </principle>
+      
+      <principle priority="2">
+        <title>체크박스 순서대로 진행</title>
+        <description>Phase2_진척도.md 순서 준수, 건너뛰기 금지, 한 번에 하나씩 완료</description>
+      </principle>
+      
+      <principle priority="3">
+        <title>매 작업 후 검증 필수</title>
+        <description>파일 저장 → 실행 테스트 → 에러 확인 → 로그 확인 → 다음 체크박스</description>
+      </principle>
+      
+      <principle priority="4">
+        <title>v10이 Day 4의 설계도</title>
+        <description>v10 없이 Day 4 시작 금지, 설계도 있으면 시간 절반</description>
+      </principle>
+      
+      <principle priority="5">
+        <title>TV 제약사항 엄수</title>
+        <description>큰 숫자 72px+, 카드 최대 12개, 색상 대비율 5:1+</description>
+      </principle>
+    </key_principles>
+    
+    <success_formula>
+      <step>1. 참고 문서 3종 완벽 학습 (30분)</step>
+      <step>2. v10 설계 완료 (케로님, 2-3시간)</step>
+      <step>3. API 수정 판단 및 실행 (필요시, 0-1시간)</step>
+      <step>4. Day 4 구현 (Claude, 4-6시간)</step>
+      <step>5. 검증 및 커밋</step>
+      <result>= Phase 2 성공! 🎉</result>
+    </success_formula>
+    
+    <time_estimate>
+      <total unit="hours">6-10</total>
+      <breakdown>
+        <kero unit="hours">2-3</kero>
+        <api_mod unit="hours">0-1</api_mod>
+        <claude unit="hours">4-6</claude>
+      </breakdown>
+      <target>1-2일 내 완료</target>
+    </time_estimate>
+    
+  </summary>
+  
+</v10_guide>

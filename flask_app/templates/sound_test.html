@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 경보음 최종 샘플 (10종)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            padding: 30px;
+            color: white;
+        }
+        h1 { text-align: center; margin-bottom: 8px; font-size: 28px; }
+        .subtitle { text-align: center; color: rgba(255,255,255,0.8); margin-bottom: 25px; }
+        .container { max-width: 950px; margin: 0 auto; }
+        .section-title {
+            background: rgba(231,76,60,0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin: 20px 0 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .sound-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .sound-card:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+        .sound-card.playing {
+            border-color: #e74c3c;
+            box-shadow: 0 0 25px rgba(231,76,60,0.5);
+        }
+        .sound-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-right: 12px;
+            min-width: 45px;
+        }
+        .sound-info { flex: 1; }
+        .sound-name { font-size: 16px; font-weight: bold; margin-bottom: 3px; }
+        .sound-pattern { color: #e74c3c; font-size: 13px; margin-bottom: 3px; font-weight: bold; }
+        .sound-desc { color: rgba(255,255,255,0.7); font-size: 11px; }
+        .play-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border: none;
+            color: white;
+            padding: 10px 22px;
+            font-size: 14px;
+            border-radius: 22px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .play-btn:hover { transform: scale(1.05); }
+        .play-btn:active { transform: scale(0.98); }
+        .note {
+            text-align: center;
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 경보음 최종 샘플 (10종)</h1>
+        <p class="subtitle">1번(기본) 변형 5개 + 10번(화음) 변형 5개</p>
+
+        <div class="section-title">🔔 1번 기본 경보 변형 (붕— 붕— 스타일)</div>
+        <div class="grid">
+            <div class="sound-card" id="card1">
+                <span class="sound-number">1</span>
+                <div class="sound-info">
+                    <div class="sound-name">기본 5회</div>
+                    <div class="sound-pattern">붕— 붕— 붕— 붕— 붕—</div>
+                    <div class="sound-desc">원본 그대로</div>
+                </div>
+                <button class="play-btn" onclick="playSound1()">▶</button>
+            </div>
+
+            <div class="sound-card" id="card2">
+                <span class="sound-number">2</span>
+                <div class="sound-info">
+                    <div class="sound-name">기본 + 길게</div>
+                    <div class="sound-pattern">붕— 붕— 붕— 붕———</div>
+                    <div class="sound-desc">마지막 여운 강화</div>
+                </div>
+                <button class="play-btn" onclick="playSound2()">▶</button>
+            </div>
+
+            <div class="sound-card" id="card3">
+                <span class="sound-number">3</span>
+                <div class="sound-info">
+                    <div class="sound-name">기본 + 빠르게</div>
+                    <div class="sound-pattern">붕붕붕— 붕붕붕—</div>
+                    <div class="sound-desc">3연타 + 쉼 반복</div>
+                </div>
+                <button class="play-btn" onclick="playSound3()">▶</button>
+            </div>
+
+            <div class="sound-card" id="card4">
+                <span class="sound-number">4</span>
+                <div class="sound-info">
+                    <div class="sound-name">기본 + 고저</div>
+                    <div class="sound-pattern">붕↑ 붕↓ 붕↑ 붕↓ 붕↑</div>
+                    <div class="sound-desc">높낮이 변화</div>
+                </div>
+                <button class="play-btn" onclick="playSound4()">▶</button>
+            </div>
+
+            <div class="sound-card" id="card5">
+                <span class="sound-number">5</span>
+                <div class="sound-info">
+                    <div class="sound-name">기본 + 강조</div>
+                    <div class="sound-pattern">붕! 붕 붕 붕!</div>
+                    <div class="sound-desc">첫/끝 강조</div>
+                </div>
+                <button class="play-btn" onclick="playSound5()">▶</button>
+            </div>
+        </div>
+
+        <div class="section-title">🔊 10번 화음 경보 변형 (웅— 웅— 스타일)</div>
+        <div class="grid">
+            <div class="sound-card" id="card6">
+                <span class="sound-number">6</span>
+                <div class="sound-info">
+                    <div class="sound-name">화음 3회</div>
+                    <div class="sound-pattern">웅—— 웅—— 웅——</div>
+                    <div class="sound-desc">원본 그대로</div>
+                </div>
+                <button class="play-btn" onclick="playSound6()">▶</button>
+            </div>
+
+            <div class="sound-card" id="card7">
+                <span class="sound-number">7</span>
+                <div class="sound-info">
+                    <div class="sound-name">화음 + 길게</div>
+                    <div class="sound-pattern">웅—— 웅———————</div>
+                    <div class="sound-desc">마지막 깊은 여운</div>
+                </div>
+                <button class="play-btn" onclick="playSound7()">▶</button>
+            </div>
+
+            <div class="sound-card" id="card8">
+                <span class="sound-number">8</span>
+                <div class="sound-info">
+                    <div class="sound-name">화음 + 상승</div>
+                    <div class="sound-pattern">웅↗ 웅↗↗ 웅↗↗↗</div>
+                    <div class="sound-desc">점점 높아지는 화음</div>
+                </div>
+                <button class="play-btn" onclick="playSound8()">▶</button>
+            </div>
+
+            <div class="sound-card" id="card9">
+                <span class="sound-number">9</span>
+                <div class="sound-info">
+                    <div class="sound-name">화음 + 두꺼움</div>
+                    <div class="sound-pattern">우웅—— 우웅——</div>
+                    <div class="sound-desc">더 묵직한 저음</div>
+                </div>
+                <button class="play-btn" onclick="playSound9()">▶</button>
+            </div>
+
+            <div class="sound-card" id="card10">
+                <span class="sound-number">10</span>
+                <div class="sound-info">
+                    <div class="sound-name">화음 + 웨이브</div>
+                    <div class="sound-pattern">우웅~~~웅~~~</div>
+                    <div class="sound-desc">오르내리는 화음</div>
+                </div>
+                <button class="play-btn" onclick="playSound10()">▶</button>
+            </div>
+        </div>
+
+        <div class="note">
+            💡 최종 선택할 번호를 알려주세요!
+        </div>
+    </div>
+
+    <script>
+        let audioContext = null;
+        let currentlyPlaying = null;
+
+        function getAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioContext;
+        }
+
+        function setPlaying(cardId, duration) {
+            if (currentlyPlaying) {
+                document.getElementById(currentlyPlaying).classList.remove('playing');
+            }
+            currentlyPlaying = cardId;
+            document.getElementById(cardId).classList.add('playing');
+            setTimeout(() => {
+                document.getElementById(cardId).classList.remove('playing');
+                currentlyPlaying = null;
+            }, duration);
+        }
+
+        // 기본 비프
+        function playBeep(ctx, freq, startTime, duration, volume = 0.45) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, startTime);
+            
+            gain.gain.setValueAtTime(0, startTime);
+            gain.gain.linearRampToValueAtTime(volume, startTime + 0.06);
+            gain.gain.setValueAtTime(volume * 0.9, startTime + duration * 0.7);
+            gain.gain.linearRampToValueAtTime(0, startTime + duration);
+            
+            osc.start(startTime);
+            osc.stop(startTime + duration + 0.05);
+        }
+
+        // 화음 비프
+        function playChord(ctx, baseFreq, startTime, duration, volume = 0.35) {
+            // 기본음
+            playBeep(ctx, baseFreq, startTime, duration, volume);
+            // 5도
+            playBeep(ctx, baseFreq * 1.5, startTime + 0.01, duration * 0.9, volume * 0.6);
+            // 옥타브 아래
+            playBeep(ctx, baseFreq * 0.5, startTime + 0.02, duration * 1.05, volume * 0.5);
+        }
+
+        // ========== 1번 변형 (기본 경보) ==========
+
+        // 1. 기본 5회
+        function playSound1() {
+            const ctx = getAudioContext();
+            setPlaying('card1', 5000);
+            const now = ctx.currentTime;
+            
+            for (let i = 0; i < 5; i++) {
+                playBeep(ctx, 440, now + i * 1.0, 0.6, 0.45);
+            }
+        }
+
+        // 2. 기본 + 마지막 길게
+        function playSound2() {
+            const ctx = getAudioContext();
+            setPlaying('card2', 5000);
+            const now = ctx.currentTime;
+            
+            playBeep(ctx, 440, now, 0.5, 0.45);
+            playBeep(ctx, 440, now + 0.9, 0.5, 0.45);
+            playBeep(ctx, 440, now + 1.8, 0.5, 0.45);
+            playBeep(ctx, 440, now + 2.7, 2.0, 0.5);
+        }
+
+        // 3. 기본 + 3연타
+        function playSound3() {
+            const ctx = getAudioContext();
+            setPlaying('card3', 5000);
+            const now = ctx.currentTime;
+            
+            for (let i = 0; i < 2; i++) {
+                const t = now + i * 2.4;
+                playBeep(ctx, 440, t, 0.35, 0.45);
+                playBeep(ctx, 440, t + 0.4, 0.35, 0.45);
+                playBeep(ctx, 440, t + 0.8, 0.35, 0.45);
+            }
+        }
+
+        // 4. 기본 + 고저
+        function playSound4() {
+            const ctx = getAudioContext();
+            setPlaying('card4', 5000);
+            const now = ctx.currentTime;
+            
+            const freqs = [480, 400, 480, 400, 480];
+            for (let i = 0; i < 5; i++) {
+                playBeep(ctx, freqs[i], now + i * 1.0, 0.6, 0.45);
+            }
+        }
+
+        // 5. 기본 + 첫끝 강조
+        function playSound5() {
+            const ctx = getAudioContext();
+            setPlaying('card5', 5000);
+            const now = ctx.currentTime;
+            
+            playBeep(ctx, 440, now, 0.7, 0.55);           // 강
+            playBeep(ctx, 440, now + 1.0, 0.5, 0.35);     // 약
+            playBeep(ctx, 440, now + 1.9, 0.5, 0.35);     // 약
+            playBeep(ctx, 440, now + 2.8, 0.5, 0.35);     // 약
+            playBeep(ctx, 440, now + 3.7, 1.0, 0.55);     // 강
+        }
+
+        // ========== 10번 변형 (화음 경보) ==========
+
+        // 6. 화음 3회 (원본)
+        function playSound6() {
+            const ctx = getAudioContext();
+            setPlaying('card6', 5000);
+            const now = ctx.currentTime;
+            
+            for (let i = 0; i < 3; i++) {
+                playChord(ctx, 350, now + i * 1.6, 1.1, 0.35);
+            }
+        }
+
+        // 7. 화음 + 마지막 길게
+        function playSound7() {
+            const ctx = getAudioContext();
+            setPlaying('card7', 5000);
+            const now = ctx.currentTime;
+            
+            playChord(ctx, 350, now, 1.0, 0.35);
+            playChord(ctx, 350, now + 1.5, 3.2, 0.4);
+        }
+
+        // 8. 화음 + 상승
+        function playSound8() {
+            const ctx = getAudioContext();
+            setPlaying('card8', 5000);
+            const now = ctx.currentTime;
+            
+            playChord(ctx, 300, now, 1.2, 0.35);
+            playChord(ctx, 350, now + 1.5, 1.2, 0.38);
+            playChord(ctx, 400, now + 3.0, 1.6, 0.42);
+        }
+
+        // 9. 화음 + 더 두꺼움
+        function playSound9() {
+            const ctx = getAudioContext();
+            setPlaying('card9', 5000);
+            const now = ctx.currentTime;
+            
+            for (let i = 0; i < 2; i++) {
+                const t = now + i * 2.4;
+                // 더 두꺼운 화음
+                playBeep(ctx, 280, t, 1.8, 0.35);
+                playBeep(ctx, 350, t + 0.01, 1.7, 0.3);
+                playBeep(ctx, 420, t + 0.02, 1.6, 0.25);
+                playBeep(ctx, 140, t + 0.03, 1.9, 0.25);
+            }
+        }
+
+        // 10. 화음 + 웨이브
+        function playSound10() {
+            const ctx = getAudioContext();
+            setPlaying('card10', 5000);
+            const now = ctx.currentTime;
+            
+            // 오르내리는 화음
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            osc1.type = 'sine';
+            
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.type = 'sine';
+            
+            const osc3 = ctx.createOscillator();
+            const gain3 = ctx.createGain();
+            osc3.connect(gain3);
+            gain3.connect(ctx.destination);
+            osc3.type = 'sine';
+            
+            // 기본음 웨이브
+            osc1.frequency.setValueAtTime(300, now);
+            osc1.frequency.linearRampToValueAtTime(400, now + 1.5);
+            osc1.frequency.linearRampToValueAtTime(300, now + 3.0);
+            osc1.frequency.linearRampToValueAtTime(400, now + 4.5);
+            
+            // 5도 웨이브
+            osc2.frequency.setValueAtTime(450, now);
+            osc2.frequency.linearRampToValueAtTime(600, now + 1.5);
+            osc2.frequency.linearRampToValueAtTime(450, now + 3.0);
+            osc2.frequency.linearRampToValueAtTime(600, now + 4.5);
+            
+            // 옥타브 아래
+            osc3.frequency.setValueAtTime(150, now);
+            osc3.frequency.linearRampToValueAtTime(200, now + 1.5);
+            osc3.frequency.linearRampToValueAtTime(150, now + 3.0);
+            osc3.frequency.linearRampToValueAtTime(200, now + 4.5);
+            
+            // 볼륨
+            gain1.gain.setValueAtTime(0, now);
+            gain1.gain.linearRampToValueAtTime(0.35, now + 0.2);
+            gain1.gain.setValueAtTime(0.35, now + 4.5);
+            gain1.gain.linearRampToValueAtTime(0, now + 5);
+            
+            gain2.gain.setValueAtTime(0, now);
+            gain2.gain.linearRampToValueAtTime(0.2, now + 0.2);
+            gain2.gain.setValueAtTime(0.2, now + 4.5);
+            gain2.gain.linearRampToValueAtTime(0, now + 5);
+            
+            gain3.gain.setValueAtTime(0, now);
+            gain3.gain.linearRampToValueAtTime(0.2, now + 0.2);
+            gain3.gain.setValueAtTime(0.2, now + 4.5);
+            gain3.gain.linearRampToValueAtTime(0, now + 5);
+            
+            osc1.start(now);
+            osc1.stop(now + 5);
+            osc2.start(now);
+            osc2.stop(now + 5);
+            osc3.start(now);
+            osc3.stop(now + 5);
+        }
+    </script>
+</body>
+</html>

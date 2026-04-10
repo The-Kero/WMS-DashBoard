@@ -1,0 +1,90 @@
+{
+  "snapshot_time": "2025-12-04 21:29:08",
+  "backup_file": "outbound_all_20251204_20251204_182806_backup.csv",
+  "products": [
+    {
+      "product_code": "26048888",
+      "product_name": "감자샐러드 행복한맛남",
+      "unit": "PK.(1kg)",
+      "unallocated_qty": 56,
+      "inbound_info": []
+    },
+    {
+      "product_code": "41006641",
+      "product_name": "아워홈 고려삼계탕",
+      "unit": "EA(800g)",
+      "unallocated_qty": 1240,
+      "inbound_info": []
+    },
+    {
+      "product_code": "41040645",
+      "product_name": "런천미트(파우치,수입산) 행복한맛남",
+      "unit": "EA(1.8kg)",
+      "unallocated_qty": 33,
+      "inbound_info": []
+    },
+    {
+      "product_code": "41055038",
+      "product_name": "후레쉬햄(파우치,수입산) 행복한맛남",
+      "unit": "EA(1.8kg)",
+      "unallocated_qty": 19,
+      "inbound_info": []
+    },
+    {
+      "product_code": "41055700",
+      "product_name": "[아워키즈] 토마토스파게티소스",
+      "unit": "EA(500g)",
+      "unallocated_qty": 328,
+      "inbound_info": []
+    },
+    {
+      "product_code": "41076156",
+      "product_name": "후레쉬햄 마일드(파우치,수입산)",
+      "unit": "EA(1.8kg)",
+      "unallocated_qty": 14,
+      "inbound_info": []
+    },
+    {
+      "product_code": "41084052",
+      "product_name": "진미채볶음 행복한맛남",
+      "unit": "EA(1kg)",
+      "unallocated_qty": 21,
+      "inbound_info": []
+    },
+    {
+      "product_code": "41105139",
+      "product_name": "고구마샐러드R 행복한맛남",
+      "unit": "PK.(1kg)",
+      "unallocated_qty": 111,
+      "inbound_info": []
+    },
+    {
+      "product_code": "41120361",
+      "product_name": "(닥터로빈)스테비아시럽",
+      "unit": "PK.(2kg)",
+      "unallocated_qty": 2,
+      "inbound_info": []
+    },
+    {
+      "product_code": "41126349",
+      "product_name": "맛있는꼬리곰탕 행복한맛남",
+      "unit": "PK.(1kg)",
+      "unallocated_qty": 30,
+      "inbound_info": []
+    },
+    {
+      "product_code": "41126806",
+      "product_name": "[케어플러스]저당 오리엔탈드레싱",
+      "unit": "EA(2kg)",
+      "unallocated_qty": 7,
+      "inbound_info": []
+    },
+    {
+      "product_code": "41127612",
+      "product_name": "[케어플러스]라구소스",
+      "unit": "EA(2kg)",
+      "unallocated_qty": 14,
+      "inbound_info": []
+    }
+  ]
+}

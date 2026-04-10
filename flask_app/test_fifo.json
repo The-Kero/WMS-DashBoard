@@ -1,0 +1,631 @@
+﻿{
+    "card1":  {
+                  "inboundRiskyCount":  0,
+                  "progressRate":  65.7,
+                  "riskyItems":  [
+
+                                 ],
+                  "totalCount":  35
+              },
+    "card2":  {
+                  "amount":  40913665,
+                  "compare":  -48.0,
+                  "irregularTotal":  0,
+                  "irregularUnprinted":  0,
+                  "totalLabel":  2748,
+                  "unprintedLabel":  1532
+              },
+    "card3":  {
+                  "amount":  11917438,
+                  "compare":  -20.8,
+                  "destinations":  {
+                                       "ansan":  0,
+                                       "eumseong":  0,
+                                       "gumi":  0,
+                                       "gyeryong":  0,
+                                       "hanex":  1,
+                                       "honam":  0,
+                                       "jecheon":  0,
+                                       "jeju":  0,
+                                       "kids":  0,
+                                       "yangsan":  125,
+                                       "yangsan2":  0,
+                                       "yongin2":  0,
+                                       "yongin3":  0
+                                   },
+                  "unprintedPicking":  0
+              },
+    "card5":  {
+                  "riskyItems":  [
+                                     {
+                                         "expiryDate":  "20251204",
+                                         "location":  "K040901",
+                                         "productCode":  "27576687",
+                                         "productName":  "(갓잇)블랙페퍼마요",
+                                         "validityRatio":  6.0
+                                     },
+                                     {
+                                         "expiryDate":  "20251223",
+                                         "location":  "K011303",
+                                         "productCode":  "27286876",
+                                         "productName":  "(순대실록) 고추장소스",
+                                         "validityRatio":  14.0
+                                     },
+                                     {
+                                         "expiryDate":  "20251210",
+                                         "location":  "L060903",
+                                         "productCode":  "41127612",
+                                         "productName":  "[케어플러스]라구소스",
+                                         "validityRatio":  14.0
+                                     },
+                                     {
+                                         "expiryDate":  "20251205",
+                                         "location":  "K042402",
+                                         "productCode":  "27392768",
+                                         "productName":  "(핏제리아오) 그라나파다노그레이티드",
+                                         "validityRatio":  15.0
+                                     },
+                                     {
+                                         "expiryDate":  "20251229",
+                                         "location":  "K011403",
+                                         "productCode":  "27558034",
+                                         "productName":  "[그남파] 그남자의 치킨칠라프소스",
+                                         "validityRatio":  17.0
+                                     },
+                                     {
+                                         "expiryDate":  "20251229",
+                                         "location":  "K011301",
+                                         "productCode":  "27558027",
+                                         "productName":  "[그남파] 그남자의 상하이소스",
+                                         "validityRatio":  17.0
+                                     },
+                                     {
+                                         "expiryDate":  "20251223",
+                                         "location":  "K060401",
+                                         "productCode":  "41063934",
+                                         "productName":  "동치미물냉면",
+                                         "validityRatio":  20.0
+                                     },
+                                     {
+                                         "expiryDate":  "20251228",
+                                         "location":  "L061002",
+                                         "productCode":  "41126790",
+                                         "productName":  "[케어플러스]저당 참깨흑임자드레싱",
+                                         "validityRatio":  20.0
+                                     }
+                                 ],
+                  "totalCount":  8,
+                  "urgentCount":  1,
+                  "warningCount":  7
+              },
+    "card6":  {
+                  "deleteAnsan":  [
+                                      {
+                                          "product_name":  "강된장소스 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "강된장소스 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "강된장소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "피자치즈(모짜렐라100) 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "PK.(2.5kg_외국산)"
+                                      },
+                                      {
+                                          "product_name":  "순쌀떡국떡 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(1kg_외국산)"
+                                      },
+                                      {
+                                          "product_name":  "요거트드레싱 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "우동육수 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "만능비빔무침소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "냉채소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "간장치킨소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "오리엔탈소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "데미그라스소스 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "오리엔탈소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "참깨흑임자드레싱 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "돈코츠라멘소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "고소한마요네즈 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(5kg)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "순쌀떡국떡 행복한맛남",
+                                          "qty":  10,
+                                          "unit":  "PK.(1kg_외국산)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "오리엔탈소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "깐풍소스 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "깐풍소스 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "치폴레마요드레싱(소단량) 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(40g*30ea)"
+                                      },
+                                      {
+                                          "product_name":  "아워홈 칼칼한 돼지김치찌개(실온)",
+                                          "qty":  12,
+                                          "unit":  "EA(300g)"
+                                      },
+                                      {
+                                          "product_name":  "홉라(식물성,무가당) 선인",
+                                          "qty":  1,
+                                          "unit":  "EA(1000㎖_이탈리아)"
+                                      },
+                                      {
+                                          "product_name":  "오리엔탈소스 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "사우전아일랜드드레싱 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "타르타르드레싱 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "키위드레싱 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "허니머스타드 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "오리엔탈소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "어묵탕용육수 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "데리야끼소스 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "스위트칠리소스(R) 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "BOX(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "사우전아일랜드드레싱 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "고소한마요네즈 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "시저드레싱 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "순두부찌개용양념장 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "소고기국물베이스(액상) 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "짬뽕양념장(R) 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "데미그라스소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "식물성마요 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "데리야끼소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "고소한마요네즈 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "청양마요소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "쫄면양념장 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "멸균우유(3.5%) 믈레코비타",
+                                          "qty":  7,
+                                          "unit":  "EA(1ℓ_폴란드)"
+                                      },
+                                      {
+                                          "product_name":  "고소한마요네즈 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "데리야끼소스 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "로제파스타소스 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "프리미엄유자레몬드레싱 행복한맛남",
+                                          "qty":  1,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "product_name":  "키위드레싱 행복한맛남",
+                                          "qty":  2,
+                                          "unit":  "PK.(2kg)"
+                                      }
+                                  ],
+                  "deleteEumseong":  [
+
+                                     ],
+                  "fifo":  [
+                               {
+                                   "lower":  {
+                                                 "expiry":  "26.08.10",
+                                                 "location":  "K081001",
+                                                 "product":  "아워홈 얼큰한 해물 순두부찌개"
+                                             },
+                                   "upper":  {
+                                                 "expiry":  "26.07.29",
+                                                 "location":  "K070503"
+                                             }
+                               },
+                               {
+                                   "lower":  {
+                                                 "expiry":  "27.03.01",
+                                                 "location":  "K071701",
+                                                 "product":  "아워홈 전통 삼계탕"
+                                             },
+                                   "upper":  {
+                                                 "expiry":  "27.02.28",
+                                                 "location":  "L010603"
+                                             }
+                               }
+                           ],
+                  "inventory":  {
+                                    "total_value":  872247488
+                                },
+                  "partial":  [
+
+                              ],
+                  "storageRate":  {
+                                      "rate":  71.8
+                                  },
+                  "unallocated":  [
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "배합초(초밥소스) 행복한맛남",
+                                          "qty":  64,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "고소한마요네즈 행복한맛남",
+                                          "qty":  112,
+                                          "unit":  "EA(5kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "생라멘소스(얼큰한맛) 행복한맛남",
+                                          "qty":  10,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "생라멘소스(얼큰한맛) 행복한맛남",
+                                          "qty":  22,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "해물순두부찌개용양념장 행복한맛남",
+                                          "qty":  64,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "양송이스프 행복한맛남",
+                                          "qty":  100,
+                                          "unit":  "EA(1kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "쇠고기맛국물내기 행복한맛남",
+                                          "qty":  280,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "달콤떡볶이소스 행복한맛남",
+                                          "qty":  256,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "데미그라스소스 행복한맛남",
+                                          "qty":  54,
+                                          "unit":  "PK.(5kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "데미그라스소스 행복한맛남",
+                                          "qty":  86,
+                                          "unit":  "PK.(5kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "멸치육수 행복한맛남",
+                                          "qty":  512,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "딸기잼(소단량) 행복한맛남",
+                                          "qty":  140,
+                                          "unit":  "PK.(일회용_12g*100ea)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "NB-아워홈 김치세끼 볶은김치 80g",
+                                          "qty":  1487,
+                                          "unit":  "EA(80g)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "시저드레싱 행복한맛남",
+                                          "qty":  256,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "아워홈 아워홈 바로우렁강된장양념",
+                                          "qty":  240,
+                                          "unit":  "EA"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "오렌지드레싱 행복한맛남",
+                                          "qty":  32,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "(면세)야채피클Ⅱ 행복한맛남",
+                                          "qty":  361,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "(면세)야채피클Ⅱ 행복한맛남",
+                                          "qty":  250,
+                                          "unit":  "PK.(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "불향굴소스 행복한맛남",
+                                          "qty":  32,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "중화풍소스_250g 행복한맛남",
+                                          "qty":  20,
+                                          "unit":  "EA(250g)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "숯불갈비맛소스_2kg 행복한맛남",
+                                          "qty":  32,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "아워홈 굴소스Ⅱ 행복한맛남",
+                                          "qty":  280,
+                                          "unit":  "EA(2kg)"
+                                      },
+                                      {
+                                          "center":  "음성",
+                                          "product_name":  "돼지곰탕육수 행복한맛남",
+                                          "qty":  32,
+                                          "unit":  "EA(2kg)"
+                                      }
+                                  ]
+              },
+    "data_counts":  {
+                        "delete":  68,
+                        "inbound":  35,
+                        "inventory":  934,
+                        "irregular":  0,
+                        "outbound":  2874
+                    },
+    "date":  "20251127",
+    "success":  true,
+    "timestamp":  "2025-11-27T11:07:04.385192"
+}

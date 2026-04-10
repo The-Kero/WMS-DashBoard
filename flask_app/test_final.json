@@ -1,0 +1,555 @@
+﻿{
+  "card1": {
+    "inboundRiskyCount": 0,
+    "progressRate": 100.0,
+    "riskyItems": [],
+    "totalCount": 49
+  },
+  "card2": {
+    "amount": 78722867,
+    "compare": 29.9,
+    "irregularTotal": 11,
+    "irregularUnprinted": 5,
+    "totalLabel": 5803,
+    "unprintedLabel": 0
+  },
+  "card3": {
+    "amount": 15053322,
+    "compare": -46.9,
+    "destinations": {
+      "ansan": 0,
+      "eumseong": 0,
+      "gumi": 0,
+      "gyeryong": 0,
+      "hanex": 1,
+      "honam": 0,
+      "jecheon": 0,
+      "jeju": 0,
+      "kids": 0,
+      "yangsan": 304,
+      "yangsan2": 0,
+      "yongin2": 3,
+      "yongin3": 0
+    },
+    "unprintedPicking": 0
+  },
+  "card5": {
+    "riskyItems": [
+      {
+        "expiryDate": "20251204",
+        "location": "K040901",
+        "productCode": "27576687",
+        "productName": "(\uac13\uc787)\ube14\ub799\ud398\ud37c\ub9c8\uc694",
+        "validityRatio": 6.0
+      },
+      {
+        "expiryDate": "20251223",
+        "location": "K011303",
+        "productCode": "27286876",
+        "productName": "(\uc21c\ub300\uc2e4\ub85d) \uace0\ucd94\uc7a5\uc18c\uc2a4",
+        "validityRatio": 15.0
+      },
+      {
+        "expiryDate": "20251210",
+        "location": "L060903",
+        "productCode": "41127612",
+        "productName": "[\ucf00\uc5b4\ud50c\ub7ec\uc2a4]\ub77c\uad6c\uc18c\uc2a4",
+        "validityRatio": 15.0
+      },
+      {
+        "expiryDate": "20251205",
+        "location": "K042402",
+        "productCode": "27392768",
+        "productName": "(\ud54f\uc81c\ub9ac\uc544\uc624) \uadf8\ub77c\ub098\ud30c\ub2e4\ub178\uadf8\ub808\uc774\ud2f0\ub4dc",
+        "validityRatio": 17.0
+      },
+      {
+        "expiryDate": "20251229",
+        "location": "K011403",
+        "productCode": "27558034",
+        "productName": "[\uadf8\ub0a8\ud30c] \uadf8\ub0a8\uc790\uc758 \uce58\ud0a8\uce60\ub77c\ud504\uc18c\uc2a4",
+        "validityRatio": 18.0
+      },
+      {
+        "expiryDate": "20251229",
+        "location": "K011301",
+        "productCode": "27558027",
+        "productName": "[\uadf8\ub0a8\ud30c] \uadf8\ub0a8\uc790\uc758 \uc0c1\ud558\uc774\uc18c\uc2a4",
+        "validityRatio": 18.0
+      }
+    ],
+    "totalCount": 6,
+    "urgentCount": 1,
+    "warningCount": 5
+  },
+  "card6": {
+    "deleteAnsan": [],
+    "deleteEumseong": [],
+    "fifo": [
+      {
+        "lower": {
+          "expiry": "26.05.19",
+          "location": "K070202",
+          "product": "\ubd88\ub2ed\ubcf6\uc74c\uc6a9\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8"
+        },
+        "upper": {
+          "expiry": "26.05.03",
+          "location": "L030403"
+        }
+      },
+      {
+        "lower": {
+          "expiry": "26.04.23",
+          "location": "K080302",
+          "product": "\ud0c0\ub974\ud0c0\ub974\ub4dc\ub808\uc2f1 \ud589\ubcf5\ud55c\ub9db\ub0a8"
+        },
+        "upper": {
+          "expiry": "26.04.13",
+          "location": "L030402"
+        }
+      },
+      {
+        "lower": {
+          "expiry": "26.02.23",
+          "location": "K080303",
+          "product": "\ub370\ubbf8\uadf8\ub77c\uc2a4\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8"
+        },
+        "upper": {
+          "expiry": "26.02.12",
+          "location": "L020302"
+        }
+      },
+      {
+        "lower": {
+          "expiry": "26.04.28",
+          "location": "K100403",
+          "product": "\ubd80\ub300\ucc0c\uac1c\uc6a9\uc591\ub150\uc7a5 \ud589\ubcf5\ud55c\ub9db\ub0a8"
+        },
+        "upper": {
+          "expiry": "26.04.15",
+          "location": "L050502"
+        }
+      },
+      {
+        "lower": {
+          "expiry": "26.04.18",
+          "location": "K080102",
+          "product": "\ucc38\uae68\ud751\uc784\uc790\ub4dc\ub808\uc2f1 \ud589\ubcf5\ud55c\ub9db\ub0a8"
+        },
+        "upper": {
+          "expiry": "26.04.11",
+          "location": "L020202"
+        }
+      },
+      {
+        "lower": {
+          "expiry": "26.05.10",
+          "location": "K090904",
+          "product": "\uccad\uc591\ub9c8\uc694\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8"
+        },
+        "upper": {
+          "expiry": "26.05.06",
+          "location": "L050801"
+        }
+      },
+      {
+        "lower": {
+          "expiry": "27.03.01",
+          "location": "K071701",
+          "product": "\uc544\uc6cc\ud648 \uc804\ud1b5 \uc0bc\uacc4\ud0d5"
+        },
+        "upper": {
+          "expiry": "27.02.28",
+          "location": "L010603"
+        }
+      }
+    ],
+    "inventory": {
+      "total_value": 866242825
+    },
+    "partial": [
+      {
+        "delivery_group": "9999",
+        "delivery_name": "\uc591\uc0b0",
+        "order_qty": 69,
+        "original_qty": 100,
+        "product_name": "\uc0ac\ucc9c\uc9dc\ubcf6\uc774(NB)",
+        "unit": "EA(\uac1c\ub2f9450g)"
+      },
+      {
+        "delivery_group": "9999",
+        "delivery_name": "\uc6a9\uc7782",
+        "order_qty": 0,
+        "original_qty": 1,
+        "product_name": "[\ubbf8\ud0dc\ub9ac]\uc720\ub2c8\uadf8\ub77c \ub9c8\ud2f0\ub2c8 \ud478\ub4dc \uc11c\ube44\uc2a4 \ud06c\ub9bc",
+        "unit": "EA(1\u2113_\ub9d0\ub808\uc774\uc2dc\uc544)"
+      },
+      {
+        "delivery_group": "9999",
+        "delivery_name": "\uc548\uc0b0",
+        "order_qty": 1,
+        "original_qty": 2,
+        "product_name": "(\uac13\uc787)(\u65b0)\ub80c\uce58\uc18c\uc2a4",
+        "unit": "BOX(3kg*3pk)"
+      },
+      {
+        "delivery_group": "9907",
+        "delivery_name": "\uc6a9\uc7782",
+        "order_qty": 0,
+        "original_qty": 1,
+        "product_name": "[\ubbf8\ud0dc\ub9ac]\uc720\ub2c8\uadf8\ub77c \ub9c8\ud2f0\ub2c8 \ud478\ub4dc \uc11c\ube44\uc2a4 \ud06c\ub9bc",
+        "unit": "EA(1\u2113_\ub9d0\ub808\uc774\uc2dc\uc544)"
+      },
+      {
+        "delivery_group": "9999",
+        "delivery_name": "\uc591\uc0b02",
+        "order_qty": 0,
+        "original_qty": 2,
+        "product_name": "\u2605(\uac13\uc787)\uce58\ud3f4\ub808\uc18c\uc2a4",
+        "unit": "PK.(2kg)"
+      },
+      {
+        "delivery_group": "9999",
+        "delivery_name": "\uc81c\uc8fc",
+        "order_qty": 0,
+        "original_qty": 3,
+        "product_name": "\ubc00\ub77d \uace8\ub4dc \ud718\ud551\ud06c\ub9bc(\ucef4\ud30c\uc6b4\ub4dc \ud0c0\uc785)",
+        "unit": "EA(1\u2113_\uc601\uad6d)"
+      },
+      {
+        "delivery_group": "9999",
+        "delivery_name": "\uc81c\uc8fc",
+        "order_qty": 0,
+        "original_qty": 11,
+        "product_name": "\ubc00\ub77d \uace8\ub4dc \ud718\ud551\ud06c\ub9bc(\ucef4\ud30c\uc6b4\ub4dc \ud0c0\uc785)",
+        "unit": "EA(1\u2113_\uc601\uad6d)"
+      },
+      {
+        "delivery_group": "9999",
+        "delivery_name": "\uc81c\uc8fc",
+        "order_qty": 0,
+        "original_qty": 1,
+        "product_name": "\ubc00\ub77d \uace8\ub4dc \ud718\ud551\ud06c\ub9bc(\ucef4\ud30c\uc6b4\ub4dc \ud0c0\uc785)",
+        "unit": "EA(1\u2113_\uc601\uad6d)"
+      },
+      {
+        "delivery_group": "9999",
+        "delivery_name": "\uc81c\uc8fc",
+        "order_qty": 0,
+        "original_qty": 2,
+        "product_name": "\ubc00\ub77d \uace8\ub4dc \ud718\ud551\ud06c\ub9bc(\ucef4\ud30c\uc6b4\ub4dc \ud0c0\uc785)",
+        "unit": "EA(1\u2113_\uc601\uad6d)"
+      }
+    ],
+    "storageRate": {
+      "rate": 38.0
+    },
+    "unallocated": [
+      {
+        "center": "\uc548\uc0b0",
+        "product_name": "\ud478\uc2e4\ub9ac\uc0d0\ub7ec\ub4dc \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 30,
+        "unit": "PK.(1kg)"
+      },
+      {
+        "center": "\uc548\uc0b0",
+        "product_name": "\uc9c4\ubbf8\ucc44\ubcf6\uc74c \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 50,
+        "unit": "EA(1kg)"
+      },
+      {
+        "center": "\uc548\uc0b0",
+        "product_name": "\uba85\uc5fd\ucc44\ubcf6\uc74c \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 100,
+        "unit": "EA(1kg)"
+      },
+      {
+        "center": "\uc548\uc0b0",
+        "product_name": "\uc5b4\ucc44\ubcf6\uc74c \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 50,
+        "unit": "EA(1kg)"
+      },
+      {
+        "center": "\uc548\uc0b0",
+        "product_name": "\uacac\uacfc\ub958\uba78\uce58\ubcf6\uc74c \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 50,
+        "unit": "PK.(1kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\ud504\ub9ac\ubbf8\uc5c4\uc720\uc790\ub808\ubaac\ub4dc\ub808\uc2f1 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 256,
+        "unit": "PK.(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\ud06c\ub9bc\uc2a4\ud30c\uac8c\ud2f0\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 64,
+        "unit": "PK.(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\ud0c0\ub974\ud0c0\ub974\ub4dc\ub808\uc2f1 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 768,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\ub370\ubbf8\uadf8\ub77c\uc2a4\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 126,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\ub370\ubbf8\uadf8\ub77c\uc2a4\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 319,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\ubb34\uce68\uac04\uc7a5\uc591\ub150\uc7a5 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 16,
+        "unit": "PK.(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\ucf58\uc0d0\ub7ec\ub4dc\uc6a9\ub4dc\ub808\uc2f1 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 32,
+        "unit": "PK.(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\ud0c4\ub450\ub9ac\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 28,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\ud0c4\ub450\ub9ac\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 256,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uace0\uc18c\ud55c\ub9c8\uc694\ub124\uc988 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 32,
+        "unit": "EA(5kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\ub0c9\ucc44\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 78,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\ub0c9\ucc44\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 256,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uba78\uce58\ub9db\uad6d\ubb3c\ub0b4\uae30 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 100,
+        "unit": "EA(1kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc1e0\uace0\uae30\ub9db\uad6d\ubb3c\ub0b4\uae30 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 188,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc544\uc6cc\ud648 \ub9e4\ucf64\uc591\ub150\uc7a5",
+        "qty": 21,
+        "unit": "PK.(\ube44\ube54\ubc25\uc6a9_35g*40ea)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc5b8\uc591\uc2dd\ubc14\uc2f9\ubd88\uace0\uae30\uc591\ub150\uc7a5 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 32,
+        "unit": "PK.(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc544\uc6cc\ud648 \ubc14\ub85c\ubd80\ub300\ucc0c\uac1c\uc591\ub150",
+        "qty": 240,
+        "unit": "EA"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc544\uc6cc\ud648 \ubc14\ub85c\uc21c\ub450\ubd80\ucc0c\uac1c\uc591\ub150",
+        "qty": 360,
+        "unit": "EA"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uce58\ud0a8\ub09c\ubc29\uc6a9\ub9c8\uc694",
+        "qty": 10,
+        "unit": "BOX(2kg*5ea)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc544\uc6cc\ud648 \ud2b9\uc804\ubcf5\uc8fd",
+        "qty": 1280,
+        "unit": "EA(270g)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc544\uc6cc\ud648 \ubc84\uc12f\uc18c\uace0\uae30\uc8fd",
+        "qty": 1280,
+        "unit": "EA(270g)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc6b0\ub3d9\uc18c\uc2a4\u2161(R) \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 264,
+        "unit": "PK.(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc624\ub9ac\uc5d4\ud0c8\ub4dc\ub808\uc2f1(\uc18c\ub2e8\ub7c9) \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 199,
+        "unit": "PK.(30g*40ea)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc624\ub9ac\uc5d4\ud0c8\ub4dc\ub808\uc2f1(\uc18c\ub2e8\ub7c9) \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 149,
+        "unit": "PK.(30g*40ea)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\ub370\ubbf8\uc640\uc778\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 64,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc2dd\ubb3c\uc131\ub9c8\uc694 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 64,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc544\uc6cc\ud648 \uad74\uc18c\uc2a4\u2161 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 202,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc544\uc6cc\ud648 \uace0\ucd94\ub9db\uae30\ub984",
+        "qty": 60,
+        "unit": "EA(1.8\u2113)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "\uc544\uc6cc\ud648 \ubd88\ub9db\uace0\ucd94\uae30\ub984",
+        "qty": 30,
+        "unit": "EA(1.8\u2113)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "[\uc544\ud1a0\ud0a4\ud1a0]\uc0ac\uc6b0\uc804\uc544\uc77c\ub79c\ub4dc\ub4dc\ub808\uc2f1",
+        "qty": 28,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "[\uc544\ud1a0\ud0a4\ud1a0]\uc0ac\uc6b0\uc804\uc544\uc77c\ub79c\ub4dc\ub4dc\ub808\uc2f1",
+        "qty": 4,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "[\ucf00\uc5b4\ud50c\ub7ec\uc2a4]\uc800\ub2f9 \ucc38\uae68\ud751\uc784\uc790\ub4dc\ub808\uc2f1",
+        "qty": 32,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "[\ucf00\uc5b4\ud50c\ub7ec\uc2a4]\uc800\ub2f9 \uc2a4\uc704\ud2b8\uce60\ub9ac\uc18c\uc2a4",
+        "qty": 16,
+        "unit": "EA(2kg)"
+      },
+      {
+        "center": "\uc591\uc0b0",
+        "product_name": "\uba54\ucd94\ub9ac\uc54c\uc7a5\uc870\ub9bc(\uc57d55\uac1c) \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 200,
+        "unit": "EA(1kg)"
+      },
+      {
+        "center": "\uc591\uc0b0",
+        "product_name": "\uc0ac\ucc9c\uc9dc\ubcf6\uc774(NB)",
+        "qty": 30,
+        "unit": "EA(\uac1c\ub2f9450g)"
+      },
+      {
+        "center": "\uc591\uc0b0",
+        "product_name": "\uc544\uc6cc\ud648 \uc655\uac08\ube44\ud0d5",
+        "qty": 600,
+        "unit": "EA(600g)"
+      },
+      {
+        "center": "\uc6a9\uc7782",
+        "product_name": "(\uac13\uc787)(\u65b0)\ub80c\uce58\uc18c\uc2a4",
+        "qty": 1,
+        "unit": "BOX(3kg*3pk)"
+      },
+      {
+        "center": "\uc6a9\uc7782",
+        "product_name": "(\ub0c9\uc7a5)\uc5c4\ub9c8\uc190\uce7c\uad6d\uc218 \uc0dd\uba74",
+        "qty": 1,
+        "unit": "BOX(200g*45ea)"
+      },
+      {
+        "center": "\uc6a9\uc7783",
+        "product_name": "\ud1a0\ub9c8\ud1a0\uc2a4\ud30c\uac8c\ud2f0\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8(\ub0c9\uc7a5)",
+        "qty": 240,
+        "unit": "EA(2kg_\uc911\uad6d)"
+      },
+      {
+        "center": "\uc6a9\uc7782",
+        "product_name": "\ud718\ud551\ud06c\ub9bc(\uc720\uc9c0\ubc29 35.1%) \ub098\ub974\ub9cc",
+        "qty": 1152,
+        "unit": "EA(1\u2113_\ub3c5\uc77c)"
+      },
+      {
+        "center": "\uacc4\ub8e1",
+        "product_name": "OH)\uc0dd\ucac4\uba74 432g",
+        "qty": 40,
+        "unit": "PK."
+      },
+      {
+        "center": "\uc548\uc0b0",
+        "product_name": "(\uadc0\uc871)\uadc0\uc871\uc7c1\ubc18\uc18c\uc2a4",
+        "qty": 3,
+        "unit": "PK.(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "[Careplus] \ub3c8\uae4c\uc2a4\uc18c\uc2a4 \ud589\ubcf5\ud55c\ub9db\ub0a8",
+        "qty": 1,
+        "unit": "PK.(2kg)"
+      },
+      {
+        "center": "\uc74c\uc131",
+        "product_name": "NB-\uc544\uc6cc\ud648 \uae40\uce58\uc138\ub07c \ubcf6\uc740\uae40\uce58 80g",
+        "qty": 100,
+        "unit": "EA(80g)"
+      }
+    ]
+  },
+  "data_counts": {
+    "delete": 0,
+    "inbound": 49,
+    "inventory": 900,
+    "irregular": 11,
+    "outbound": 6125
+  },
+  "date": "20251126",
+  "success": true,
+  "timestamp": "2025-11-26T22:27:52.410816"
+}
+
