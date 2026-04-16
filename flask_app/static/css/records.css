@@ -1,7 +1,18 @@
 /* ============================================================
-   재고조사 기록 — OPS톤 CSS (210차 #16)
+   재고조사 기록 — OPS톤 CSS (210차 #16 / 216차 #26 확장)
    6원칙: OPS톤(유리질감) + 7원칙(현장3초) + 엑셀 정합성
    ============================================================ */
+
+/* ★ 216차 #26: 셀 크기/폰트 CSS 변수화 (기초공사 — 재조정 1줄 수정)
+   케로님 피드백: "가로 세로 스크롤 있어도 OK, 현장 3초 우선"
+   32→40 / 12→13 확대. 데스크톱 담김, 노트북 가로 스크롤 자연. */
+:root {
+    --cell-width: 40px;        /* 날짜 셀 최소 너비 (32 → 40) */
+    --cell-height: 40px;       /* 날짜 셀 높이 (30 → 40, 2줄 대응) */
+    --cell-font-main: 13px;    /* 차이값 폰트 (12 → 13) */
+    --cell-font-note: 10px;    /* 비고 서브 폰트 (신규) */
+    --matrix-font: 13px;       /* 매트릭스 기본 폰트 (12 → 13) */
+}
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; height: 100%; }
@@ -92,12 +103,12 @@ body {
 #matrix-table {
     border-collapse: separate;
     border-spacing: 0;
-    font-size: 12px;
+    font-size: var(--matrix-font);   /* ★ 216차 #26: 12 → 13 */
     width: max-content;  /* 가로 스크롤 */
     min-width: 100%;
 }
 #matrix-table th, #matrix-table td {
-    padding: 7px 5px;
+    padding: 5px 5px;   /* ★ 216차 #26: 7 → 5 (2줄 여유 확보) */
     border-bottom: 1px solid #EEF1F5;
     border-right: 1px solid #EEF1F5;
     text-align: center;
@@ -119,7 +130,7 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 #matrix-table thead th.day-col {
-    min-width: 32px;
+    min-width: var(--cell-width);   /* ★ 216차 #26: 32 → 40 */
     padding: 10px 4px;
 }
 #matrix-table thead th.day-col.weekend { background: linear-gradient(180deg, #E53935 0%, #C62828 100%); }
@@ -146,8 +157,21 @@ body {
 #matrix-table tbody tr:hover .sticky-col { background: #F5F9FD !important; }
 #matrix-table tbody tr:hover td { background-color: rgba(25, 118, 210, 0.03); }
 
-/* 차이 값 셀 (6원칙: 현장 3초 색상) */
-.day-cell { min-width: 32px; font-weight: 600; cursor: pointer; }
+/* ============================================================
+   차이 값 셀 (6원칙: 현장 3초 색상)
+   ★ 216차 #26: 색 체계 단순화 (-/+만) + 차이값/비고 2줄 배치
+   - cell-diff-neg / cell-diff-pos 유지
+   - cell-diff-zero: 배경 제거 (클래스 삭제)
+   - cell-text: 주황색 제거 (완전 삭제)
+   ============================================================ */
+.day-cell {
+    min-width: var(--cell-width);
+    max-width: var(--cell-width);    /* ★ 216차 #26: 셀 폭 강제 고정 (긴 비고로 매트릭스 정렬 깨지는 것 방지) */
+    height: var(--cell-height);      /* ★ 216차 #26: 2줄 대응 */
+    overflow: hidden;                 /* ★ 216차 #26: 넘침 차단 */
+    font-weight: 600;
+    cursor: pointer;
+}
 .cell-diff-neg {
     background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
     color: #C62828;
@@ -158,17 +182,32 @@ body {
     color: #0D47A1;
     font-weight: 700;
 }
-.cell-diff-zero {
-    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-    color: #2E7D32;
+/* ★ 216차 #26: 차이값 + 비고 2줄 배치 (비고 있을 때만 cell-has-note 클래스) */
+.day-cell.cell-has-note {
+    padding: 3px 4px;   /* 2줄 여유 */
+    line-height: 1.1;
 }
-.cell-text {
-    background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
-    color: #E65100;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 2px;
+.cell-diff-val {
+    display: block;
+    font-size: var(--cell-font-main);
+    font-weight: 700;
 }
+.cell-note-text {
+    display: block;
+    max-width: 100%;              /* ★ 216차 #26: 부모 셀 폭 준수 */
+    overflow: hidden;              /* ★ 216차 #26: 넘침 차단 */
+    text-overflow: ellipsis;       /* ★ 216차 #26: 자동 "…" 말줄임 (CSS 레벨 2차 방어) */
+    white-space: nowrap;           /* 한 줄 유지 */
+    font-size: var(--cell-font-note);
+    font-weight: 400;
+    color: #546E7A;      /* 중립 회색 — 차이 색 강조 흐리지 않게 */
+    margin-top: 1px;
+    letter-spacing: -0.3px;
+}
+/* 비고 있는 셀에서도 차이 색 유지 — 비고 텍스트 색만 회색 */
+.day-cell.cell-diff-neg.cell-has-note .cell-note-text { color: #8D6E63; }
+.day-cell.cell-diff-pos.cell-has-note .cell-note-text { color: #455A64; }
+
 .day-cell:hover {
     box-shadow: inset 0 0 0 2px #1976D2;
     transform: scale(1.05);
@@ -319,6 +358,115 @@ body {
 .event-extra .pill.resolved { background: #E8F5E9; color: #2E7D32; }
 .event-extra .pill.unresolved { background: #FFF3E0; color: #E65100; }
 
+/* ============================================================
+   ★ 216차 #26: 인쇄 필터 선택 모달
+   6원칙: ①OPS톤(유리질감) ②7원칙(빅터치 52px+/3초/기호) ③정합성(매트릭스 색상)
+          ④확장성(PRINT_FILTERS 배열 기반) ⑤안정성 ⑥무결성
+   ============================================================ */
+.print-modal .modal-content {
+    min-width: 440px;
+    max-width: 520px;
+}
+
+.print-modal .modal-header h2::before {
+    content: ""; /* ::before 중복 방지 (h2 자체에 📋 이미 포함) */
+}
+
+.print-options {
+    padding: 18px 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 단일 필터 버튼 — 빅터치 52px+, 세로 배치, 각 필터 고유 색상 */
+.print-option {
+    --opt-color: #1976D2;
+    --opt-bg-from: #E3F2FD;
+    --opt-bg-to: #BBDEFB;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    min-height: 64px;   /* ★ 빅터치: 52px+ 여유 */
+    background: white;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    color: #263238;
+    text-align: left;
+    transition: all 0.15s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 좌측 컬러 바 — 매트릭스 색 체계 재사용 (③정합성) */
+.print-option::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 5px;
+    background: var(--opt-color);
+}
+
+.print-option:hover {
+    background: linear-gradient(135deg, var(--opt-bg-from) 0%, var(--opt-bg-to) 100%);
+    border-color: var(--opt-color);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
+}
+
+.print-option:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.print-option .option-icon {
+    font-size: 28px;
+    flex: 0 0 auto;
+    line-height: 1;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.print-option .option-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.print-option .option-text b {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--opt-color);
+    letter-spacing: -0.2px;
+}
+
+.print-option .option-text small {
+    font-size: 12px;
+    color: #607D8B;
+    font-weight: 400;
+    letter-spacing: -0.1px;
+}
+
+.print-option:hover .option-text b {
+    color: var(--opt-color);
+}
+
+.print-option:hover .option-text small {
+    color: #37474F;
+}
+
+/* 인쇄 시 모달 숨김 (매트릭스 인쇄와 충돌 방지) */
+@media print {
+    .print-modal { display: none !important; }
+}
+
 /* 인쇄 */
 @media print {
     body { background: white; }
@@ -328,5 +476,5 @@ body {
     #matrix-table thead th { background: #555 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .sticky-col { position: static !important; box-shadow: none; }
     .day-cell { min-width: 28px; padding: 4px 2px; }
-    .cell-diff-neg, .cell-diff-pos, .cell-diff-zero, .cell-text { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cell-diff-neg, .cell-diff-pos { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

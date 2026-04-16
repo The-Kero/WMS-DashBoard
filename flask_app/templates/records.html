@@ -61,6 +61,20 @@
     </div>
 </div>
 
+<!-- ★ 216차 #26: 날짜 헤더 클릭 → 인쇄 필터 선택 모달 -->
+<div id="print-modal" class="modal print-modal">
+    <div class="modal-content print-modal-content">
+        <div class="modal-header">
+            <div>
+                <h2 id="print-modal-title">📋 재고장 인쇄</h2>
+                <span id="print-modal-subtitle" class="subtitle">–</span>
+            </div>
+            <button class="modal-close" id="print-modal-close">×</button>
+        </div>
+        <div class="print-options" id="print-options"></div>
+    </div>
+</div>
+
 <script>
 // ============================================================
 // 재고조사 기록 — JavaScript (210차 #16)
@@ -83,6 +97,40 @@ const modal = $('#detail-modal');
 const modalTitle = $('#modal-title');
 const modalSubtitle = $('#modal-subtitle');
 const modalBody = $('#modal-body');
+
+// ★ 216차 #26: 인쇄 필터 선택 모달
+const printModal = $('#print-modal');
+const printModalSubtitle = $('#print-modal-subtitle');
+const printOptionsContainer = $('#print-options');
+
+// ★ 216차 #26: 인쇄 필터 정의 (미래 확장 시 객체 1개 추가로 버튼 자동 생성)
+// 6원칙: ①OPS톤 색상 체계(매트릭스와 통일) ③정합성(태블릿 용어) ④확장성(버튼 자동 생성)
+const PRINT_FILTERS = [
+    {
+        key: 'all',
+        icon: '🗂',
+        label: '전체 재고장',
+        desc: '차이+체크 모두 · 아워홈 제출용',
+        color: '#1976D2',   // CBlue — 매트릭스 헤더 색
+        bgFrom: '#E3F2FD', bgTo: '#BBDEFB',
+    },
+    {
+        key: 'diff',
+        icon: '⚠',
+        label: '차이만 인쇄',
+        desc: '미해결 차이만 · 원인 추적용',
+        color: '#C62828',   // CRed — 매트릭스 cell-diff-neg
+        bgFrom: '#FFEBEE', bgTo: '#FFCDD2',
+    },
+    {
+        key: 'caution',
+        icon: '🌿',
+        label: '신선&부진만',
+        desc: '유통비 낮은 상품 · 부진재고 관리용',
+        color: '#E65100',   // Orange — 매트릭스 cell-text
+        bgFrom: '#FFF3E0', bgTo: '#FFE0B2',
+    },
+];
 
 let currentData = null;
 
@@ -116,12 +164,17 @@ function renderHead(year, month, lastDay) {
         const w = weekdayOf(year, month, d);
         const cls = w === 0 ? 'weekend' : (w === 6 ? 'saturday' : '');
         const dateStr = `${year}${String(month).padStart(2,'0')}${String(d).padStart(2,'0')}`;
-        theadRow.innerHTML += `<th class="day-col printable ${cls}" data-date="${dateStr}" title="클릭: 이 날짜 차이 재고장 (태블릿 양식) 미리보기">${d}</th>`;
+        theadRow.innerHTML += `<th class="day-col printable ${cls}" data-date="${dateStr}" title="클릭: 이 날짜 재고장 인쇄 (전체/차이/신선&부진 선택)">${d}</th>`;
     }
 }
 
-// ───── 날짜 헤더 클릭 → 태블릿 양식 PDF 미리보기 (211차 #24) ─────
+// ───── 날짜 헤더 클릭 → 태블릿 양식 PDF 미리보기 (211차 #24 / 216차 #26 모달 분기) ─────
+// 6원칙 ⑤안정성: R2 팝업차단 감지 + R5 0건 안내 + R6 중복클릭 방지
 async function printDay(dateStr, filter='diff') {
+    // ★ filter 라벨 (안내 메시지용)
+    const filterDef = PRINT_FILTERS.find(f => f.key === filter);
+    const filterLabel = filterDef ? filterDef.label : filter;
+
     try {
         const res = await fetch('/api/records/print', {
             method: 'POST',
@@ -138,13 +191,69 @@ async function printDay(dateStr, filter='diff') {
             alert(`인쇄 실패 ${res.status}: ${t.slice(0, 200)}`);
             return;
         }
+
+        // ★ R5 대응: 응답이 JSON(WARN)인지 PDF인지 Content-Type으로 판정
+        const ct = res.headers.get('Content-Type') || '';
+        if (ct.includes('application/json')) {
+            const data = await res.json();
+            alert(`⚠ "${filterLabel}" 조건의 인쇄할 데이터가 없어요.\n\n${data.detail || ''}`);
+            return;
+        }
+
         const blob = await res.blob();
+        if (!blob.size) {
+            alert(`⚠ "${filterLabel}" 조건의 인쇄 데이터가 비어있어요.`);
+            return;
+        }
+
         const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
+        // ★ R2 대응: 팝업 차단기 감지
+        const newWin = window.open(url, '_blank');
+        if (!newWin || newWin.closed || typeof newWin.closed === 'undefined') {
+            URL.revokeObjectURL(url);
+            alert('❌ 팝업이 차단됐어요!\n\n브라우저 주소창 옆 팝업 차단 아이콘을 눌러서 "허용"으로 바꾸신 후 다시 시도해주세요.');
+            return;
+        }
         setTimeout(() => URL.revokeObjectURL(url), 30000);
     } catch (e) {
         alert(`인쇄 요청 실패: ${e.message}`);
     }
+}
+
+// ★ 216차 #26: 날짜 헤더 클릭 → 인쇄 필터 선택 모달 열기
+function openPrintModal(dateStr) {
+    // dateStr = "YYYYMMDD" → "M월 D일 (요일)" 변환
+    const y = parseInt(dateStr.slice(0, 4));
+    const m = parseInt(dateStr.slice(4, 6));
+    const d = parseInt(dateStr.slice(6, 8));
+    const weekdayKor = ['일', '월', '화', '수', '목', '금', '토'];
+    const w = weekdayKor[new Date(y, m - 1, d).getDay()];
+    printModalSubtitle.textContent = `${m}월 ${d}일 (${w})`;
+
+    // 필터 버튼 동적 생성 (PRINT_FILTERS 배열 기반 — 기초공사: 확장 시 배열만 수정)
+    printOptionsContainer.innerHTML = '';
+    PRINT_FILTERS.forEach(f => {
+        const btn = document.createElement('button');
+        btn.className = 'print-option';
+        btn.style.setProperty('--opt-color', f.color);
+        btn.style.setProperty('--opt-bg-from', f.bgFrom);
+        btn.style.setProperty('--opt-bg-to', f.bgTo);
+        btn.innerHTML = `
+            <span class="option-icon">${f.icon}</span>
+            <span class="option-text">
+                <b>${f.label}</b>
+                <small>${f.desc}</small>
+            </span>
+        `;
+        btn.addEventListener('click', () => {
+            // ★ R6 대응: 옵션 클릭 즉시 모달 닫음 (중복 클릭 방지)
+            printModal.classList.remove('visible');
+            printDay(dateStr, f.key);
+        });
+        printOptionsContainer.appendChild(btn);
+    });
+
+    printModal.classList.add('visible');
 }
 
 // ───── 매트릭스 본문 렌더링 ─────
@@ -170,25 +279,37 @@ function renderBody(items, year, month, lastDay) {
             if (rec) {
                 cellCount++;
                 const diff = rec.diff;
-                if (rec.note) {
-                    // 특이사항 문자 우선 표시
-                    textCount++;
-                    td.classList.add('cell-text');
-                    td.textContent = truncate(rec.note, 6);
-                    td.title = `${rec.note}\n차이: ${diff >= 0 ? '+' + diff : diff}\n작업자: ${rec.worker || '–'}`;
-                } else if (diff < 0) {
+
+                // ★ 216차 #26-B: 색상 체계 단순화 — 빨강(-)/파랑(+)만. 주황(비고)/초록(0) 제거.
+                // 차이값 색상 결정
+                let diffText = '';
+                if (diff < 0) {
                     td.classList.add('cell-diff-neg');
-                    td.textContent = diff;
+                    diffText = String(diff);
                     td.title = `${diff}개 부족 | ${rec.worker || '–'}`;
                 } else if (diff > 0) {
                     td.classList.add('cell-diff-pos');
-                    td.textContent = '+' + diff;
+                    diffText = '+' + diff;
                     td.title = `${diff}개 잉여 | ${rec.worker || '–'}`;
                 } else {
-                    td.classList.add('cell-diff-zero');
-                    td.textContent = '0';
+                    // 차이 0 — 무색 배경 + "0" 텍스트 (빈 셀과 구분)
+                    diffText = '0';
                     td.title = `정물일치 | ${rec.worker || '–'}`;
                 }
+
+                // ★ 216차 #26-B: 비고 있으면 세로 2줄 배치 (차이 위, 비고 아래).
+                // 비고 없으면 1줄 유지 (조건부 2줄).
+                if (rec.note) {
+                    textCount++;
+                    td.classList.add('cell-has-note');
+                    // title에 비고+차이 full 정보 포함 (hover 시 상세 확인)
+                    td.title = `${rec.note}\n차이: ${diff >= 0 ? '+' + diff : diff}\n작업자: ${rec.worker || '–'}`;
+                    // innerHTML 사용 — escapeHtml 필수 (XSS 방지, R1 대응)
+                    td.innerHTML = `<span class="cell-diff-val">${diffText}</span><span class="cell-note-text">${escapeHtml(truncate(rec.note, 6))}</span>`;
+                } else {
+                    td.textContent = diffText;  // 1줄 (기존 동작 유지)
+                }
+
                 const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 td.onclick = () => openDetail(item, dateStr);
             }
@@ -338,7 +459,17 @@ function downloadCSV() {
 // ───── 이벤트 ─────
 $('#modal-close').onclick = () => modal.classList.remove('visible');
 modal.onclick = e => { if (e.target === modal) modal.classList.remove('visible'); };
-document.addEventListener('keydown', e => { if (e.key === 'Escape') modal.classList.remove('visible'); });
+
+// ★ 216차 #26: 인쇄 필터 선택 모달 닫기 (ESC / 바깥 클릭 / × 버튼)
+$('#print-modal-close').onclick = () => printModal.classList.remove('visible');
+printModal.onclick = e => { if (e.target === printModal) printModal.classList.remove('visible'); };
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        modal.classList.remove('visible');
+        printModal.classList.remove('visible');  // ★ 216차 #26
+    }
+});
 
 monthSelect.onchange = loadMatrix;
 partSelect.onchange = loadMatrix;
@@ -346,11 +477,11 @@ refreshBtn.onclick = loadMatrix;
 csvBtn.onclick = downloadCSV;
 printBtn.onclick = () => window.print();  // 매트릭스 월별 전체 인쇄 (브라우저 기본)
 
-// ★ 211차: 날짜 헤더 클릭 → 태블릿 양식 PDF 미리보기 (이벤트 위임)
+// ★ 211차 → 216차 #26: 날짜 헤더 클릭 → 인쇄 필터 선택 모달 (이벤트 위임)
 theadRow.addEventListener('click', (e) => {
     const th = e.target.closest('th.printable');
     if (!th || !th.dataset.date) return;
-    printDay(th.dataset.date, 'diff');
+    openPrintModal(th.dataset.date);  // ★ 216차: 'diff' 하드코딩 → 모달 분기
 });
 
 // ───── 초기화 ─────
