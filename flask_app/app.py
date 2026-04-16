@@ -49,6 +49,7 @@ from api.delete import bp as delete_bp
 from api.irregular import bp as irregular_bp
 from api.dashboard import bp as dashboard_bp
 from api.schedule import bp as schedule_bp
+from api.records import bp as records_bp  # ★ 210차 #16: 재고조사 기록 열람
 
 app.register_blueprint(inbound_bp)
 app.register_blueprint(outbound_bp)
@@ -57,6 +58,7 @@ app.register_blueprint(delete_bp)
 app.register_blueprint(irregular_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(schedule_bp)
+app.register_blueprint(records_bp)  # ★ 210차 #16
 
 
 # ============================================================
@@ -75,6 +77,13 @@ def schedule_admin():
     """스케줄 관리 페이지"""
     logger.info("스케줄 관리 페이지 접근")
     return render_template('schedule_admin.html')
+
+
+@app.route('/records')
+def records_page():
+    """★ 210차 #16: 재고조사 기록 열람 페이지"""
+    logger.info("재고조사 기록 페이지 접근")
+    return render_template('records.html')
 
 
 @app.route('/api/health')

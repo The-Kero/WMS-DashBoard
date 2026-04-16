@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>재고조사 기록 — 냉장파트 DX</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/records.css') }}">
+</head>
+<body>
+
+<div class="top-bar">
+    <h1>재고조사 기록</h1>
+    <div class="controls">
+        <label for="month-select">월</label>
+        <select id="month-select"></select>
+        <label for="part-select">부서</label>
+        <select id="part-select">
+            <option value="냉장">냉장</option>
+            <option value="냉동">냉동</option>
+            <option value="상온">상온</option>
+        </select>
+        <button id="refresh-btn" class="primary">🔄 새로고침</button>
+        <button id="csv-btn">💾 CSV</button>
+        <button id="print-btn">🖨️ 인쇄</button>
+    </div>
+</div>
+
+<div class="summary">
+    <span class="badge">차이 기록 상품 <b id="sum-items">–</b>건</span>
+    <span class="badge">차이값 셀 <b id="sum-cells">–</b>건</span>
+    <span class="badge">특이사항 <b id="sum-text">–</b>건</span>
+    <span class="badge">마감일 <b id="sum-month">–</b></span>
+</div>
+
+<div class="matrix-container">
+    <div id="loading" class="loading">⏳ 불러오는 중...</div>
+    <table id="matrix-table" style="display:none;">
+        <thead>
+            <tr id="thead-row"></tr>
+        </thead>
+        <tbody id="matrix-body"></tbody>
+    </table>
+    <div id="empty" class="empty-state" style="display:none;">
+        <span class="emoji">📋</span>
+        해당 월에 차이 기록이 없어요.<br>
+        <small style="color:#90A4AE;">재고조사 시 차이가 발견된 항목만 기록됩니다.</small>
+    </div>
+</div>
+
+<!-- 셀 클릭 상세 모달 -->
+<div id="detail-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div>
+                <h2 id="modal-title">–</h2>
+                <span id="modal-subtitle" class="subtitle">–</span>
+            </div>
+            <button class="modal-close" id="modal-close">×</button>
+        </div>
+        <div id="modal-body" class="modal-body"></div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// 재고조사 기록 — JavaScript (210차 #16)
+// ============================================================
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+const monthSelect = $('#month-select');
+const partSelect = $('#part-select');
+const refreshBtn = $('#refresh-btn');
+const csvBtn = $('#csv-btn');
+const printBtn = $('#print-btn');
+const loading = $('#loading');
+const table = $('#matrix-table');
+const theadRow = $('#thead-row');
+const matrixBody = $('#matrix-body');
+const empty = $('#empty');
+const modal = $('#detail-modal');
+const modalTitle = $('#modal-title');
+const modalSubtitle = $('#modal-subtitle');
+const modalBody = $('#modal-body');
+
+let currentData = null;
+
+// ───── 월 옵션 생성 (현재 포함 과거 12개월) ─────
+function initMonths() {
+    const now = new Date();
+    for (let i = 0; i < 12; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const opt = document.createElement('option');
+        opt.value = ym;
+        opt.textContent = ym;
+        monthSelect.appendChild(opt);
+    }
+}
+
+// ───── 요일 판정 (헤더 주말 강조용) ─────
+function weekdayOf(year, month, day) {
+    return new Date(year, month - 1, day).getDay();  // 0=일, 6=토
+}
+
+// ───── 헤더 렌더링 ─────
+function renderHead(year, month, lastDay) {
+    theadRow.innerHTML = `
+        <th class="sticky-col col-locaky">로케</th>
+        <th class="sticky-col col-skukey">상품코드</th>
+        <th class="sticky-col col-name">상품명</th>
+        <th class="sticky-col col-spec">규격</th>
+    `;
+    for (let d = 1; d <= lastDay; d++) {
+        const w = weekdayOf(year, month, d);
+        const cls = w === 0 ? 'weekend' : (w === 6 ? 'saturday' : '');
+        const dateStr = `${year}${String(month).padStart(2,'0')}${String(d).padStart(2,'0')}`;
+        theadRow.innerHTML += `<th class="day-col printable ${cls}" data-date="${dateStr}" title="클릭: 이 날짜 차이 재고장 (태블릿 양식) 미리보기">${d}</th>`;
+    }
+}
+
+// ───── 날짜 헤더 클릭 → 태블릿 양식 PDF 미리보기 (211차 #24) ─────
+async function printDay(dateStr, filter='diff') {
+    try {
+        const res = await fetch('/api/records/print', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                center: 'WH15',
+                part: partSelect.value,
+                date: dateStr,
+                filter: filter
+            })
+        });
+        if (!res.ok) {
+            const t = await res.text();
+            alert(`인쇄 실패 ${res.status}: ${t.slice(0, 200)}`);
+            return;
+        }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+    } catch (e) {
+        alert(`인쇄 요청 실패: ${e.message}`);
+    }
+}
+
+// ───── 매트릭스 본문 렌더링 ─────
+function renderBody(items, year, month, lastDay) {
+    matrixBody.innerHTML = '';
+    let cellCount = 0;
+    let textCount = 0;
+
+    items.forEach(item => {
+        const tr = document.createElement('tr');
+        const lotaBadge = item.lota13
+            ? `<span style="font-size:10px;color:#90A4AE;">·${item.lota13.slice(2)}</span>` : '';
+        tr.innerHTML = `
+            <td class="sticky-col col-locaky">${item.locaky}</td>
+            <td class="sticky-col col-skukey">${item.skukey}</td>
+            <td class="sticky-col col-name">${escapeHtml(item.product_name || '–')}${lotaBadge}</td>
+            <td class="sticky-col col-spec">${escapeHtml(item.spec || '')}</td>
+        `;
+        for (let d = 1; d <= lastDay; d++) {
+            const td = document.createElement('td');
+            td.className = 'day-cell';
+            const rec = item.days[d];
+            if (rec) {
+                cellCount++;
+                const diff = rec.diff;
+                if (rec.note) {
+                    // 특이사항 문자 우선 표시
+                    textCount++;
+                    td.classList.add('cell-text');
+                    td.textContent = truncate(rec.note, 6);
+                    td.title = `${rec.note}\n차이: ${diff >= 0 ? '+' + diff : diff}\n작업자: ${rec.worker || '–'}`;
+                } else if (diff < 0) {
+                    td.classList.add('cell-diff-neg');
+                    td.textContent = diff;
+                    td.title = `${diff}개 부족 | ${rec.worker || '–'}`;
+                } else if (diff > 0) {
+                    td.classList.add('cell-diff-pos');
+                    td.textContent = '+' + diff;
+                    td.title = `${diff}개 잉여 | ${rec.worker || '–'}`;
+                } else {
+                    td.classList.add('cell-diff-zero');
+                    td.textContent = '0';
+                    td.title = `정물일치 | ${rec.worker || '–'}`;
+                }
+                const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                td.onclick = () => openDetail(item, dateStr);
+            }
+            tr.appendChild(td);
+        }
+        matrixBody.appendChild(tr);
+    });
+
+    $('#sum-items').textContent = items.length;
+    $('#sum-cells').textContent = cellCount;
+    $('#sum-text').textContent = textCount;
+}
+
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+}
+function truncate(s, n) {
+    s = String(s);
+    return s.length > n ? s.slice(0, n) + '…' : s;
+}
+
+// ───── 매트릭스 로드 ─────
+async function loadMatrix() {
+    const month = monthSelect.value;
+    const part = partSelect.value;
+    $('#sum-month').textContent = month;
+    loading.style.display = 'block';
+    table.style.display = 'none';
+    empty.style.display = 'none';
+
+    try {
+        const res = await fetch(`/api/records/matrix?month=${month}&part=${encodeURIComponent(part)}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'API 실패');
+        currentData = data;
+        const [y, m] = month.split('-').map(Number);
+        renderHead(y, m, data.last_day);
+        if (data.items.length === 0) {
+            loading.style.display = 'none';
+            empty.style.display = 'block';
+            $('#sum-items').textContent = 0;
+            $('#sum-cells').textContent = 0;
+            $('#sum-text').textContent = 0;
+        } else {
+            renderBody(data.items, y, m, data.last_day);
+            loading.style.display = 'none';
+            table.style.display = '';
+        }
+    } catch (e) {
+        loading.innerHTML = `❌ 에러: ${e.message}`;
+        console.error(e);
+    }
+}
+
+// ───── 셀 상세 모달 ─────
+async function openDetail(item, date) {
+    modalTitle.textContent = `${item.product_name || item.skukey}`;
+    modalSubtitle.textContent = `${item.locaky} · ${item.skukey}${item.lota13 ? ' · 소비기한 ' + item.lota13 : ''} · ${date}`;
+    modalBody.innerHTML = '<div class="loading">⏳ 이력 조회 중...</div>';
+    modal.classList.add('visible');
+
+    try {
+        const params = new URLSearchParams({
+            locaky: item.locaky,
+            skukey: item.skukey,
+            lota13: item.lota13 || '',
+            date: date,
+            part: partSelect.value,
+        });
+        const res = await fetch(`/api/records/detail?${params}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'API 실패');
+        renderEvents(data.events);
+    } catch (e) {
+        modalBody.innerHTML = `<div class="empty-state">❌ ${e.message}</div>`;
+    }
+}
+
+function renderEvents(events) {
+    if (!events || events.length === 0) {
+        modalBody.innerHTML = '<div class="empty-state">해당 날짜에 기록이 없어요.</div>';
+        return;
+    }
+    modalBody.innerHTML = events.map(e => {
+        const diffCls = e.diff < 0 ? 'neg' : (e.diff > 0 ? 'pos' : 'zero');
+        const diffStr = e.diff >= 0 ? '+' + e.diff : e.diff;
+        const resolvedPill = e.resolved
+            ? '<span class="pill resolved">해결</span>'
+            : '<span class="pill unresolved">미해결</span>';
+        const actionLabel = {
+            'diff': '차이', 'check': '확인', 'cancel': '취소', 'unlock': '풀림'
+        }[e.action] || e.action;
+        return `
+            <div class="event-card action-${e.action}">
+                <div class="event-head">
+                    <span class="event-time">${e.time}</span>
+                    <span class="event-action action-${e.action}">${actionLabel}</span>
+                    <span class="event-worker">${escapeHtml(e.worker)}</span>
+                </div>
+                ${e.action === 'diff' ? `
+                <div class="event-qty">
+                    가용 ${e.system_qty} → 실제 ${e.actual_qty}
+                    <span class="diff ${diffCls}">(${diffStr})</span>
+                </div>
+                ` : ''}
+                ${e.note ? `<div class="event-extra"><span class="label">비고:</span>${escapeHtml(e.note)}</div>` : ''}
+                ${e.reason ? `<div class="event-extra"><span class="label">사유:</span>${escapeHtml(e.reason)}</div>` : ''}
+                ${e.action === 'diff' ? `<div class="event-extra"><span class="label">상태:</span>${resolvedPill}</div>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+// ───── CSV 다운로드 ─────
+function downloadCSV() {
+    if (!currentData) return;
+    const { items, month, last_day } = currentData;
+    const headers = ['로케', '상품코드', '상품명', '규격'];
+    for (let d = 1; d <= last_day; d++) headers.push(d + '일');
+    const rows = [headers.join(',')];
+    items.forEach(it => {
+        const row = [
+            it.locaky, it.skukey,
+            `"${(it.product_name || '').replace(/"/g, '""')}"`,
+            `"${(it.spec || '').replace(/"/g, '""')}"`
+        ];
+        for (let d = 1; d <= last_day; d++) {
+            const rec = it.days[d];
+            if (!rec) { row.push(''); continue; }
+            if (rec.note) row.push(`"${rec.note.replace(/"/g, '""')}"`);
+            else row.push(rec.diff);
+        }
+        rows.push(row.join(','));
+    });
+    const csv = '\uFEFF' + rows.join('\n');  // BOM for Excel Korean
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `재고조사기록_${month}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// ───── 이벤트 ─────
+$('#modal-close').onclick = () => modal.classList.remove('visible');
+modal.onclick = e => { if (e.target === modal) modal.classList.remove('visible'); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') modal.classList.remove('visible'); });
+
+monthSelect.onchange = loadMatrix;
+partSelect.onchange = loadMatrix;
+refreshBtn.onclick = loadMatrix;
+csvBtn.onclick = downloadCSV;
+printBtn.onclick = () => window.print();  // 매트릭스 월별 전체 인쇄 (브라우저 기본)
+
+// ★ 211차: 날짜 헤더 클릭 → 태블릿 양식 PDF 미리보기 (이벤트 위임)
+theadRow.addEventListener('click', (e) => {
+    const th = e.target.closest('th.printable');
+    if (!th || !th.dataset.date) return;
+    printDay(th.dataset.date, 'diff');
+});
+
+// ───── 초기화 ─────
+initMonths();
+loadMatrix();
+</script>
+
+</body>
+</html>
