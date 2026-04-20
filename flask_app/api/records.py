@@ -262,3 +262,133 @@ def proxy_print_inventory():
     except Exception as e:
         logger.error(f"[records/print] 프록시 실패: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ============================================================
+# ★ 222차 #45: 상품 자동완성 (태블릿 search-product와 동일 스펙, 독립 구현)
+# GET /api/records/search-product?q=검색어&center=WH15&part=냉장
+# 2글자 이상 필수, 최대 20건
+# ============================================================
+@bp.route('/search-product', methods=['GET'])
+def search_product():
+    q = request.args.get('q', '').strip()
+    center = request.args.get('center', 'WH15')
+    part = request.args.get('part', '냉장')
+
+    if len(q) < 2:
+        return jsonify({'success': False, 'error': '2글자 이상 입력'}), 400
+
+    try:
+        conn = _conn()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        # product_master ILIKE 부분 매칭 + inventory_current에서 qtduom 조회 (태블릿 동일 스펙)
+        cur.execute("""
+            SELECT pm.product_code, pm.product_name, pm.spec, pm.stock_location,
+                   COALESCE((SELECT ic.qtduom FROM inventory_current ic
+                             WHERE ic.center = pm.center_code AND ic.part = pm.part
+                               AND ic.skukey = pm.product_code AND ic.deleted_at IS NULL
+                             LIMIT 1), 0) as qtduom
+            FROM product_master pm
+            WHERE pm.center_code = %s AND pm.part = %s AND pm.deleted_at IS NULL
+              AND (pm.product_name ILIKE %s OR pm.product_code ILIKE %s)
+            ORDER BY pm.product_name
+            LIMIT 20
+        """, (center, part, f"%{q}%", f"%{q}%"))
+        products = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        logger.info(f"[records/search-product] q={q!r} → {len(products)}건")
+        return jsonify({
+            'success': True,
+            'products': [dict(p) for p in products],
+            'count': len(products),
+        })
+    except Exception as e:
+        logger.error(f"[records/search-product] 실패: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ============================================================
+# ★ 222차 #45: 상품별 재고조사 이력 (최근 N일)
+# GET /api/records/product-history?skukey=&days=7&center=WH15&part=냉장
+# 모든 action(check/diff/cancel/unlock/add_item) 포함, 시간역순
+# ============================================================
+@bp.route('/product-history', methods=['GET'])
+def product_history():
+    skukey = request.args.get('skukey', '').strip()
+    center = request.args.get('center', 'WH15')
+    part = request.args.get('part', '냉장')
+    try:
+        days = int(request.args.get('days', '7'))
+        if days < 1 or days > 365:
+            days = 7
+    except ValueError:
+        days = 7
+
+    if not skukey:
+        return jsonify({'success': False, 'error': 'skukey 필수'}), 400
+
+    try:
+        conn = _conn()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+
+        # 상품 기본 정보 (상품명/규격/기본로케)
+        cur.execute("""
+            SELECT product_code, product_name, spec, stock_location
+            FROM product_master
+            WHERE center_code = %s AND part = %s AND product_code = %s AND deleted_at IS NULL
+            LIMIT 1
+        """, (center, part, skukey))
+        pm = cur.fetchone()
+
+        # 기간 내 모든 재고조사 이벤트 (시간역순)
+        cur.execute("""
+            SELECT ic.checked_at, ic.check_date, ic.locaky, ic.skukey, ic.lota13,
+                   ic.action, ic.worker, ic.system_qty, ic.actual_qty,
+                   ic.note, ic.reason, ic.resolved, ic.is_added
+            FROM inventory_check ic
+            WHERE ic.center = %s AND ic.part = %s AND ic.skukey = %s
+              AND ic.check_date >= CURRENT_DATE - INTERVAL '%s days'
+              AND ic.deleted_at IS NULL
+            ORDER BY ic.checked_at DESC
+            LIMIT 500
+        """, (center, part, skukey, days))
+
+        events = []
+        for r in cur.fetchall():
+            diff = (r['actual_qty'] or 0) - (r['system_qty'] or 0) if r['action'] == 'diff' else 0
+            events.append({
+                'check_date': r['check_date'].strftime('%Y-%m-%d') if r['check_date'] else '',
+                'time': r['checked_at'].strftime('%H:%M:%S') if r['checked_at'] else '',
+                'locaky': r['locaky'],
+                'lota13': r['lota13'] or '',
+                'action': r['action'],
+                'worker': r['worker'] or '',
+                'system_qty': r['system_qty'] or 0,
+                'actual_qty': r['actual_qty'] or 0,
+                'diff': diff,
+                'note': r['note'] or '',
+                'reason': r['reason'] or '',
+                'resolved': r['resolved'],
+                'is_added': r['is_added'] or False,
+            })
+        cur.close()
+        conn.close()
+
+        logger.info(f"[records/product-history] skukey={skukey} days={days} → {len(events)}건")
+        return jsonify({
+            'success': True,
+            'product': {
+                'skukey': skukey,
+                'product_name': pm['product_name'] if pm else '',
+                'spec': pm['spec'] if pm else '',
+                'stock_location': pm['stock_location'] if pm else '',
+            } if pm else {'skukey': skukey, 'product_name': '', 'spec': '', 'stock_location': ''},
+            'days': days,
+            'events': events,
+            'count': len(events),
+        })
+    except Exception as e:
+        logger.error(f"[records/product-history] 실패: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500

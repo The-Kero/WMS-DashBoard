@@ -478,3 +478,269 @@ body {
     .day-cell { min-width: 28px; padding: 4px 2px; }
     .cell-diff-neg, .cell-diff-pos { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+
+/* ============================================================
+   ★ 222차 #45: 상품 검색 바 + 상품별 이력 섹션
+   태블릿 SearchDialog와 동일 톤 (CBlue #1976D2 / 0.04 / 0.15)
+   6원칙: ①OPS톤 ②7원칙(현장3초/빅터치) ③정합성(태블릿 미러링) ④확장성(PERIOD_PRESETS)
+   ============================================================ */
+
+/* 검색 바 (top-bar 아래 독립 행) */
+.search-bar {
+    padding: 10px 24px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    z-index: 40;
+}
+.search-bar .search-icon { font-size: 18px; color: #1976D2; }
+.search-input-wrap { flex: 1; position: relative; max-width: 520px; }
+.search-bar input {
+    width: 100%;
+    height: 44px;
+    padding: 0 16px;
+    background: rgba(25, 118, 210, 0.04);
+    border: 1.5px solid rgba(25, 118, 210, 0.15);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #2C3E50;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+}
+.search-bar input::placeholder { color: #90A4AE; }
+.search-bar input:focus {
+    border-color: rgba(25, 118, 210, 0.4);
+    background: rgba(25, 118, 210, 0.06);
+}
+.search-bar .search-clear {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    font-size: 14px;
+    color: #546E7A;
+    transition: background 0.15s;
+}
+.search-bar .search-clear:hover { background: rgba(0, 0, 0, 0.12); }
+
+/* 자동완성 드롭다운 */
+.search-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    max-height: 320px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid rgba(25, 118, 210, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 60;
+}
+.search-dropdown .dropdown-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    transition: background 0.1s;
+}
+.search-dropdown .dropdown-item:last-child { border-bottom: none; }
+.search-dropdown .dropdown-item:hover { background: rgba(25, 118, 210, 0.06); }
+.search-dropdown .dd-name { font-weight: 600; color: #2C3E50; font-size: 14px; }
+.search-dropdown .dd-meta {
+    display: flex; gap: 10px; align-items: center;
+    font-size: 12px; color: #78909C; margin-top: 3px;
+}
+.search-dropdown .dd-code { color: #1976D2; font-weight: 600; }
+.search-dropdown .dd-spec { color: #546E7A; }
+.search-dropdown .dd-stockloc {
+    background: rgba(25, 118, 210, 0.08);
+    color: #1976D2;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+.search-dropdown .dropdown-empty {
+    padding: 20px; text-align: center; color: #90A4AE; font-size: 13px;
+}
+
+/* 상품별 이력 섹션 */
+.product-history-section {
+    margin: 16px;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+/* 상품 정보 카드 */
+.product-info-card {
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid rgba(25, 118, 210, 0.15);
+}
+.product-info-card .product-name {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0D47A1;
+}
+.product-info-card .product-meta {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #1565C0;
+    display: flex; gap: 8px; align-items: center;
+}
+.product-info-card .product-meta .dot { color: #90CAF9; }
+.product-info-card .product-meta b { color: #0D47A1; }
+.product-info-card .ph-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    font-size: 14px;
+    color: #1565C0;
+    transition: background 0.15s;
+}
+.product-info-card .ph-close:hover { background: rgba(255, 255, 255, 0.85); }
+
+/* 기간 토글 */
+.period-toggle {
+    padding: 12px 20px;
+    display: flex;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.6);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.period-toggle .period-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(25, 118, 210, 0.2);
+    background: white;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 600;
+    color: #546E7A;
+    cursor: pointer;
+    transition: all 0.15s;
+    min-width: 64px;
+}
+.period-toggle .period-btn:hover { background: rgba(25, 118, 210, 0.04); }
+.period-toggle .period-btn.active {
+    background: #1976D2;
+    color: white;
+    border-color: #1976D2;
+}
+
+/* 이력 테이블 */
+.history-table-wrap {
+    max-height: 60vh;
+    overflow: auto;
+    position: relative;
+}
+.ph-loading, .ph-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #90A4AE;
+    font-size: 14px;
+}
+.ph-empty .emoji { font-size: 28px; display: block; margin-bottom: 8px; }
+.history-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+}
+.history-table th {
+    background: #F0F4F9;
+    color: #455A64;
+    font-weight: 700;
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 12px;
+    position: sticky;
+    top: 0;
+    border-bottom: 2px solid #1976D2;
+    z-index: 5;
+}
+.history-table td {
+    padding: 8px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    vertical-align: middle;
+}
+.history-table tr.history-row:hover { background: rgba(25, 118, 210, 0.03); }
+.history-table .h-date { font-weight: 600; color: #2C3E50; white-space: nowrap; }
+.history-table .h-time { color: #546E7A; font-size: 12px; white-space: nowrap; font-family: 'Consolas', monospace; }
+.history-table .h-loc { font-weight: 600; color: #1976D2; }
+.history-table .h-lota { color: #546E7A; font-size: 12px; white-space: nowrap; }
+.history-table .h-worker { color: #2C3E50; }
+.history-table .h-sys, .history-table .h-act { font-weight: 600; color: #2C3E50; }
+.history-table .qty-sys { color: #78909C; }
+.history-table .qty-act { color: #0D47A1; }
+.history-table .h-diff { font-weight: 700; font-size: 14px; }
+.history-table .diff-neg { color: #C62828; }
+.history-table .diff-pos { color: #1565C0; }
+.history-table .diff-zero { color: #90A4AE; }
+.history-table .h-extra { text-align: left; padding-left: 12px; }
+.history-table .h-extra .ex-note {
+    display: inline-block;
+    background: #FFF8E1;
+    color: #E65100;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 6px;
+    font-size: 12px;
+}
+.history-table .h-extra .ex-reason {
+    display: inline-block;
+    color: #546E7A;
+    margin-right: 6px;
+    font-size: 12px;
+}
+.history-table .h-extra .ex-resolved {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 6px;
+}
+.history-table .h-extra .ex-resolved.ok { background: #E8F5E9; color: #2E7D32; }
+.history-table .h-extra .ex-resolved.ng { background: #FFEBEE; color: #C62828; }
+.history-table .h-extra .ex-added {
+    display: inline-block;
+    background: #E3F2FD;
+    color: #1565C0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.history-table .h-extra .ex-empty { color: #CFD8DC; }
+
+/* 액션 배지 */
+.history-table .action-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.history-table .action-badge.act-check { background: #E8F5E9; color: #2E7D32; }
+.history-table .action-badge.act-diff { background: #FFEBEE; color: #C62828; }
+.history-table .action-badge.act-cancel { background: #F5F5F5; color: #757575; }
+.history-table .action-badge.act-unlock { background: #FFF3E0; color: #E65100; }
+.history-table .action-badge.act-add { background: #E3F2FD; color: #1565C0; }

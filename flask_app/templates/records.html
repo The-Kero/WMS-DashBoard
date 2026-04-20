@@ -25,6 +25,16 @@
     </div>
 </div>
 
+<!-- ★ 222차 #45: 상품 검색 바 (태블릿 SearchDialog와 동일 톤) -->
+<div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <div class="search-input-wrap">
+        <input type="text" id="product-search" placeholder="상품명 2글자 이상 입력 (재고조사 이력 조회)" autocomplete="off">
+        <div id="search-dropdown" class="search-dropdown" style="display:none"></div>
+    </div>
+    <button id="search-clear" class="search-clear" style="display:none">✕</button>
+</div>
+
 <div class="summary">
     <span class="badge">차이 기록 상품 <b id="sum-items">–</b>건</span>
     <span class="badge">차이값 셀 <b id="sum-cells">–</b>건</span>
@@ -44,6 +54,52 @@
         <span class="emoji">📋</span>
         해당 월에 차이 기록이 없어요.<br>
         <small style="color:#90A4AE;">재고조사 시 차이가 발견된 항목만 기록됩니다.</small>
+    </div>
+</div>
+
+<!-- ★ 222차 #45: 상품별 재고조사 이력 섹션 (상품 선택 시에만 표시) -->
+<div id="product-history-section" class="product-history-section" style="display:none">
+    <div class="product-info-card">
+        <div class="product-info-left">
+            <h2 class="product-name" id="ph-name">–</h2>
+            <div class="product-meta">
+                <span id="ph-skukey">–</span>
+                <span class="dot">·</span>
+                <span id="ph-spec">–</span>
+                <span class="dot">·</span>
+                <span>기본 <b id="ph-stockloc">–</b></span>
+            </div>
+        </div>
+        <button id="ph-close" class="ph-close" title="닫기">✕</button>
+    </div>
+
+    <div class="period-toggle" id="period-toggle">
+        <!-- JS로 버튼 동적 생성 (PERIOD_PRESETS 배열 기반) -->
+    </div>
+
+    <div class="history-table-wrap">
+        <div id="ph-loading" class="ph-loading" style="display:none">⏳ 조회 중...</div>
+        <div id="ph-empty" class="ph-empty" style="display:none">
+            <span class="emoji">📋</span>
+            해당 기간에 재고조사 기록이 없어요.
+        </div>
+        <table id="ph-table" class="history-table" style="display:none">
+            <thead>
+                <tr>
+                    <th>날짜</th>
+                    <th>시간</th>
+                    <th>로케</th>
+                    <th>소비기한</th>
+                    <th>Action</th>
+                    <th>작업자</th>
+                    <th>가용수량</th>
+                    <th>실사수량</th>
+                    <th>차이</th>
+                    <th>비고 / 사유 / 상태</th>
+                </tr>
+            </thead>
+            <tbody id="ph-tbody"></tbody>
+        </table>
     </div>
 </div>
 
@@ -484,9 +540,220 @@ theadRow.addEventListener('click', (e) => {
     openPrintModal(th.dataset.date);  // ★ 216차: 'diff' 하드코딩 → 모달 분기
 });
 
+// ============================================================
+// ★ 222차 #45: 상품 검색 + 상품별 이력 (태블릿 SearchDialog 미러링)
+// ============================================================
+
+const PERIOD_PRESETS = [
+    { days: 7,  label: '7일' },
+    { days: 14, label: '14일' },
+    { days: 30, label: '30일' },
+    { days: 90, label: '90일' },
+];
+
+const ACTION_LABELS = {
+    'check':    { txt: '✓ 확인', cls: 'act-check' },
+    'diff':     { txt: '⚠ 차이', cls: 'act-diff' },
+    'cancel':   { txt: '↶ 취소', cls: 'act-cancel' },
+    'unlock':   { txt: '🔓 풀림', cls: 'act-unlock' },
+    'add_item': { txt: '+ 추가', cls: 'act-add' },
+};
+
+const searchInput = $('#product-search');
+const searchDropdown = $('#search-dropdown');
+const searchClear = $('#search-clear');
+const phSection = $('#product-history-section');
+const phName = $('#ph-name');
+const phSkukey = $('#ph-skukey');
+const phSpec = $('#ph-spec');
+const phStockloc = $('#ph-stockloc');
+const phLoading = $('#ph-loading');
+const phEmpty = $('#ph-empty');
+const phTable = $('#ph-table');
+const phTbody = $('#ph-tbody');
+const periodToggle = $('#period-toggle');
+
+let selectedSkukey = '';
+let selectedDays = 7;
+let searchTimer = null;
+
+// ───── 기간 토글 버튼 생성 ─────
+function initPeriodToggle() {
+    periodToggle.innerHTML = '';
+    PERIOD_PRESETS.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'period-btn';
+        btn.dataset.days = p.days;
+        btn.textContent = p.label;
+        if (p.days === selectedDays) btn.classList.add('active');
+        btn.addEventListener('click', () => {
+            selectedDays = p.days;
+            $$('#period-toggle .period-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.days) === selectedDays));
+            if (selectedSkukey) loadHistory();
+        });
+        periodToggle.appendChild(btn);
+    });
+}
+
+// ───── 상품 검색 (debounce 300ms) ─────
+searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim();
+    searchClear.style.display = q ? '' : 'none';
+    clearTimeout(searchTimer);
+    if (q.length < 2) { searchDropdown.style.display = 'none'; return; }
+    searchTimer = setTimeout(() => doSearchProduct(q), 300);
+});
+
+async function doSearchProduct(q) {
+    try {
+        const res = await fetch(`/api/records/search-product?q=${encodeURIComponent(q)}&part=${encodeURIComponent(partSelect.value)}`);
+        const data = await res.json();
+        if (!data.success) { searchDropdown.style.display = 'none'; return; }
+        renderDropdown(data.products || []);
+    } catch (e) {
+        searchDropdown.style.display = 'none';
+    }
+}
+
+function renderDropdown(products) {
+    if (!products.length) {
+        searchDropdown.innerHTML = '<div class="dropdown-empty">결과 없음</div>';
+        searchDropdown.style.display = '';
+        return;
+    }
+    searchDropdown.innerHTML = products.map(p => `
+        <div class="dropdown-item" data-skukey="${p.product_code}" data-name="${escapeHtml(p.product_name || '')}" data-spec="${escapeHtml(p.spec || '')}" data-stockloc="${escapeHtml(p.stock_location || '')}">
+            <div class="dd-name">${escapeHtml(p.product_name || '')}</div>
+            <div class="dd-meta">
+                <span class="dd-code">${p.product_code}</span>
+                ${p.spec ? `<span class="dd-spec">${escapeHtml(p.spec)}</span>` : ''}
+                ${p.stock_location ? `<span class="dd-stockloc">기본 ${escapeHtml(p.stock_location)}</span>` : ''}
+            </div>
+        </div>
+    `).join('');
+    searchDropdown.style.display = '';
+    $$('#search-dropdown .dropdown-item').forEach(el => {
+        el.addEventListener('click', () => {
+            selectProduct({
+                product_code: el.dataset.skukey,
+                product_name: el.dataset.name,
+                spec: el.dataset.spec,
+                stock_location: el.dataset.stockloc,
+            });
+        });
+    });
+}
+
+function selectProduct(p) {
+    selectedSkukey = p.product_code;
+    phName.textContent = p.product_name || '–';
+    phSkukey.textContent = p.product_code;
+    phSpec.textContent = p.spec || '–';
+    phStockloc.textContent = p.stock_location || '–';
+    searchInput.value = '';
+    searchDropdown.style.display = 'none';
+    searchClear.style.display = 'none';
+    phSection.style.display = '';
+    selectedDays = 7;
+    $$('#period-toggle .period-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.days) === 7));
+    loadHistory();
+    // 섹션으로 스크롤
+    setTimeout(() => phSection.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+}
+
+// ───── 검색 클리어 ─────
+searchClear.addEventListener('click', () => {
+    searchInput.value = '';
+    searchDropdown.style.display = 'none';
+    searchClear.style.display = 'none';
+    searchInput.focus();
+});
+
+// ───── 드롭다운 외부 클릭 닫기 ─────
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-bar')) searchDropdown.style.display = 'none';
+});
+
+// ───── 상품 이력 섹션 닫기 ─────
+$('#ph-close').addEventListener('click', () => {
+    phSection.style.display = 'none';
+    selectedSkukey = '';
+});
+
+// ───── 이력 로드 ─────
+async function loadHistory() {
+    if (!selectedSkukey) return;
+    phLoading.style.display = '';
+    phEmpty.style.display = 'none';
+    phTable.style.display = 'none';
+
+    try {
+        const res = await fetch(`/api/records/product-history?skukey=${encodeURIComponent(selectedSkukey)}&days=${selectedDays}&part=${encodeURIComponent(partSelect.value)}`);
+        const data = await res.json();
+        phLoading.style.display = 'none';
+        if (!data.success) {
+            phEmpty.style.display = '';
+            phEmpty.textContent = '조회 실패: ' + (data.error || '알 수 없는 오류');
+            return;
+        }
+        const events = data.events || [];
+        if (!events.length) {
+            phEmpty.style.display = '';
+            phEmpty.innerHTML = '<span class="emoji">📋</span> 최근 ' + selectedDays + '일 재고조사 기록이 없어요.';
+            return;
+        }
+        renderHistoryTable(events);
+        phTable.style.display = '';
+    } catch (e) {
+        phLoading.style.display = 'none';
+        phEmpty.style.display = '';
+        phEmpty.textContent = '오류: ' + e.message;
+    }
+}
+
+function renderHistoryTable(events) {
+    phTbody.innerHTML = events.map(ev => {
+        const actDef = ACTION_LABELS[ev.action] || { txt: ev.action, cls: '' };
+        const diffCls = ev.diff < 0 ? 'diff-neg' : (ev.diff > 0 ? 'diff-pos' : 'diff-zero');
+        const diffStr = ev.action === 'diff' ? (ev.diff >= 0 ? '+' + ev.diff : String(ev.diff)) : '';
+        const lota13Fmt = ev.lota13 && ev.lota13.length === 8
+            ? `${ev.lota13.slice(2,4)}.${ev.lota13.slice(4,6)}.${ev.lota13.slice(6,8)}` : (ev.lota13 || '–');
+        const qtyStr = ev.action === 'diff' ? `<span class="qty-sys">${ev.system_qty}</span>` : (ev.system_qty ? String(ev.system_qty) : '–');
+        const actStr = ev.action === 'diff' ? `<span class="qty-act">${ev.actual_qty}</span>` : (ev.actual_qty ? String(ev.actual_qty) : '–');
+
+        // 비고/사유/상태 조합 (2줄 구조 — 핵심 1줄 + 서브 1줄)
+        const extras = [];
+        if (ev.note) extras.push(`<span class="ex-note">비고: ${escapeHtml(ev.note)}</span>`);
+        if (ev.reason) extras.push(`<span class="ex-reason">사유: ${escapeHtml(ev.reason)}</span>`);
+        if (ev.action === 'diff') {
+            extras.push(ev.resolved
+                ? '<span class="ex-resolved ok">해결</span>'
+                : '<span class="ex-resolved ng">미해결</span>');
+        }
+        if (ev.is_added) extras.push('<span class="ex-added">+ 항목추가</span>');
+        const extraStr = extras.length ? extras.join(' ') : '<span class="ex-empty">–</span>';
+
+        return `
+            <tr class="history-row ${actDef.cls}">
+                <td class="h-date">${ev.check_date}</td>
+                <td class="h-time">${ev.time}</td>
+                <td class="h-loc">${ev.locaky}</td>
+                <td class="h-lota">${lota13Fmt}</td>
+                <td class="h-action"><span class="action-badge ${actDef.cls}">${actDef.txt}</span></td>
+                <td class="h-worker">${escapeHtml(ev.worker) || '–'}</td>
+                <td class="h-sys">${qtyStr}</td>
+                <td class="h-act">${actStr}</td>
+                <td class="h-diff ${diffCls}">${diffStr || '–'}</td>
+                <td class="h-extra">${extraStr}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
 // ───── 초기화 ─────
 initMonths();
 loadMatrix();
+initPeriodToggle();
 </script>
 
 </body>
