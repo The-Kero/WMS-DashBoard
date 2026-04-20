@@ -342,19 +342,23 @@ def product_history():
         """, (center, part, skukey))
         pm = cur.fetchone()
 
-        # 기간 내 모든 재고조사 이벤트 — 3단 정렬 (케로님 설계)
-        # ① check_date ASC (오래된 날 먼저, 시선 흐름 위→아래)
-        # ② locaky ASC (같은 날짜 내 로케 오름차순)
-        # ③ checked_at ASC (같은 로케 내 시간순)
+        # 기간 내 재고조사 이벤트 — 매트릭스(get_matrix)와 동일 DISTINCT ON 패턴
+        # ★ 222차 #45-3: 같은 (날짜, 로케, 소비기한) 조합은 최신 1건만 (중간 cancel/note 스킵)
+        # 내부: DISTINCT ON (check_date, locaky, lota13) + checked_at DESC → 각 조합 최신
+        # 외부: check_date ASC, locaky ASC, checked_at ASC → 시선 흐름 위→아래
         cur.execute("""
-            SELECT ic.checked_at, ic.check_date, ic.locaky, ic.skukey, ic.lota13,
-                   ic.action, ic.worker, ic.system_qty, ic.actual_qty,
-                   ic.note, ic.reason, ic.resolved, ic.is_added
-            FROM inventory_check ic
-            WHERE ic.center = %s AND ic.part = %s AND ic.skukey = %s
-              AND ic.check_date >= CURRENT_DATE - INTERVAL '%s days'
-              AND ic.deleted_at IS NULL
-            ORDER BY ic.check_date ASC, ic.locaky ASC, ic.checked_at ASC
+            SELECT * FROM (
+                SELECT DISTINCT ON (ic.check_date, ic.locaky, COALESCE(ic.lota13, ''))
+                    ic.checked_at, ic.check_date, ic.locaky, ic.skukey, ic.lota13,
+                    ic.action, ic.worker, ic.system_qty, ic.actual_qty,
+                    ic.note, ic.reason, ic.resolved, ic.is_added
+                FROM inventory_check ic
+                WHERE ic.center = %s AND ic.part = %s AND ic.skukey = %s
+                  AND ic.check_date >= CURRENT_DATE - INTERVAL '%s days'
+                  AND ic.deleted_at IS NULL
+                ORDER BY ic.check_date, ic.locaky, COALESCE(ic.lota13, ''), ic.checked_at DESC
+            ) sub
+            ORDER BY check_date ASC, locaky ASC, checked_at ASC
             LIMIT 500
         """, (center, part, skukey, days))
 
