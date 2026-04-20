@@ -342,7 +342,10 @@ def product_history():
         """, (center, part, skukey))
         pm = cur.fetchone()
 
-        # 기간 내 모든 재고조사 이벤트 (시간역순)
+        # 기간 내 모든 재고조사 이벤트 — 3단 정렬 (케로님 설계)
+        # ① check_date ASC (오래된 날 먼저, 시선 흐름 위→아래)
+        # ② locaky ASC (같은 날짜 내 로케 오름차순)
+        # ③ checked_at ASC (같은 로케 내 시간순)
         cur.execute("""
             SELECT ic.checked_at, ic.check_date, ic.locaky, ic.skukey, ic.lota13,
                    ic.action, ic.worker, ic.system_qty, ic.actual_qty,
@@ -351,7 +354,7 @@ def product_history():
             WHERE ic.center = %s AND ic.part = %s AND ic.skukey = %s
               AND ic.check_date >= CURRENT_DATE - INTERVAL '%s days'
               AND ic.deleted_at IS NULL
-            ORDER BY ic.checked_at DESC
+            ORDER BY ic.check_date ASC, ic.locaky ASC, ic.checked_at ASC
             LIMIT 500
         """, (center, part, skukey, days))
 
