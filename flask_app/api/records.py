@@ -399,3 +399,99 @@ def product_history():
     except Exception as e:
         logger.error(f"[records/product-history] 실패: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ============================================================
+# ★ 222차 #45-4: 긴 형식 CSV 다운로드용 (엑셀 필터/피벗 분석 최적)
+# GET /api/records/export-csv?month=YYYY-MM&center=WH15&part=냉장
+# 매트릭스와 동일 스코프 (월별 + diff만 + 현재 재고 있는 셀만)
+# 18컬럼: 날짜/요일/시간/로케/기본로케/상품코드/상품명/규격/소비기한/
+#        액션/작업자/가용/실사/차이/비고/사유/해결/항목추가
+# ============================================================
+@bp.route('/export-csv', methods=['GET'])
+def export_csv():
+    month = request.args.get('month', datetime.now().strftime('%Y-%m'))
+    center = request.args.get('center', 'WH15')
+    part = request.args.get('part', '냉장')
+
+    try:
+        year, mon = map(int, month.split('-'))
+    except ValueError:
+        return jsonify({'success': False, 'error': 'month 형식 YYYY-MM'}), 400
+
+    start_date = datetime(year, mon, 1).date()
+    last_day = monthrange(year, mon)[1]
+    end_date = datetime(year, mon, last_day).date()
+
+    try:
+        conn = _conn()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        # 매트릭스 쿼리(L76~106)와 동일 + checked_at/is_added/stock_location 추가
+        cur.execute("""
+            SELECT ic.locaky, ic.skukey, ic.lota13, ic.check_date, ic.checked_at,
+                   ic.actual_qty, ic.system_qty, ic.note,
+                   ic.worker, ic.resolved, ic.reason, ic.action, ic.is_added,
+                   pm.product_name, pm.spec, pm.stock_location
+            FROM (
+                SELECT DISTINCT ON (locaky, skukey, COALESCE(lota13, ''), check_date)
+                    center, part, locaky, skukey, lota13, check_date, checked_at,
+                    action, actual_qty, system_qty, note, worker, resolved, reason, is_added
+                FROM inventory_check
+                WHERE center = %s AND part = %s
+                  AND check_date BETWEEN %s AND %s
+                  AND action IN ('check', 'diff', 'cancel')
+                  AND deleted_at IS NULL
+                ORDER BY locaky, skukey, COALESCE(lota13, ''), check_date, checked_at DESC
+            ) ic
+            LEFT JOIN product_master pm
+                ON pm.center_code = ic.center AND pm.part = ic.part
+                AND pm.product_code = ic.skukey AND pm.deleted_at IS NULL
+            WHERE ic.action = 'diff'
+              AND EXISTS (
+                  SELECT 1 FROM inventory_current invc2
+                  WHERE invc2.center = ic.center AND invc2.part = ic.part
+                    AND invc2.locaky = ic.locaky AND invc2.skukey = ic.skukey
+                    AND COALESCE(invc2.lota13, '') = COALESCE(ic.lota13, '')
+                    AND invc2.locaky NOT LIKE 'RCVLOC%%' AND invc2.locaky NOT LIKE 'L07RCV%%'
+                    AND invc2.deleted_at IS NULL
+                    AND (invc2.useqty > 0 OR invc2.is_added = true)
+              )
+            ORDER BY ic.check_date, ic.locaky, ic.skukey
+        """, (center, part, start_date, end_date))
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        events = []
+        for r in rows:
+            events.append({
+                'check_date': r['check_date'].strftime('%Y-%m-%d') if r['check_date'] else '',
+                'time': r['checked_at'].strftime('%H:%M:%S') if r['checked_at'] else '',
+                'locaky': r['locaky'],
+                'skukey': r['skukey'],
+                'product_name': r['product_name'] or '',
+                'spec': r['spec'] or '',
+                'stock_location': r['stock_location'] or '',
+                'lota13': r['lota13'] or '',
+                'action': r['action'],
+                'worker': r['worker'] or '',
+                'system_qty': r['system_qty'] or 0,
+                'actual_qty': r['actual_qty'] or 0,
+                'note': r['note'] or '',
+                'reason': r['reason'] or '',
+                'resolved': r['resolved'],
+                'is_added': r['is_added'] or False,
+            })
+
+        logger.info(f"[records/export-csv] {month} {part}: {len(events)}건")
+        return jsonify({
+            'success': True,
+            'month': month,
+            'center': center,
+            'part': part,
+            'events': events,
+            'count': len(events),
+        })
+    except Exception as e:
+        logger.error(f"[records/export-csv] 실패: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500

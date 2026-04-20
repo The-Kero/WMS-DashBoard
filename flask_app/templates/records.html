@@ -487,35 +487,72 @@ function renderEvents(events) {
     }).join('');
 }
 
-// ───── CSV 다운로드 ─────
-function downloadCSV() {
-    if (!currentData) return;
-    const { items, month, last_day } = currentData;
-    const headers = ['로케', '상품코드', '상품명', '규격'];
-    for (let d = 1; d <= last_day; d++) headers.push(d + '일');
-    const rows = [headers.join(',')];
-    items.forEach(it => {
-        const row = [
-            it.locaky, it.skukey,
-            `"${(it.product_name || '').replace(/"/g, '""')}"`,
-            `"${(it.spec || '').replace(/"/g, '""')}"`
+// ───── ★ 222차 #45-4: CSV 다운로드 — 긴 형식 (엑셀 필터/피벗 분석용) ─────
+// 매트릭스와 동일 스코프 (월별 + 차이만), 18컬럼 상세
+async function downloadCSV() {
+    const month = monthSelect.value;
+    const part = partSelect.value;
+    try {
+        const res = await fetch(`/api/records/export-csv?month=${month}&part=${encodeURIComponent(part)}`);
+        const data = await res.json();
+        if (!data.success) { alert('CSV 생성 실패: ' + (data.error || '알 수 없음')); return; }
+        if (!data.events || !data.events.length) { alert('해당 월에 차이 기록이 없어요.'); return; }
+
+        const headers = [
+            '날짜', '요일', '시간', '로케', '기본로케', '상품코드', '상품명', '규격',
+            '소비기한', '액션', '작업자', '가용수량', '실사수량', '차이',
+            '비고', '사유', '해결여부', '항목추가'
         ];
-        for (let d = 1; d <= last_day; d++) {
-            const rec = it.days[d];
-            if (!rec) { row.push(''); continue; }
-            if (rec.note) row.push(`"${rec.note.replace(/"/g, '""')}"`);
-            else row.push(rec.diff);
-        }
-        rows.push(row.join(','));
-    });
-    const csv = '\uFEFF' + rows.join('\n');  // BOM for Excel Korean
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `재고조사기록_${month}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+        const rows = [headers.join(',')];
+        const WK = ['일','월','화','수','목','금','토'];
+        const esc = (s) => `"${String(s || '').replace(/"/g, '""')}"`;
+
+        data.events.forEach(ev => {
+            const [y, m, d] = ev.check_date.split('-').map(Number);
+            const weekday = WK[new Date(y, m - 1, d).getDay()];
+            const isBase = (ev.stock_location && ev.locaky === ev.stock_location) ? 'Y' : '';
+            const lota13Fmt = (ev.lota13 && ev.lota13.length === 8)
+                ? `${ev.lota13.slice(0,4)}-${ev.lota13.slice(4,6)}-${ev.lota13.slice(6,8)}`
+                : (ev.lota13 || '');
+            const diff = (ev.actual_qty || 0) - (ev.system_qty || 0);
+            const diffStr = diff > 0 ? '+' + diff : String(diff);
+            const resolvedStr = ev.action === 'diff' ? (ev.resolved ? '해결' : '미해결') : '';
+            const addedStr = ev.is_added ? '+' : '';
+
+            const row = [
+                ev.check_date,
+                weekday,
+                ev.time,
+                ev.locaky,
+                isBase,
+                ev.skukey,
+                esc(ev.product_name),
+                esc(ev.spec),
+                lota13Fmt,
+                ev.action,
+                esc(ev.worker),
+                ev.system_qty,
+                ev.actual_qty,
+                diffStr,
+                esc(ev.note),
+                esc(ev.reason),
+                resolvedStr,
+                addedStr,
+            ];
+            rows.push(row.join(','));
+        });
+
+        const csv = '\uFEFF' + rows.join('\n');  // BOM for Excel Korean
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `재고조사_차이내역_${month}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        alert('CSV 다운로드 오류: ' + e.message);
+    }
 }
 
 // ───── 이벤트 ─────
