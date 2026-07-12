@@ -631,20 +631,23 @@ def get_dashboard():
         
         # ==========================================
         # 2-2. 초록불 시 재고조사 엑셀 자동 생성
+        # ★ 2026-07-12 비활성화 (케로님 지시): 재고조사가 태블릿으로 전환됨.
+        #    종이 인쇄물은 아무도 안 봄 + API 서버에 데이터 누적으로 중복 기능화.
+        #    → 엑셀 생성 + 자동 인쇄를 통째 중단. 되돌리려면 아래 주석 해제.
         # ==========================================
-        if inventory_check_status == 'green' and EXCEL_GENERATOR_AVAILABLE:
-            try:
-                if check_inventory_excel_exists(today):
-                    logger.info(f"재고조사 엑셀 이미 존재 - 생성 스킵 ({today})")
-                else:
-                    logger.info(f"초록불! 재고조사 엑셀 생성 시작 ({today})")
-                    result = generate_inventory_excel(today)
-                    if result['success']:
-                        logger.info(f"재고조사 엑셀 생성 완료: {result['files']}")
-                    else:
-                        logger.warning(f"재고조사 엑셀 생성 실패: {result['message']}")
-            except Exception as e:
-                logger.error(f"재고조사 엑셀 생성 중 오류: {str(e)}")
+        # if inventory_check_status == 'green' and EXCEL_GENERATOR_AVAILABLE:
+        #     try:
+        #         if check_inventory_excel_exists(today):
+        #             logger.info(f"재고조사 엑셀 이미 존재 - 생성 스킵 ({today})")
+        #         else:
+        #             logger.info(f"초록불! 재고조사 엑셀 생성 시작 ({today})")
+        #             result = generate_inventory_excel(today)
+        #             if result['success']:
+        #                 logger.info(f"재고조사 엑셀 생성 완료: {result['files']}")
+        #             else:
+        #                 logger.warning(f"재고조사 엑셀 생성 실패: {result['message']}")
+        #     except Exception as e:
+        #         logger.error(f"재고조사 엑셀 생성 중 오류: {str(e)}")
         
         # ==========================================
         # 3. 재고 데이터 (이미 2-0에서 로드됨 - 초록불 판정용으로 앞으로 이동)
