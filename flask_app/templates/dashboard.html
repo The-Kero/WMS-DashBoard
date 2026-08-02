@@ -1110,15 +1110,15 @@
         .destination-section {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 3px 12px;
+            gap: 1px 12px;   /* ★265차: 12→14칸 되면서 세로 간격 3px→1px */
             font-size: 13px;
         }
-        
+
         .destination-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 2px 0;
+            padding: 1px 0;  /* ★265차: 2px→1px (케로님 "줄간격 조금 줄이는 게 좋을 거야") */
         }
         
         .destination-name {
@@ -1899,58 +1899,72 @@
                             </div>
                         </div>
                         
-                        <!-- 배송처별 수량 (12개) -->
+                        <!-- 배송처별 수량 (14개) — ★2026-08-02 265차: 12→14칸
+                             제천 제거(물량 0, 없어진 센터) / 원주·남오산·기타 추가
+                             '기타'는 우리가 모르는 배송처가 생기면 여기 뜬다 (평소 0) -->
                         <div class="destination-section" id="card3DestinationList">
-                            <!-- 좌측 6개 -->
+                            <!-- 1행 -->
                             <div class="destination-item">
                                 <span class="destination-name">제주:</span>
-                                <span class="destination-value" id="dest-jeju">64</span>
+                                <span class="destination-value" id="dest-jeju">0</span>
                             </div>
                             <div class="destination-item">
-                                <span class="destination-name">제천:</span>
-                                <span class="destination-value" id="dest-jecheon">153</span>
+                                <span class="destination-name">원주:</span>
+                                <span class="destination-value" id="dest-wonju">0</span>
                             </div>
+                            <!-- 2행 -->
                             <div class="destination-item">
                                 <span class="destination-name">호남:</span>
-                                <span class="destination-value" id="dest-honam">116</span>
+                                <span class="destination-value" id="dest-honam">0</span>
                             </div>
                             <div class="destination-item">
                                 <span class="destination-name">구미:</span>
-                                <span class="destination-value" id="dest-gumi">28</span>
+                                <span class="destination-value" id="dest-gumi">0</span>
                             </div>
+                            <!-- 3행 -->
                             <div class="destination-item">
                                 <span class="destination-name">계룡:</span>
-                                <span class="destination-value" id="dest-gyeryong">1,230</span>
+                                <span class="destination-value" id="dest-gyeryong">0</span>
                             </div>
                             <div class="destination-item">
                                 <span class="destination-name">음성:</span>
-                                <span class="destination-value" id="dest-eumseong">1</span>
+                                <span class="destination-value" id="dest-eumseong">0</span>
                             </div>
-                            
-                            <!-- 우측 6개 -->
+                            <!-- 4행 -->
                             <div class="destination-item">
                                 <span class="destination-name">용인2:</span>
-                                <span class="destination-value" id="dest-yongin2">743</span>
+                                <span class="destination-value" id="dest-yongin2">0</span>
                             </div>
                             <div class="destination-item">
                                 <span class="destination-name">용인3:</span>
-                                <span class="destination-value" id="dest-yongin3">13</span>
+                                <span class="destination-value" id="dest-yongin3">0</span>
                             </div>
+                            <!-- 5행 -->
                             <div class="destination-item">
                                 <span class="destination-name">안산:</span>
-                                <span class="destination-value" id="dest-ansan">396</span>
+                                <span class="destination-value" id="dest-ansan">0</span>
                             </div>
                             <div class="destination-item">
                                 <span class="destination-name">양산:</span>
-                                <span class="destination-value" id="dest-yangsan">37</span>
+                                <span class="destination-value" id="dest-yangsan">0</span>
                             </div>
+                            <!-- 6행 -->
                             <div class="destination-item">
                                 <span class="destination-name">양산2:</span>
-                                <span class="destination-value" id="dest-yangsan2">114</span>
+                                <span class="destination-value" id="dest-yangsan2">0</span>
                             </div>
+                            <div class="destination-item">
+                                <span class="destination-name">남오산:</span>
+                                <span class="destination-value" id="dest-namosan">0</span>
+                            </div>
+                            <!-- 7행 -->
                             <div class="destination-item small">
                                 <span class="destination-name">한익스,키즈:</span>
-                                <span class="destination-value" id="dest-hanex">3, 4</span>
+                                <span class="destination-value" id="dest-hanex">0</span>
+                            </div>
+                            <div class="destination-item">
+                                <span class="destination-name">기타:</span>
+                                <span class="destination-value" id="dest-etc">0</span>
                             </div>
                         </div>
                     </div>
@@ -2692,19 +2706,24 @@
             }
             
             // 배송처별 수량 (printedQty + unprintedQty 형태)
-            const destKeys = ['jeju', 'jecheon', 'honam', 'gumi', 'gyeryong', 'eumseong', 
-                              'yongin2', 'yongin3', 'ansan', 'yangsan', 'yangsan2'];
-            
+            // ★2026-08-02 265차: 제천 제거 / 원주·남오산·기타 추가
+            //   서버가 키를 안 주거나 칸이 없어도 죽지 않게 방어함 (예전엔 여기서 에러 나면
+            //   카드4·5·6까지 통째로 갱신이 멈췄음)
+            const destKeys = ['jeju', 'wonju', 'honam', 'gumi', 'gyeryong', 'eumseong',
+                              'yongin2', 'yongin3', 'ansan', 'yangsan', 'yangsan2',
+                              'namosan', 'etc'];
+
             let totalUnprintedCount = 0;  // 전체 미발행 건수 합계
-            
+
             destKeys.forEach(key => {
                 const el = document.getElementById('dest-' + key);
-                const dest = data.destinations[key];
+                if (!el) return;                              // 칸이 없으면 건너뜀
+                const dest = (data.destinations || {})[key] || {};   // 키가 없어도 0 처리
                 const printed = dest.printedQty || 0;
                 const unprinted = dest.unprintedQty || 0;
-                
+
                 totalUnprintedCount += (dest.unprintedCount || 0);
-                
+
                 if (unprinted > 0) {
                     el.innerHTML = formatNumber(printed) + ' + <span class="unprinted-qty">' + formatNumber(unprinted) + '</span>';
                 } else {
@@ -2712,19 +2731,21 @@
                 }
             });
             
-            // 한익스/키즈 (합산 표시)
+            // 한익스/키즈 (합산 표시) — ★265차: 키가 없어도 죽지 않게 방어
             const hanexEl = document.getElementById('dest-hanex');
-            const hanex = data.destinations.hanex;
-            const kids = data.destinations.kids;
-            const hanexPrinted = (hanex.printedQty || 0) + (kids.printedQty || 0);
-            const hanexUnprinted = (hanex.unprintedQty || 0) + (kids.unprintedQty || 0);
-            
-            totalUnprintedCount += (hanex.unprintedCount || 0) + (kids.unprintedCount || 0);
-            
-            if (hanexUnprinted > 0) {
-                hanexEl.innerHTML = formatNumber(hanexPrinted) + ' + <span class="unprinted-qty">' + formatNumber(hanexUnprinted) + '</span>';
-            } else {
-                hanexEl.textContent = formatNumber(hanexPrinted + hanexUnprinted);
+            if (hanexEl) {
+                const hanex = (data.destinations || {}).hanex || {};
+                const kids = (data.destinations || {}).kids || {};
+                const hanexPrinted = (hanex.printedQty || 0) + (kids.printedQty || 0);
+                const hanexUnprinted = (hanex.unprintedQty || 0) + (kids.unprintedQty || 0);
+
+                totalUnprintedCount += (hanex.unprintedCount || 0) + (kids.unprintedCount || 0);
+
+                if (hanexUnprinted > 0) {
+                    hanexEl.innerHTML = formatNumber(hanexPrinted) + ' + <span class="unprinted-qty">' + formatNumber(hanexUnprinted) + '</span>';
+                } else {
+                    hanexEl.textContent = formatNumber(hanexPrinted + hanexUnprinted);
+                }
             }
             
             // 카드3 테두리 (미발행 있으면 빨간 테두리)
@@ -3135,15 +3156,23 @@
                 lastData = data;
                 
                 // 카드 업데이트
-                updateCard1(data.card1);
-                updateCard2(data.card2);
-                updateCard3(data.card3);
-                updateCard4(data.card4);
-                updateCard5(data.card5);
-                updateCard6(data.card6);
-                
+                // ★2026-08-02 265차: 카드별로 따로 감싼다.
+                //   예전엔 카드 하나가 에러 나면 그 아래 카드와 신호등까지 통째로 갱신이 멈췄다.
+                //   (updateCard3에서 실패 → card4·5·6·신호등이 옛 숫자로 굳음)
+                const safeUpdate = (name, fn, arg) => {
+                    try { fn(arg); }
+                    catch (e) { console.error(`[${timeStr}] ⚠ ${name} 갱신 실패 (나머지는 계속):`, e); }
+                };
+
+                safeUpdate('card1', updateCard1, data.card1);
+                safeUpdate('card2', updateCard2, data.card2);
+                safeUpdate('card3', updateCard3, data.card3);
+                safeUpdate('card4', updateCard4, data.card4);
+                safeUpdate('card5', updateCard5, data.card5);
+                safeUpdate('card6', updateCard6, data.card6);
+
                 // 시스템 상태 신호등 업데이트
-                updateSystemStatus(data.systemStatus);
+                safeUpdate('신호등', updateSystemStatus, data.systemStatus);
                 
                 // 마지막 갱신 시각 저장
                 lastRefreshTime = new Date();

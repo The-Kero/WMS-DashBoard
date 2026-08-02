@@ -152,7 +152,45 @@ def get_baseline_unpicked_by_dest(base_path, target_hour, target_destinations, c
 # 미할당 입고현황 스냅샷 헬퍼 함수들
 # ==========================================
 
+# ==========================================
+# ★ 지방 배송처 정의 (2026-08-02 265차 신설)
+# ==========================================
+# 이 표 한 곳만 고치면 집계 그릇 · 긴급알림 대상 · 알림 문구 이름표가 전부 따라온다.
+# 예전에는 같은 목록이 5군데(분류/집계/알림1/알림2/이름표)에 흩어져 있어서
+# 남오산·원주가 조용히 빠졌다. (264차에 남오산 누락 발견 → 265차에 원주까지 확인)
+#
+#   키          화면이름   배차     배송처코드   비고
+LOCAL_DESTINATIONS = [
+    ('jeju',     '제주',    '21시', 'WH16'),
+    ('wonju',    '원주',    '21시', 'WH21'),   # ★265차 신규 (2026-07-31 첫 등장)
+    ('honam',    '호남',    '21시', 'WH07'),
+    ('gumi',     '구미',    '21시', 'WH04'),
+    ('gyeryong', '계룡',    '21시', 'WH10'),
+    ('eumseong', '음성',    '16시', 'WH03'),
+    ('yongin2',  '용인2',   '21시', 'WH02'),
+    ('yongin3',  '용인3',   '21시', None),     # WH02 안에서 배송군 4xxx로 갈림
+    ('ansan',    '안산',    '21시', 'WH09'),
+    ('yangsan',  '양산',    '16시', 'WH05'),
+    ('yangsan2', '양산2',   '16시', 'WH14'),
+    ('namosan',  '남오산',  '21시', 'WH20'),   # ★265차 신규 (계속 있었으나 미등록)
+    ('hanex',    '한익스',  '21시', 'WH17'),   # 배송처명 '식재'
+    ('kids',     '키즈',    '21시', None),     # WH02 안에서 배송군 3xxx로 갈림
+    ('etc',      '기타',    '21시', None),     # ★265차 신규 안전망 — 모르는 코드가 여기로
+]
+# ⚠ 제천(WH12)은 2026-07-31부터 물량 0 → 케로님 "제천이 없어지고 원주가 생겼댔어"
+#    코드 매핑에서 뺐으므로, 혹시 다시 나오면 '기타'로 잡혀 알림이 울린다(=우리가 알게 된다).
+#    단 화면 호환을 위해 응답 키(jecheon)는 값 0으로 계속 내려보낸다. → LEGACY_DEST_KEYS
+
+DEST_BY_CODE = {code: key for key, _n, _s, code in LOCAL_DESTINATIONS if code}
+DEST_NAME_MAP = {key: name for key, name, _s, _c in LOCAL_DESTINATIONS}
+DEST_KEYS = [key for key, _n, _s, _c in LOCAL_DESTINATIONS]
+SLOT1_DESTS = [key for key, _n, slot, _c in LOCAL_DESTINATIONS if slot == '16시']  # 14:20~16:00
+SLOT2_DESTS = [key for key, _n, slot, _c in LOCAL_DESTINATIONS if slot == '21시']  # 19:20~21:00
+LEGACY_DEST_KEYS = ['jecheon']  # 화면이 아직 참조할 수 있는 옛 키 (값 0으로 유지)
+
+
 # 지방센터 9개 목록 (그대로 표시, 그 외는 "공급사"로 통일)
+# ※ 이건 '입고 공급사명' 정규화용이라 위 배송처 목록과 별개 (실측: 남오산·원주는 공급사로 안 나옴)
 LOCAL_CENTERS = {'안산', '음성', '제주', '제천', '호남', '구미', '계룡', '용인', '양산'}
 
 def normalize_supplier(supplier_raw):
@@ -773,61 +811,46 @@ def get_dashboard():
         # ==========================================
         
         def classify_destination(row):
-            """배송처 분류 함수 (v9 가이드 기준)"""
-            출고유형 = row['출고유형']
-            배송군 = row['배송군']
-            배송처명 = row['배송처명']
-            
-            if pd.isna(배송군):
-                배송군_str = ''
-            else:
-                배송군_str = str(int(배송군))
-            
-            if pd.isna(배송처명):
-                배송처명 = ''
-            
-            배송군_4자리 = len(배송군_str) == 4
-            
-            # 출고유형 05
-            if 출고유형 == 5:
-                if 배송처명 == '식재':
-                    return 'hanex'
-                elif 배송군_4자리 and 배송군_str[0] == '3':
-                    return 'kids'
-                elif 배송군_4자리 and 배송군_str[0] == '4':
-                    return 'yongin3'
-                elif 배송군_4자리 and 배송군_str[0] == '2':
-                    return 'yongin2'
-            
-            # 출고유형 08
-            elif 출고유형 == 8:
-                if 배송군_4자리 and 배송군_str[0] == '4':
-                    return 'yongin3'
-                elif 배송군_4자리 and 배송군_str[0] == '2':
-                    return 'yongin2'
-            
-            # 출고유형 04, 16, 17, 52, 53
-            elif 출고유형 in [4, 16, 17, 52, 53]:
-                if '용인' in 배송처명:
-                    if 배송군_4자리 and 배송군_str[0] == '4':
+            """배송처 분류 — 배송처 코드(WHxx) 기준
+
+            ★ 2026-08-02 265차 변경 (케로님 승인)
+              [바뀐 이유]
+                ① 원주(WH21)가 7/31 신규 등장 → 옛 규칙에 없어서 통째로 소멸(하루 105줄)
+                ② 남오산(WH20)도 미등록 상태로 계속 누락
+                ③ 출고유형 08번이 배송처명을 안 봐서 40일 275건 소멸 +
+                   계룡·구미 10건이 용인2로 잘못 합산
+                   (케로님: "배송처에 계룡 구미라고 써져 있으면 이건 계룡 구미야")
+              [근거]
+                60일 15,338건 전수 검사에서 배송처코드 ↔ 배송처명이 1:1 (예외 0건, 결측 0건)
+                WH02(용인2)만 배송군으로 세분되고, 그 배송군은 100% 4자리
+              [검증]
+                130일 34,110건 전수 → 'etc' 발생 0건
+                40일 before/after → 줄어드는 건 용인2 −10(위 ③의 제자리 복귀)뿐
+              [옛 방식과의 차이]
+                v9 가이드는 '출고유형+배송군' 우선, 배송처명은 마지막 fallback 이었음.
+                그 fallback이 구현에서 'etc'(버림)로 바뀌어 있어 새 배송처가 조용히 사라졌음.
+                → 코드 기준으로 바꾸고, 모르는 코드는 '기타'로 모아 로그에 남긴다.
+            """
+            code = row.get('배송처')
+
+            if pd.isna(code) or not str(code).strip():
+                return 'etc'
+
+            code = str(code).strip()
+
+            # 용인2 센터(WH02)만 배송군 첫 자리로 세분 (용인2 / 용인3 / 키즈)
+            if code == 'WH02':
+                배송군 = row['배송군']
+                배송군_str = '' if pd.isna(배송군) else str(int(배송군))
+                if len(배송군_str) == 4:
+                    if 배송군_str[0] == '3':
+                        return 'kids'
+                    if 배송군_str[0] == '4':
                         return 'yongin3'
-                    else:
-                        return 'yongin2'
-                elif 배송처명 == '양산':
-                    return 'yangsan'
-                elif 배송처명 == '양산2':
-                    return 'yangsan2'
-                else:
-                    # 배송처명 → 영문키 매핑
-                    dest_mapping = {
-                        '제주': 'jeju', '제천': 'jecheon', '호남': 'honam',
-                        '구미': 'gumi', '계룡': 'gyeryong', '음성': 'eumseong',
-                        '안산': 'ansan'
-                    }
-                    return dest_mapping.get(배송처명, 'etc')
-            
-            return 'etc'
-        
+                return 'yongin2'
+
+            return DEST_BY_CODE.get(code, 'etc')
+
         # 지방 출고 타입 필터링
         card3_types = [4, 5, 8, 16, 17, 52, 53]
         card3_data = outbound_data[outbound_data['출고유형'].isin(card3_types)].copy()
@@ -858,20 +881,10 @@ def get_dashboard():
                 continue
         
         # 배송처별 집계 (destinations 객체) - printedQty, unprintedQty, unprintedCount 포함
+        # ★265차: 위 LOCAL_DESTINATIONS 표에서 자동 생성 (+ 옛 키는 값 0으로 유지 = 화면 방어)
         card3_destinations = {
-            'jeju': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0},
-            'jecheon': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0},
-            'honam': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0},
-            'gumi': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0},
-            'gyeryong': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0},
-            'eumseong': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0},
-            'yongin2': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0},
-            'yongin3': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0},
-            'ansan': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0},
-            'yangsan': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0},
-            'yangsan2': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0},
-            'hanex': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0},
-            'kids': {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0}
+            key: {'printedQty': 0, 'unprintedQty': 0, 'unprintedCount': 0}
+            for key in DEST_KEYS + LEGACY_DEST_KEYS
         }
         
         if len(card3_data) > 0:
@@ -893,6 +906,18 @@ def get_dashboard():
                     card3_destinations[dest_key]['unprintedQty'] = int(unprinted_qty_by_dest.get(dest_key, 0))
                     card3_destinations[dest_key]['unprintedCount'] = int(unprinted_count_by_dest.get(dest_key, 0))
         
+        # ★265차 신설: '기타'로 빠진 게 있으면 어떤 배송처인지 로그에 남긴다.
+        #   예전엔 이 기록이 없어서 원주(하루 105줄)가 넉 달간 조용히 사라져도 아무도 몰랐다.
+        #   여기에 뭔가 찍히면 = 우리가 모르는 배송처 코드가 생겼다는 뜻 → 위 표에 추가할 것
+        if len(card3_data) > 0 and 'dest_key' in card3_data.columns:
+            etc_rows = card3_data[card3_data['dest_key'] == 'etc']
+            if len(etc_rows) > 0:
+                detail = etc_rows.groupby(['배송처', '배송처명']).size().to_dict()
+                logger.warning(
+                    f"★card3 '기타' 발생 {len(etc_rows)}건 — 모르는 배송처 코드입니다. "
+                    f"내역: {detail}  → dashboard.py의 LOCAL_DESTINATIONS 표에 추가하세요"
+                )
+
         logger.info(f"card3 - 금액: {card3_amount:,}원, 미발행피킹: {card3_unprinted_picking}건")
         
         # ==========================================
@@ -911,10 +936,13 @@ def get_dashboard():
         test_alert = request.args.get('test_alert', 'false').lower() == 'true'
         test_unallocated_count = int(request.args.get('test_unallocated', '0'))  # 미할당 더미 데이터 개수
         
-        # 시간대별 대상 배송처 정의
-        slot1_dests = ['yangsan', 'yangsan2', 'eumseong']  # 13~16시: 3곳
-        slot2_dests = ['jeju', 'jecheon', 'honam', 'gumi', 'gyeryong', 'eumseong', 
-                       'yongin2', 'yongin3', 'ansan', 'yangsan', 'yangsan2', 'hanex', 'kids']  # 18:40~20시: 전체
+        # 시간대별 대상 배송처 정의 (★265차: LOCAL_DESTINATIONS 표에서 자동 생성)
+        #   14:20~16:00 → 배차 16시인 곳 (양산·양산2·음성)
+        #   19:20~21:00 → 배차 21시인 곳 (나머지 전부 + 원주·남오산·기타)
+        # ※ 원주는 케로님 현장 상의로 21시 확정 ("4시 넘어서도 발주가 계속 들어온대")
+        #    나중에 16시로 바뀌면 위 표에서 '21시'→'16시' 한 곳만 고치면 됨
+        slot1_dests = SLOT1_DESTS
+        slot2_dests = SLOT2_DESTS
         
         target_dests = None
         target_hour = None
@@ -940,14 +968,11 @@ def get_dashboard():
             card3_baseline_count = baseline['total']
             
             # 대상 배송처 미발행 건수 합계 (현재값) - 팝업 트리거용
-            dest_name_map = {
-                'jeju': '제주', 'jecheon': '제천', 'honam': '호남', 'gumi': '구미',
-                'gyeryong': '계룡', 'eumseong': '음성', 'yongin2': '용인2', 'yongin3': '용인3',
-                'ansan': '안산', 'yangsan': '양산', 'yangsan2': '양산2', 'hanex': '한익스', 'kids': '키즈'
-            }
-            
+            # ★265차: LOCAL_DESTINATIONS 표에서 자동 생성 ('기타' 포함)
+            dest_name_map = DEST_NAME_MAP
+
             for dest in target_dests:
-                current_count = card3_destinations[dest]['unprintedCount']
+                current_count = card3_destinations.get(dest, {}).get('unprintedCount', 0)
                 if current_count > 0:
                     card3_urgent_destinations.append(dest_name_map.get(dest, dest))
                 card3_urgent_count += current_count
