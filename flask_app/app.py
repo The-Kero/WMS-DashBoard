@@ -153,5 +153,5 @@ if __name__ == '__main__':
     app.run(
         host='0.0.0.0',  # 모든 IP에서 접근 가능
         port=5000,
-        debug=True
+        debug=False  # 2026-06-21: 디스크풀 사건 — 리로더 다중프로세스+로그폭증 차단
     )

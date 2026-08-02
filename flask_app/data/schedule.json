@@ -25,18 +25,8 @@
     "type": "leave"
   },
   {
-    "date": "2026-08-24",
-    "content": "김석원 주임",
-    "type": "birthday"
-  },
-  {
     "date": "2025-12-13",
     "content": "구성경 대리",
-    "type": "birthday"
-  },
-  {
-    "date": "2026-11-27",
-    "content": "강보경",
     "type": "birthday"
   },
   {
@@ -60,18 +50,8 @@
     "type": "birthday"
   },
   {
-    "date": "2026-12-01",
-    "content": "박재우 주임",
-    "type": "birthday"
-  },
-  {
     "date": "2026-12-13",
     "content": "구성경 대리",
-    "type": "birthday"
-  },
-  {
-    "date": "2026-12-09",
-    "content": "이은규",
     "type": "birthday"
   },
   {
@@ -188,5 +168,135 @@
     "date": "2026-04-17",
     "content": "이은규",
     "type": "leave"
+  },
+  {
+    "date": "2026-04-15",
+    "content": "박지호 주임",
+    "type": "leave"
+  },
+  {
+    "date": "2026-05-05",
+    "content": "박재우 주임",
+    "type": "leave"
+  },
+  {
+    "date": "2026-05-06",
+    "content": "박재우 주임",
+    "type": "leave"
+  },
+  {
+    "date": "2026-05-07",
+    "content": "박재우 주임",
+    "type": "leave"
+  },
+  {
+    "date": "2026-05-08",
+    "content": "박재우 주임",
+    "type": "leave"
+  },
+  {
+    "date": "2026-05-10",
+    "content": "구성경 대리",
+    "type": "leave"
+  },
+  {
+    "date": "2026-05-13",
+    "content": "김석원 주임",
+    "type": "leave"
+  },
+  {
+    "date": "2026-05-14",
+    "content": "김석원 주임",
+    "type": "leave"
+  },
+  {
+    "date": "2026-05-15",
+    "content": "김석원 주임",
+    "type": "leave"
+  },
+  {
+    "date": "2026-05-11",
+    "content": "김백종",
+    "type": "leave"
+  },
+  {
+    "date": "2026-05-12",
+    "content": "김백종",
+    "type": "leave"
+  },
+  {
+    "date": "2026-05-17",
+    "content": "박지호 주임",
+    "type": "leave"
+  },
+  {
+    "date": "2026-06-30",
+    "content": "회계감사",
+    "type": "event"
+  },
+  {
+    "date": "2026-06-01",
+    "content": "강보경",
+    "type": "leave"
+  },
+  {
+    "date": "2026-06-02",
+    "content": "강보경",
+    "type": "leave"
+  },
+  {
+    "date": "2026-06-02",
+    "content": "김백종",
+    "type": "leave"
+  },
+  {
+    "date": "2026-06-03",
+    "content": "강보경",
+    "type": "leave"
+  },
+  {
+    "date": "2026-06-11",
+    "content": "안전점검",
+    "type": "event"
+  },
+  {
+    "date": "2026-06-12",
+    "content": "소방훈련",
+    "type": "event"
+  },
+  {
+    "date": "2026-06-16",
+    "content": "미군납품인증(판다)",
+    "type": "event"
+  },
+  {
+    "date": "2026-06-09",
+    "content": "예비소방훈련",
+    "type": "event"
+  },
+  {
+    "date": "2026-07-29",
+    "content": "김석원 마지막근무",
+    "type": "event"
+  },
+  {
+    "date": "2026-07-31",
+    "content": "한화회계감사(오전10시)",
+    "type": "event"
+  },
+  {
+    "date": "2026-07-26",
+    "content": "박지호",
+    "type": "leave"
+  },
+  {
+    "date": "2026-07-19",
+    "content": "구성경",
+    "type": "leave"
+  },
+  {
+    "date": "2026-07-30",
+    "content": "월말재고조사",
+    "type": "event"
   }
 ]
