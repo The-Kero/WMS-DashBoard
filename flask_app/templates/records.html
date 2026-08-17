@@ -134,6 +134,8 @@
             <button class="modal-close" id="print-modal-close">×</button>
         </div>
         <div class="print-options" id="print-options"></div>
+        <!-- ★ 275차: 재고조사 일괄체크 (오늘 날짜에만 나타남) -->
+        <div class="bulk-area" id="bulk-area" style="display:none"></div>
     </div>
 </div>
 
@@ -315,7 +317,151 @@ function openPrintModal(dateStr) {
         printOptionsContainer.appendChild(btn);
     });
 
+    // ★ 275차: 일괄체크 영역 (오늘 날짜에만)
+    renderBulkArea(dateStr);
+
     printModal.classList.add('visible');
+}
+
+// ============================================================
+// ★ 275차: 재고조사 일괄체크 ("전부 동그라미") — 파트장님 요청
+// ------------------------------------------------------------
+// 배경 = 직원 13명→5명이라 매일 전수조사가 안 되는데 아워홈은 재고장을 매일 받는다.
+//        오늘 아직 안 본 줄을 "맞음"으로 채워 재고장을 완성한다.
+// 🔴 오늘 날짜에만 뜬다. 마감된 날은 막는다. 차이 입력된 줄은 절대 안 건드린다.
+// 설계 = diary/274차_재고조사_일괄체크_설계_20260816.md (전수검증 빈틈 28개 반영)
+// ============================================================
+const bulkArea = $('#bulk-area');
+let bulkBusy = false;   // 중복 클릭 방지
+
+async function renderBulkArea(dateStr) {
+    bulkArea.style.display = 'none';
+    bulkArea.innerHTML = '';
+    try {
+        const res = await fetch(`/api/records/bulk-check/status?date=${dateStr}`
+                                + `&part=${encodeURIComponent(partSelect.value)}`);
+        const st = await res.json();
+        if (!st.success) return;   // 조회 자체가 실패했을 때만 조용히 넘어감
+
+        // ★ 오늘이 아니어도 "회색으로 보이되 못 누르게" (케로님 8/17)
+        //   완전히 숨기면 "왜 없지?" 를 사람이 추측하게 된다 (OPS "생각하게 하지 마")
+        //   안전은 화면이 아니라 서버가 지킨다 — 오늘이 아니면 400으로 거부
+        bulkArea.style.display = '';
+        const canRun = st.can_run;
+        const label = canRun
+            ? `아직 안 본 <b>${st.target_count}건</b>을 전부 맞음으로`
+            : escapeHtml(st.reason || '지금은 쓸 수 없어요');
+
+        bulkArea.innerHTML = `
+            <div class="bulk-divider"><span>재고조사</span></div>
+            <button class="print-option bulk-btn" id="bulk-run-btn" ${canRun ? '' : 'disabled'}>
+                <span class="option-icon">⭕</span>
+                <span class="option-text">
+                    <b>안 본 것 전부 채우기</b>
+                    <small>${label}</small>
+                </span>
+            </button>
+            ${st.can_undo ? `
+            <button class="print-option bulk-undo" id="bulk-undo-btn">
+                <span class="option-icon">↩️</span>
+                <span class="option-text">
+                    <b>일괄분 되돌리기</b>
+                    <small>오늘 일괄로 채운 <b>${st.bulk_count}건</b>만 지워요</small>
+                </span>
+            </button>` : ''}
+            <div class="bulk-confirm" id="bulk-confirm" style="display:none"></div>
+        `;
+
+        if (canRun) $('#bulk-run-btn').addEventListener('click', () => openBulkConfirm(dateStr, 'run', st));
+        if (st.can_undo) $('#bulk-undo-btn').addEventListener('click', () => openBulkConfirm(dateStr, 'undo', st));
+    } catch (e) {
+        console.error('[bulk] status 실패', e);   // 조용히 실패 — 인쇄 기능은 그대로 써야 하니까
+    }
+}
+
+// 확인창 + 비밀번호 (모달 안에서 그대로 펼쳐짐 — 창을 또 띄우지 않음)
+function openBulkConfirm(dateStr, mode, st) {
+    const box = $('#bulk-confirm');
+    const isRun = (mode === 'run');
+    const n = isRun ? st.target_count : st.bulk_count;
+    box.style.display = '';
+    box.innerHTML = `
+        <div class="bulk-warn">
+            ${isRun
+                ? `오늘 안 본 <b>${n}건</b>을 전부 <b>맞음</b>으로 처리합니다.<br>
+                   <small>차이가 입력된 줄과 이미 확인한 줄은 건드리지 않아요.</small>`
+                : `오늘 일괄로 채운 <b>${n}건</b>을 되돌립니다.<br>
+                   <small>사람이 직접 확인한 줄은 그대로 남아요.</small>`}
+        </div>
+        <div class="bulk-pw-row">
+            <input type="password" id="bulk-pw" inputmode="numeric" autocomplete="off"
+                   placeholder="비밀번호" maxlength="20">
+            <button class="bulk-cancel" id="bulk-cancel">취소</button>
+            <button class="bulk-ok ${isRun ? '' : 'undo'}" id="bulk-ok">${isRun ? '채우기' : '되돌리기'}</button>
+        </div>
+        <div class="bulk-msg" id="bulk-msg"></div>
+    `;
+    const pw = $('#bulk-pw');
+    pw.focus();
+    $('#bulk-cancel').onclick = () => { box.style.display = 'none'; box.innerHTML = ''; };
+    $('#bulk-ok').onclick = () => runBulk(dateStr, mode);
+    pw.addEventListener('keydown', e => { if (e.key === 'Enter') runBulk(dateStr, mode); });
+}
+
+async function runBulk(dateStr, mode) {
+    if (bulkBusy) return;                     // 중복 클릭 방지
+    const pw = $('#bulk-pw').value.trim();
+    const msg = $('#bulk-msg');
+    if (!pw) { msg.className = 'bulk-msg err'; msg.textContent = '비밀번호를 넣어주세요'; return; }
+
+    bulkBusy = true;
+    $('#bulk-ok').disabled = true;
+    msg.className = 'bulk-msg';
+    msg.textContent = '⏳ 처리 중...';
+
+    const url = (mode === 'run') ? '/api/records/bulk-check' : '/api/records/bulk-check/undo';
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                date: dateStr,
+                part: partSelect.value,
+                admin_password: pw,
+            })
+        });
+        const data = await res.json();
+        if (!data.success) {
+            msg.className = 'bulk-msg err';
+            msg.textContent = '❌ ' + (data.error || '실패했어요');
+            return;
+        }
+        msg.className = 'bulk-msg ok';
+        if (mode === 'run') {
+            const who = Object.entries(data.workers || {})
+                              .map(([k, v]) => `${k} ${v}`).join(' · ');
+            msg.innerHTML = `✅ <b>${data.inserted}건</b> 채웠어요<br>`
+                          + `<small>${escapeHtml(who)}</small><br>`
+                          + `<small>이제 위에서 <b>전체 재고장</b>을 뽑으시면 돼요.</small>`;
+        } else {
+            msg.innerHTML = `✅ <b>${data.deleted}건</b> 되돌렸어요`;
+        }
+        // 상태 새로고침 (버튼/건수 갱신) — 확인창은 결과가 보이게 잠시 남겨둔다
+        setTimeout(() => {
+            const keep = msg.innerHTML;
+            renderBulkArea(dateStr).then(() => {
+                const box = $('#bulk-confirm');
+                if (box) { box.style.display = ''; box.innerHTML = `<div class="bulk-msg ok">${keep}</div>`; }
+            });
+        }, 900);
+    } catch (e) {
+        msg.className = 'bulk-msg err';
+        msg.textContent = '❌ 통신 실패: ' + e.message;
+    } finally {
+        bulkBusy = false;
+        const ok = $('#bulk-ok');
+        if (ok) ok.disabled = false;
+    }
 }
 
 // ───── 매트릭스 본문 렌더링 ─────

@@ -822,3 +822,121 @@ body {
     .search-inline { order: 3; flex-basis: 100%; max-width: none; }
     .ph-modal-content { width: 96vw; max-height: 92vh; }
 }
+
+/* ============================================================
+   ★ 275차: 재고조사 일괄체크 ("전부 동그라미")
+   6원칙: ①OPS톤 ②빅터치 64px+(.print-option 상속) ③인쇄 3종과 색으로 구분
+          ④확장성(.print-option 그대로 재사용) ⑤안정성(진행 중 잠금) ⑥무결성
+   🔴 인쇄 3종(파랑/빨강/주황)과 헷갈리지 않게 ★초록 계열
+   ============================================================ */
+.bulk-area {
+    padding: 0 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 인쇄 3종과 시각적으로 갈라주는 줄 */
+.bulk-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 2px;
+    color: #90A4AE;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+.bulk-divider::before,
+.bulk-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.09);
+}
+
+/* 채우기 — 초록 */
+.bulk-btn {
+    --opt-color: #2E7D32;
+    --opt-bg-from: #E8F5E9;
+    --opt-bg-to: #C8E6C9;
+}
+/* 되돌리기 — 회색(눈에 덜 띄게. 되돌리기는 자주 쓸 일이 아님) */
+.bulk-undo {
+    --opt-color: #546E7A;
+    --opt-bg-from: #ECEFF1;
+    --opt-bg-to: #CFD8DC;
+}
+.bulk-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(0.6);
+}
+.bulk-btn:disabled:hover { transform: none; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+
+/* 확인창 — 모달 안에서 그대로 펼쳐진다 (창을 또 띄우지 않음) */
+.bulk-confirm {
+    border: 2px solid #A5D6A7;
+    background: #F1F8E9;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.bulk-warn {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #263238;
+}
+.bulk-warn b { color: #2E7D32; }
+.bulk-warn small { color: #607D8B; font-size: 12px; }
+
+.bulk-pw-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.bulk-pw-row input {
+    flex: 1;
+    min-width: 0;
+    height: 42px;
+    padding: 0 12px;
+    font-size: 16px;
+    font-family: inherit;
+    letter-spacing: 4px;
+    border: 2px solid #B0BEC5;
+    border-radius: 8px;
+    background: white;
+}
+.bulk-pw-row input:focus {
+    outline: none;
+    border-color: #2E7D32;
+}
+.bulk-pw-row button {
+    height: 42px;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: filter 0.15s;
+}
+.bulk-pw-row button:hover { filter: brightness(0.94); }
+.bulk-pw-row button:disabled { opacity: 0.55; cursor: wait; }
+.bulk-cancel { background: #ECEFF1; color: #455A64; }
+.bulk-ok { background: #2E7D32; color: white; }
+.bulk-ok.undo { background: #546E7A; }
+
+.bulk-msg {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #546E7A;
+    min-height: 18px;
+}
+.bulk-msg.ok  { color: #2E7D32; }
+.bulk-msg.err { color: #C62828; font-weight: 600; }
+.bulk-msg small { color: #78909C; font-size: 12px; }
